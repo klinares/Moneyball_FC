@@ -29,5 +29,4 @@ This repository houses the code and data analysis for **Moneyball_FC**, a resear
 3.  **Run the Analysis:** Execute the R scripts in numerical order, starting with data preparation and followed by model fitting.
 
 ---
-**Author:** Kevin [Your Last Name]
-**License:** MIT
+
