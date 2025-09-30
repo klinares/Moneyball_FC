@@ -1,6 +1,5 @@
 # Moneyball_FC ⚽📊💰
-
-[Image of a soccer ball made of money](https://github.com/klinares/Moneyball_FC/tree/main/images]
+<img src="https://github.com/klinares/Moneyball_FC/blob/main/images/moneyball.png" width="400" height = "400">
 
 ## Unpacking Player Market Value: A Multilevel Approach
 
