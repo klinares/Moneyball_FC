@@ -160,6 +160,26 @@ player_df |>
 
 \
 
+We plot the proportion of the players that have have been in C number of clubs, with almost 80% being only in 1 club during their career.
+
+```{r}
+#| echo: FALSE
+#| message: FALSE
+#| 
+player_df |> 
+  group_by(player_id) |> 
+  distinct(club_id) |> 
+  count() |> 
+  ungroup() |> 
+  count(n) |> 
+  mutate(prop = nn/sum(nn)) |> 
+  ggplot(aes(x=n, y=prop)) +
+  geom_col(alpha=.5, fill="dodgerblue") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="Clubs a player has been a member of", y="Percent of Players ") +
+  theme_hc()
+```
+
 Next, we explore the average market value over time and can see a lot of variability, with some players valued very high.
 
 ```{r}
@@ -337,3 +357,7 @@ This is the proposed modeling framework so that we may model individual player g
 -   **Level 2: The Individual.** This is the **player**. Predictors at this level are time-invariant (e.g., a player's primary position or country of birth does not change).
 
 -   **Level 3: The Contextual Group.** This is the **club**. Players are nested within clubs, and club-level characteristics (like the proportion of foreign players or the country the club plays in) can influence player value.
+
+\
+
+The final dataframe is named player_df.parquet.
