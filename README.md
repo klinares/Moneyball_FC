@@ -29,3 +29,5 @@ This repository houses the code and data analysis for **Moneyball_FC**, a resear
 
 ---
 
+This repository is a work in progress, and the following code attempts to prepare a [dataset for modeling](https://klinares.github.io/Moneyball_FC/code/transfermarkt_data.html).
+
