@@ -1,0 +1,329 @@
+---
+title: "Combine Transfermarkt data"
+author: "Moneyballers"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  error: false
+  tidy: true
+format: html
+theme: lumen
+toc: true
+toc-depth: 2
+---
+
+### Code for joining club and player data together.
+
+```{r}
+#| echo: FALSE
+
+pacman::p_load(arrow, gt, ggthemes, zoo, tidyverse)
+
+# path to repo
+repo_path <- "D:/repos/Moneyball_FC/"
+
+options(scipen=999)
+```
+
+This project started with the intention of using the [worldfootballR](https://jaseziv.github.io/worldfootballR/articles/load-scraped-data.html) package to scrap data from [Transfermarkt](https://www.transfermarkt.us/marktwertetop/wertvollstespieler). However, there are several limitations to this package such as time out api requests and failure to capture dynamic java tables on a web page. Luckily, kaggle already contains the data we need for this project under "[**Football Data from Transfermarkt**](https://www.kaggle.com/datasets/davidcariboo/player-scores?resource=download)**.**" The only thing needed is to merge tables and generate club level predictors to build a multilevel model to explain variation in team and player market value growth curves.
+
+-   This code can be found at <https://github.com/klinares/Moneyball_FC>.
+
+<!-- -->
+
+-   First, we compiled a table from [UEFA](https://www.uefa.com/nationalassociations/uefarankings/tenyears/?year=2025) containing rankings of European teams based on their 10 year coefficient ranking. We select the first 21 teams to only focus on the top teams in Western Europe.
+
+    -   The UEFA club coefficient is a ranking system that measures the performance of clubs in UEFA competitions over the previous five seasons. Clubs earn points for wins, draws, and reaching certain stages of tournaments, and the total is used to determine seeding for future competition draws.
+
+    -   Here we print the top 21 teams by rank. Note, this table (team_urls_df.parquet) also contains transfermarkt team URLS to be used with the worldfootballR package to enrich this data if needed.
+
+```{r}
+#| echo: FALSE
+
+# read in club rankings, use to filer teams
+team_urls_df <- read_parquet(str_c(
+  repo_path, "inputs/uefa_standing.parquet") ) |> 
+  # extract club id from url
+  mutate(club_id = str_extract(team_url, "(?<=verein/)\\d+(?=/saison_id)"),
+         club_id = as.double(club_id))
+
+team_urls_df |>
+  select(-team_url) |> 
+  arrange(Pos) |> 
+  gt()
+```
+
+\
+
+We now read in data from kaggle and begin to structure in a way to be used in our multilevel models.
+
+-   The player_valuations.parquet table contains market values during a player's season. There are 496,606 records from January 2000 through April 2025. For this reason, we will focus on data from 2013 through 2024. Market value is in euros and ranges from 0 to 200,000,000. There are 31,078 unique players representing 437 clubs around the world.
+
+-   The players.parquet table contains players' names, birth place, DOB, height, position played for 32,601 players.
+
+-   The appearances table breaks down game information for each player in a club with over 1.706 million records. This contains information about how many yellow or red cards a player received, or goals or assists a player had during a game. It also has the duration (in minutes) a player played during a game. This information is aggregated by player_by_year. We can also use this information to aggregate at the club_by_year, for instance, centering the average number of red cards a team received during a season.
+
+    -   Seasons run from mid August through end of May. Therefore, when we aggregate data by season, we cut it from say 2022 August through 2023 May, and label it as year = 2023.
+
+-   We use these three tables to generate a players table for the clubs and years we are interested in.
+
+    -   Overall, from 2013-2024 we are left with 2,215 players.
+
+```{r}
+#| echo: FALSE
+#| message: FALSE
+
+# player_valuations contains market values during their seasons
+# players is a table that has biographic data
+# appearances contains game level information by player, red cards, goals, etc.
+
+player_valuations <- read_parquet(str_c(
+  repo_path, "inputs/player_valuations.parquet") ) |> 
+  # create season dates
+  mutate(year_month = zoo::as.yearmon(date),
+         year_played = year(date),
+         season_year = ifelse(str_detect(
+           year_month, "Aug|Sep|Oct|Nov|Dec"),
+           year_played + 1, year_played) ) |> 
+  filter(between(season_year, 2013, 2024)) |> 
+  # aggregate market value and take mean for each player_by_year
+  group_by(season_year, player_id) |> 
+    reframe(market_value_ave = mean(market_value_in_eur)) 
+  
+
+player_bio <- read_parquet(str_c(
+  repo_path, "inputs/players.parquet") ) |> 
+  # keep variables of interest
+  select(player_id, name, country_of_birth, country_of_citizenship, 
+         date_of_birth, sub_position, position, height_in_cm)
+  
+
+players_appearance <- read_parquet(str_c(
+  repo_path, "inputs/appearances.parquet") ) |> 
+  # filter for teams we need
+  rename(club_id = player_club_id) |> 
+  # create a year variable
+  mutate(year_month = zoo::as.yearmon(date),
+         year_played = year(date)) |> 
+  filter(club_id %in% team_urls_df$club_id) |> 
+  # create season dates
+  mutate(season_year = ifelse(str_detect(
+    year_month, "Aug|Sep|Oct|Nov|Dec"),
+    year_played + 1, year_played) ) |> 
+  filter(between(season_year, 2012, 2024)) |> 
+  group_by(season_year, club_id, player_id) |> 
+  reframe(yellow_cards = sum(yellow_cards, na.rm=TRUE),
+          red_cards = sum(red_cards, na.rm = TRUE),
+          goals = sum(goals, na.rm=TRUE),
+          assists = sum(assists, na.rm = TRUE),
+          minutes_played = sum(minutes_played, na.rm=TRUE))
+    
+
+# combine player data
+player_df <- players_appearance |> 
+  # add biographic data
+  left_join(player_bio) |> 
+  # add season data 
+  left_join(player_valuations) |> 
+  # create age variable
+  mutate(Age =  season_year - lubridate::year(date_of_birth)) |> 
+  # drop if outcome is NA
+  filter(!is.na(market_value_ave)) |> 
+  # bring in club names
+  left_join(team_urls_df |> select(club_id, Club, Country))
+  
+
+  
+```
+
+We explore the average player's time points and find an average of 3.24 (SD=2.88) seasons played. If we drop players with less than 2 seasons, we drop down to 1,341 players.
+
+```{r}
+#| echo: FALSE
+#| message: FALSE
+#| 
+player_df |> 
+  group_by(player_id) |> 
+  count() |> 
+  ungroup() |> 
+  count(n) |> 
+  mutate(prop = nn/sum(nn)) |> 
+  ggplot(aes(x=n, y=prop)) +
+  geom_col(alpha=.5, fill="dodgerblue") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="Seasons Played", y="Percent of Players ") +
+  theme_hc()
+```
+
+\
+
+Next, we explore the average market value over time and can see a lot of variability, with some players valued very high.
+
+```{r}
+#| echo: FALSE
+#| message: FALSE
+
+player_df |> 
+  ggplot(aes(x = season_year, y = market_value_ave)) +
+  geom_jitter( alpha = 0.75, width = .60, size = .50) +
+  stat_summary(fun = mean, geom = "line", alpha=.8,
+              linewidth = 1.5, color="dodgerblue") + 
+  scale_x_continuous(breaks = player_df$season_year, 
+                     labels = as.character(player_df$season_year)) +
+  scale_y_continuous(labels = scales::dollar_format(
+    suffix = "€", prefix = "")) +
+  labs(subtitle = 
+         "Blue line: Average Season Market Value.",
+       x = "Season", y = "Market Value (in Euros)") +
+  theme_hc()
+
+```
+
+\
+
+Below we plot each team's average yearly market value and find that most teams have some growth but perhaps were impacted during the pandemic time frame more than other teams. We may need to consider transformation for these data as they do not appear linear nor normally distributed.
+
+```{r}
+#| echo: FALSE
+#| message: FALSE
+#| 
+# generate a plot
+player_df |> 
+  group_by(Club, season_year) |> 
+  reframe(ave_yearly_market_value = mean(market_value_ave)) |> 
+  ggplot(aes(x=season_year, y=ave_yearly_market_value)) +
+  geom_line() +
+  scale_y_continuous(
+    breaks = seq(from = 100000, to = 200000000, by = 15000000), 
+    labels = scales::dollar_format(suffix = "€", prefix = "")
+  ) +
+  scale_x_continuous(breaks=seq(2013, 2024, 4)) +
+  labs(y="Market Value in Euros", x="Season") +
+  facet_wrap(~Club) +
+  theme_hc()
+
+```
+
+\
+
+We plot the number of players per year that contribute to the total market value for each team. We observe that on average there are around 30 players per year contributing to each teams information.
+
+```{r}
+#| echo: FALSE
+#| message: FALSE
+#| 
+player_df |>  
+  group_by(Club, season_year) |> 
+  count() |> 
+  ungroup() |> 
+  ggplot(aes(x=season_year, y=n)) +
+  geom_col(alpha=.5, fill="dodgerblue") +
+  scale_x_continuous(breaks=seq(2013, 2024, 4)) +
+  facet_wrap(~Club) +
+  labs(y="Frequency of Players", x="Season") +
+  theme_hc()
+
+```
+
+\
+
+We plot age by yearly market value (on the log scale) for each team and observe almost an upside down u shape. The average overall age was 26.5 (SD=4.58) among these players.
+
+```{r}
+#| echo: FALSE
+#| message: FALSE
+#| 
+player_df |> 
+  ggplot(aes(x=Age, y=log(market_value_ave))) +
+  geom_point() +
+  facet_wrap(~Club) +
+   labs(y="Log Player Market Value", x="Age") +
+  theme_hc()
+```
+
+\
+
+We explore the variables we will use in building the models.
+
+-   At the team (Level 3) yearly level, we compute the centered by year proportion of foreign players,.
+
+    -   We may want to enrich the teams data with predictors such as whether they won a championship for a given year, or other useful information. (i.e, sponsorship, revenue, etc.)
+
+```{r}
+#| echo: FALSE
+#| message: FALSE
+
+# create club-year level predictors aggregated
+club_predictors <- player_df |> 
+  group_by(club_id, season_year) |> 
+  # these are all averages 
+  reframe(foreign_players = 
+            mean(ifelse(country_of_birth != Country, 
+                                             1, 0 ), na.rm=TRUE))
+
+# merge to player_df
+player_df <- player_df |> 
+  left_join(club_predictors, relationship = "many-to-many")
+
+club_predictors |> 
+  slice_sample(n=10) |> 
+  gt()
+
+```
+
+\
+
+At the player level (level 2) our predictors will include:
+
+```{r}
+#| echo: FALSE
+#| message: FALSE
+
+player_df |> 
+  filter(str_detect(name, "Messi|Ronaldo")) |> 
+  select(name, country_of_birth, sub_position, position, height_in_cm) |> 
+  distinct() |> 
+  gt()
+
+```
+
+\
+
+For our level 1 predictors that vary over time and by individual will include:
+
+```{r}
+#| echo: FALSE
+#| message: FALSE
+
+player_df |> 
+  filter(str_detect(name, "Messi")) |> 
+  select(name, season_year, Age, yellow_cards, red_cards, 
+         goals, assists, minutes_played) |> 
+  gt()
+```
+
+\
+
+Our predictor, market value varies across player and time.
+
+```{r}
+#| echo: FALSE
+#| message: FALSE
+
+player_df |> 
+  filter(str_detect(name, "Messi")) |> 
+  select(name, season_year, market_value_ave) |> 
+  gt()
+```
+
+```{r}
+#| echo: FALSE
+#| message: FALSE
+
+# write table out
+write_parquet(player_df, str_c(repo_path, "inputs/player_df.parquet"))
+
+```

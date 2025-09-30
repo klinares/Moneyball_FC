@@ -1,9 +1,20 @@
+#______________________________________________________________________________
+#____ Here be the UEFA 1o year coefficient standings for European teams _______
+#___ https://www.uefa.com/nationalassociations/uefarankings/club/?year=2025 ___
+#______________________________________________________________________________
+
+
 # Load the tidyverse library
+library(arrow)
 library(tidyverse)
 
-# --- 1. Recreate the 'all_coeffs' tibble ---
+# path to repo
+repo_path <- "D:/repos/Moneyball_FC/"
+
+# --- 1. Recreate the 'all_coeffs' tibble from the website ---
 all_coeffs <- tribble(
-  ~Pos, ~Club, ~`15/16`, ~`16/17`, ~`17/18`, ~`18/19`, ~`19/20`, ~`20/21`, ~`21/22`, ~`22/23`, ~`23/24`, ~`24/25`, ~Total_Pts, ~Assoc_Coeff, ~Country,
+  ~Pos, ~Club, ~`15/16`, ~`16/17`, ~`17/18`, ~`18/19`, ~`19/20`, ~`20/21`, ~`21/22`,
+  ~`22/23`, ~`23/24`, ~`24/25`, ~Total_Pts, ~Assoc_Coeff, ~Country,
   3, "Man City", 26, 18, 22, 25, 10, 35, 27, 33, 28, 14.75, 253.75, 41.131, "England",
   6, "Liverpool", 22, NA, 30, 29, 18, 24, 33, 19, 20, 29.5, 224.5, 41.131, "England",
   8, "Man Utd", 13, 26, 20, 19, 22, 26, 18, 19, 7, 32.5, 202.5, 41.131, "England",
@@ -35,7 +46,7 @@ team_urls_df <- tribble(
   "England", "Man Utd", "https://www.transfermarkt.com/manchester-united/startseite/verein/985/saison_id/2024",
   "England", "Chelsea", "https://www.transfermarkt.com/fc-chelsea/startseite/verein/631/saison_id/2024",
   "England", "Arsenal", "https://www.transfermarkt.com/fc-arsenal/startseite/verein/11/saison_id/2024",
-  "England", "Tottenham", "https://www.transfermarkt.com/fc-tottenham/startseite/verein/11/saison_id/2024",
+  "England", "Tottenham", "https://www.transfermarkt.com/fc-tottenham/startseite/verein/148/saison_id/2024",
   "Portugal", "Benfica", "https://www.transfermarkt.com/benfica-lissabon/startseite/verein/294/saison_id/2024",
   "Portugal", "Porto", "https://www.transfermarkt.com/fc-porto/startseite/verein/720/saison_id/2024",
   "Spain", "Real Madrid", "https://www.transfermarkt.com/real-madrid/startseite/verein/418/saison_id/2024",
@@ -60,6 +71,8 @@ all_coeffs_with_urls <- left_join(all_coeffs,
   select(Pos, Club, Country, Total_Pts, team_url)
 
 # --- 4. Print the final, combined table ---
-write_csv(all_coeffs_with_urls, "D:/soccer/uefa_standing.csv")
+write_parquet(all_coeffs_with_urls, str_c(
+  repo_path, "inputs/uefa_standing.parquet")
+)
 
 
