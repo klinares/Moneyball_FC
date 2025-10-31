@@ -1,0 +1,82 @@
+---
+title: "FinalProject_SURV687"
+author: "Jianing Zou"
+format: pdf
+editor: visual
+---
+
+```{r}
+library(arrow)
+library(lme4)
+library(lmerTest)    
+library(dplyr)
+library(performance) 
+library(broom.mixed) 
+
+```
+```{r}
+
+# Read .parquet file
+data <- read_parquet("player_df.parquet")
+
+# View the data
+head(data)
+
+```
+
+
+
+
+# Data Stricture
+
+Level 1 (time): season_year: season-year within player
+Level 2 (player): name: players
+Level 3 (club): club_id: clubs
+
+L1 time-varying: season_year, yellow_cards, red_cards, goals, assists, minutes_played
+L2 player-invariant: country_of_birth, sub_position, position, height_in_cm
+L3 club-invariant: season_year
+
+
+# Multilevel Model (Nested)
+
+Do we need centering for time-varying covariates so L1 effects are “purely within-person"?
+
+Where to put seanson_year?
+
+Do we finally make the decision that we use nested model not cross-classfied model?
+
+We need to also consider whether we need to put random slopes and interaction term or not. If we do, then which variable need to be considered?
+
+
+
+1. only random intercept model.baseline
+2. add new variables step by step.
+
+```{r}
+
+player_df <- data %>%
+  mutate(
+    player_id = factor(player_id),
+    club_id   = factor(club_id)
+  )
+```
+
+```{r}
+
+mA <- lmer(
+  market_value_ave_usd ~ 
+    # Level-1 (within-player, time-varying)
+    season_year + yellow_cards + red_cards + goals + assists +
+    # Level-2 (player-invariant)
+    player_id +  country_of_birth + sub_position + position + height_in_cm +
+    # Level-3 (club-invariant)
+    club_id + 
+    # Random intercepts: club and player-within-club
+   (1 | club_id) + (1 | player_id),
+  data = player_df, REML = TRUE
+)
+summary(mA)
+
+```
+
