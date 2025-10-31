@@ -21,7 +21,8 @@ toc-depth: 2
 #| echo: FALSE
 #| 
 
-pacman::p_load(arrow, gt, ggthemes, zoo, patchwork,  lubridate, priceR, tidyverse)
+pacman::p_load(arrow, gt, ggthemes, zoo, patchwork,  lubridate, countrycode,
+               priceR, tidyverse)
 
 # path to repo
 repo_path <- "D:/repos/Moneyball_FC/"
@@ -390,6 +391,76 @@ club_predictors |>
 ```
 
 \
+
+### There are too many countries represented in the dataframe in terms of country of birth
+
+```{r}
+player_df |> distinct(country_of_birth) |> count()
+
+```
+
+-   We can use the countrycode package to group countries into regions.
+
+```{r}
+#| echo: FALSE
+
+# First this package does not recognize england or wales as country, but part of the UK
+## we will need to recode some countries
+
+country_of_birth_list <- player_df |> 
+  distinct(country_of_birth) |> 
+  mutate(country_of_birth_fixed = case_when(
+    country_of_birth == "England" ~ "United Kingdom",
+    country_of_birth == "Wales" ~ "United Kingdom",
+    country_of_birth == "Scotland" ~ "United Kingdom",
+    country_of_birth == "Northern Ireland" ~ "United Kingdom",
+    country_of_birth == "CSSR" ~ "Czechoslovak Socialist Republic",
+    country_of_birth == "UdSSR" ~ "Union of Soviet Socialist Republics",
+    country_of_birth == "Jugoslawien (SFR)" ~ "Yugoslavia",
+    country_of_birth == "Réunion" ~ "France",
+    .default = as.character(country_of_birth)
+  )) |> 
+  # get the regions for each country
+  mutate(Region = countrycode(country_of_birth_fixed, 
+                               origin="country.name", destination="region")) 
+
+# merge regions to the player_df
+player_df <- player_df |> left_join(country_of_birth_list)
+
+player_df |> 
+    distinct(player_id, Region) |>
+    group_by(Region) |> 
+    count() |> 
+    drop_na() |> 
+    ungroup() |> 
+    mutate(prop = n/sum(n), Region = fct_reorder(Region, prop, max)) |> 
+    ggplot(aes(x=Region, y=prop, fill=Region)) +
+    geom_col() +
+    coord_flip() +
+    scale_y_continuous(labels = scales::percent) +
+    scale_fill_viridis_d(option = "B", end=.85) 
+  
+  
+```
+
+-   We also want to create a binary variable that tells us if the player is a citizen of the country they play in.
+
+```{r}
+player_df <- player_df |> 
+  mutate(citizen_of_club_country = ifelse(country_of_citizenship==Country, 
+                                          "Yes", "No")) 
+
+player_df |> 
+  group_by(player_id) |> 
+  distinct(citizen_of_club_country) |> 
+  ungroup() |> 
+  count(citizen_of_club_country) |> 
+  drop_na() |> 
+  mutate(Percent = (n/sum(n)*100)) |> 
+  gt()
+```
+
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\
 
 At the player level (level 2) our predictors will include:
 

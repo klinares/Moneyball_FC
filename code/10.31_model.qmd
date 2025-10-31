@@ -12,33 +12,29 @@ library(lmerTest)
 library(dplyr)
 library(performance) 
 library(broom.mixed) 
+library(jtools) # new package
 
+options(scipen = 999)
 ```
-```{r}
 
+```{r}
 # Read .parquet file
 data <- read_parquet("player_df.parquet")
 
 # View the data
-head(data)
+glimpse(data)
 
 ```
 
+# Data Structure
 
+Level 1 (time): season_year: season-year within player Level 2 (player): name: players Level 3 (club): club_id: clubs
 
-
-# Data Stricture
-
-Level 1 (time): season_year: season-year within player
-Level 2 (player): name: players
-Level 3 (club): club_id: clubs
-
-L1 time-varying: season_year, yellow_cards, red_cards, goals, assists, minutes_played
-L2 player-invariant: country_of_birth, sub_position, position, height_in_cm
-L3 club-invariant: season_year
-
+L1 time-varying: season_year, yellow_cards, red_cards, goals, assists, minutes_played L2 player-invariant: country_of_birth, sub_position, position, height_in_cm L3 club-invariant: season_year
 
 # Multilevel Model (Nested)
+
+-   Look at this [link ](https://rpsychologist.com/r-guide-longitudinal-lme-lmer)
 
 Do we need centering for time-varying covariates so L1 effects are “purely within-person"?
 
@@ -48,10 +44,8 @@ Do we finally make the decision that we use nested model not cross-classfied mod
 
 We need to also consider whether we need to put random slopes and interaction term or not. If we do, then which variable need to be considered?
 
-
-
-1. only random intercept model.baseline
-2. add new variables step by step.
+1.  only random intercept model.baseline
+2.  add new variables step by step.
 
 ```{r}
 
@@ -62,21 +56,56 @@ player_df <- data %>%
   )
 ```
 
+-   Intercept only model: We want to model `r usd_revenue_2024` because market value is accounting for inflation and converted to 2024 US dollars.
+
+```{r}
+intercept_only <-  lmer(
+  usd_revenue_2024 ~ (1 | club_id) +(1|club_id:player_id),  
+  data = player_df, REML = TRUE)
+
+summ(intercept_only)
+```
+
+-   Noticed that the club id only accounts for 7% of the variance in market value, while the player id accounts for 53% as expected. But what happens to the ICC if we model these data on the log scale?
+
+```{r}
+intercept_only_log <-  lmer(
+  log(usd_revenue_2024) ~ (1 | club_id) +(1|club_id:player_id),  
+  data = player_df, REML = TRUE)
+
+summ(intercept_only_log)
+```
+
+-   As expected, logged US dollars tends to normalize values, and our ICC jumped to 81%, while the AIC and BIC dropped.
+
+```{r}
+compare_performance(intercept_only, intercept_only_log,
+                    metrics = c("AIC", "BIC", "R2", "ICC", "RMSE"))
+```
+
+### Including predictors
+
 ```{r}
 
 mA <- lmer(
-  market_value_ave_usd ~ 
+  log(usd_revenue_2024)  ~ 
     # Level-1 (within-player, time-varying)
     season_year + yellow_cards + red_cards + goals + assists +
     # Level-2 (player-invariant)
-    player_id +  country_of_birth + sub_position + position + height_in_cm +
+    Region +  position + height_in_cm + citizen_of_club_country +
     # Level-3 (club-invariant)
-    club_id + 
+    foreign_players +
     # Random intercepts: club and player-within-club
-   (1 | club_id) + (1 | player_id),
+   (1 | club_id) + (1|club_id:player_id),
   data = player_df, REML = TRUE
 )
-summary(mA)
 
+summ(mA)
+
+compare_performance(intercept_only_log, mA,
+                    metrics = c("AIC", "BIC", "R2", "ICC", "RMSE"))
 ```
 
+-   NEXT, figure out which variables to center overall and by club such as (height - mean(height) by club and or year. The idea is to help us interpret the coefficients.
+
+-   Think about other variables to include. Let me know which ones and I can add them to the dataframe such as average height by club X year.
