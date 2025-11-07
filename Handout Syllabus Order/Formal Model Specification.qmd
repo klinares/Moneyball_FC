@@ -156,7 +156,7 @@ $$
 
 ## Justification for Model Choices
 
-### 1. Why Log-Transformation?
+### 1. Use of Log-Transformation
 
 Original market values range from \$0 to \$200M with severe right skew. Log-transformation:
 
@@ -183,7 +183,7 @@ kable(mobility_summary, col.names = c("Category", "Count (%)")) %>%
   kable_styling(bootstrap_options = "striped", full_width = FALSE)
 ```
 
-**Decision:** Use `(1 | club_id) + (1 | player_id)` (crossed) rather than `(1 | club_id/player_id)` (nested)
+**Decision:** Use of `(1 | club_id) + (1 | player_id)` (crossed) rather than `(1 | club_id/player_id)` (nested)
 
 **Justification:** 456 players transferred at least once, violating strict nesting assumption.
 
@@ -212,16 +212,10 @@ m_final <- lmer(
     # Random effects (crossed)
     (1 | club_id) + (1 | player_id),
   data = clean_player_df, 
-  REML = TRUE  # Use REML for final model
+  REML = TRUE  # Using REML for final model
 )
 ```
 
 **Estimation Method:** REML (Restricted Maximum Likelihood) for final parameter estimates, ML (Maximum Likelihood) for model comparison.
 
 ---
-
-## Next Steps
-
-1. Fit the model and check convergence
-2. Assess model diagnostics (see `03_model_diagnostics.qmd`)
-3. Interpret fixed effects and variance components (see `04_interpretation.qmd`)
