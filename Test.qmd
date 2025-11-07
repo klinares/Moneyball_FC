@@ -5,10 +5,10 @@ library(tidyverse)
 # Setting repo path
 repo_path <- "/Users/namomac/Desktop/Moneyball_FC/"
 
-# Read the UEFA standings data
+# Reading the UEFA standings data
 uefa_standings <- read_parquet(paste0(repo_path, "inputs/uefa_standing.parquet"))
 
-# Inspect the structure
+# Inspecting the structure
 glimpse(uefa_standings)
 ```
 ```{r}
