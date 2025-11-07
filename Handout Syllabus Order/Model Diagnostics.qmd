@@ -20,7 +20,7 @@ library(lattice)
 library(car)
 library(dplyr)
 
-# Read data with UEFA rankings
+# Reading data with UEFA rankings
 repo_path <- "/Users/namomac/Desktop/Moneyball_FC/"
 clean_player_df <- read_parquet(paste0(repo_path, "inputs/player_df_with_uefa.parquet"))
 
@@ -75,7 +75,7 @@ m_final <- lmer(
 )
 cat("✓ M_final fitted\n\n")
 
-# Refit final model with REML for diagnostics
+# Refitting final model with REML for diagnostics
 m_final_reml <- lmer(
   log(usd_revenue_2024) ~ 
     season_year + yellow_cards + goals + assists +
@@ -139,7 +139,7 @@ if(aic_comparison$Delta_AIC[3] == 0) {
 ```{r convergence}
 cat("\n=== CONVERGENCE DIAGNOSTICS ===\n\n")
 
-# Check for convergence issues
+# Checking for convergence issues
 conv_msg <- m_final_reml@optinfo$conv$lme4$messages
 if(is.null(conv_msg)) {
   cat("✓ Model converged successfully (no warnings)\n")
@@ -148,7 +148,7 @@ if(is.null(conv_msg)) {
   cat(conv_msg, "\n")
 }
 
-# Check for singularity
+# Checking for singularity
 if(isSingular(m_final_reml)) {
   cat("\n⚠ WARNING: Model is singular!\n")
   cat("   Some variance components may be zero or at boundary.\n")
@@ -184,8 +184,8 @@ plot(m_final_reml,
 
 **Interpretation:**
 
-- **Left plot**: Check for homoscedasticity (constant variance) and linearity
-- **Right plot**: Check for variance stability across fitted values
+- **Left plot**: Checks for homoscedasticity (constant variance) and linearity
+- **Right plot**: Checks for variance stability across fitted values
 - **Goal**: Points should be randomly scattered around the horizontal line
 
 ```{r resid_interpretation}
@@ -206,7 +206,7 @@ cat(" (expect <1% if normal)\n")
 ### 3.2 Q-Q Plot of Residuals
 
 ```{r qq_residuals, fig.width=7, fig.height=7}
-# Check normality of Level-1 residuals
+# Checking normality of Level-1 residuals
 qqnorm(resids, main = "Q-Q Plot: Level-1 Residuals", pch = 16, cex = 0.5)
 qqline(resids, col = "red", lwd = 2)
 
@@ -236,7 +236,7 @@ if(sw_test$p.value < 0.05) {
 ### 4.1 Normality of Random Intercepts
 
 ```{r qq_random_effects, fig.width=12, fig.height=5}
-# Extract random effects
+# Extracting random effects
 ranef_player <- ranef(m_final_reml, condVar = TRUE)$player_id[,1]
 ranef_club <- ranef(m_final_reml, condVar = TRUE)$club_id[,1]
 
@@ -329,7 +329,7 @@ cat("\n\nClubs by Random Intercept (sorted):\n")
 cat("(After controlling for UEFA coefficient)\n\n")
 print(club_ranef_df, digits = 3)
 
-# Merge with club names for interpretation
+# Merging with club names for interpretation
 club_names <- clean_player_df %>%
   distinct(club_id, Club, uefa_coefficient, uefa_rank) %>%
   mutate(club_id = as.character(club_id))
@@ -349,10 +349,10 @@ print(club_ranef_with_names, digits = 3)
 ```{r vif}
 cat("\n=== VARIANCE INFLATION FACTORS (VIF) ===\n\n")
 
-# Calculate VIF
+# Calculating VIF
 vif_values <- car::vif(m_final_reml)
 
-# Handle both numeric vectors and GVIF matrices
+# Handling both numeric vectors and GVIF matrices
 if(is.matrix(vif_values)) {
   vif_df <- data.frame(
     Predictor = rownames(vif_values),
@@ -395,13 +395,13 @@ if(max_vif > 10) {
 ```{r variance_decomp, fig.width=8, fig.height=6}
 cat("\n=== VARIANCE COMPONENTS ===\n\n")
 
-# Extract variance components
+# Extracting variance components
 vc <- as.data.frame(VarCorr(m_final_reml))
 
 cat("Raw Variance Components:\n")
 print(vc[, c("grp", "vcov", "sdcor")], digits = 4)
 
-# Calculate ICC at each level
+# Calculating ICC at each level
 total_var <- sum(vc$vcov)
 icc_club <- vc$vcov[vc$grp == "club_id"] / total_var
 icc_player <- vc$vcov[vc$grp == "player_id"] / total_var
@@ -420,7 +420,7 @@ cat("- Club variance: Differences between clubs after controlling for UEFA\n")
 cat("- Player variance: Consistent individual differences across seasons\n")
 cat("- Residual variance: Within-player variation over time\n")
 
-# Compare variance with and without UEFA
+# Comparing variance with and without UEFA
 vc_without <- as.data.frame(VarCorr(m_without_uefa))
 club_var_without <- vc_without$vcov[vc_without$grp == "club_id"]
 club_var_with <- vc$vcov[vc$grp == "club_id"]
@@ -528,22 +528,14 @@ Based on the comprehensive diagnostic checks:
 
 **Model Adequacy:**
 
-1. ✓ The model converged without issues
-2. ✓ Residual assumptions are reasonably met (log-transformation effective)
-3. ✓ Random effects show approximate normality
-4. ✓ Multicollinearity is not a concern (all VIF < 5)
-5. ✓ Outliers are within expected range (<1% extreme)
+1. The model converged without issues
+2. Residual assumptions are reasonably met (log-transformation effective)
+3. Random effects show approximate normality
+4. Multicollinearity is not a concern (all VIF < 5)
+5. Outliers are within expected range (<1% extreme)
 
 **UEFA Coefficient Effect:**
 
 - UEFA coefficient `r ifelse(lr_test2$'Pr(>Chisq)'[2] < 0.05, "**significantly improves model fit**", "does not significantly improve model fit")`
 - Explains **`r round(var_reduction, 1)`%** of between-club variance
 - `r ifelse(lr_test2$'Pr(>Chisq)'[2] < 0.05, "Club prestige has a meaningful effect on player valuations", "After controlling for player characteristics, club prestige has minimal effect")`
-
-**Recommendation:** 
-
-The model diagnostics support the validity of our final specification. We can proceed with interpretation and inference with confidence in the model's assumptions.
-
----
-
-**Next Steps:** See `04_interpretation_inference.qmd` for detailed coefficient interpretation and hypothesis testing.
