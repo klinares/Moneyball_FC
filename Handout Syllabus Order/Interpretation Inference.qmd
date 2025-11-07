@@ -24,7 +24,7 @@ library(knitr)
 library(kableExtra)
 library(tidyr)
 
-# Read data with UEFA rankings
+# Reading data with UEFA rankings
 repo_path <- "/Users/namomac/Desktop/Moneyball_FC/"
 clean_player_df <- read_parquet(paste0(repo_path, "inputs/player_df_with_uefa.parquet"))
 ```
@@ -32,7 +32,7 @@ clean_player_df <- read_parquet(paste0(repo_path, "inputs/player_df_with_uefa.pa
 ## Model Estimation
 
 ```{r fit_final_model}
-# Fit final model with UEFA coefficient
+# Fitting final model with UEFA coefficient
 m_final <- lmer(
   log(usd_revenue_2024) ~ 
     season_year + yellow_cards + goals + assists +
@@ -44,7 +44,7 @@ m_final <- lmer(
   REML = TRUE
 )
 
-cat("✓ Final model fitted successfully\n")
+cat("Final model fitted successfully\n")
 cat("Observations:", nrow(clean_player_df), "\n")
 cat("Players:", length(unique(clean_player_df$player_id)), "\n")
 cat("Clubs:", length(unique(clean_player_df$club_id)), "\n")
@@ -55,15 +55,15 @@ cat("Clubs:", length(unique(clean_player_df$club_id)), "\n")
 ### 1.1 Complete Coefficient Table
 
 ```{r fixed_effects_table}
-# Extract fixed effects with confidence intervals
+# Extracting fixed effects with confidence intervals
 fixed_df <- broom.mixed::tidy(m_final, effects = "fixed", conf.int = TRUE) %>%
   mutate(
-    # Calculate percentage change from log-coefficients
+    # Calculating percentage change from log-coefficients
     pct_change = (exp(estimate) - 1) * 100,
     pct_lower = (exp(conf.low) - 1) * 100,
     pct_upper = (exp(conf.high) - 1) * 100,
     
-    # Add significance stars
+    # Adding significance stars
     sig = case_when(
       p.value < 0.001 ~ "***",
       p.value < 0.01 ~ "**",
@@ -73,7 +73,7 @@ fixed_df <- broom.mixed::tidy(m_final, effects = "fixed", conf.int = TRUE) %>%
     )
   )
 
-# Display table
+# Displaying table
 fixed_df %>%
   select(term, estimate, std.error, statistic, p.value, 
          pct_change, sig) %>%
@@ -91,7 +91,7 @@ fixed_df %>%
 ```{r interpret_effects}
 cat("\n=== INTERPRETATION OF FIXED EFFECTS ===\n\n")
 
-# Extract specific coefficients
+# Extracting specific coefficients
 beta_uefa <- fixed_df$estimate[fixed_df$term == "uefa_coef_cen"]
 pct_uefa <- fixed_df$pct_change[fixed_df$term == "uefa_coef_cen"]
 p_uefa <- fixed_df$p.value[fixed_df$term == "uefa_coef_cen"]
@@ -110,7 +110,7 @@ cat("\nInterpretation:\n")
 cat("→ Each 1-point increase in UEFA coefficient is associated with a\n")
 cat("  ", round(pct_uefa, 3), "% change in player market value.\n\n")
 
-# Calculate effect for meaningful differences
+# Calculating effect for meaningful differences
 uefa_sd <- sd(clean_player_df$uefa_coefficient, na.rm = TRUE)
 cat("→ A 1 SD increase in UEFA coefficient (", round(uefa_sd, 2), " points)\n")
 cat("   is associated with a", round(pct_uefa * uefa_sd, 2), "% change in market value.\n\n")
@@ -137,7 +137,7 @@ cat("Age: Each year older (vs. avg 26.5) → ",
 ```{r variance_components}
 cat("\n=== VARIANCE DECOMPOSITION ===\n\n")
 
-# Extract variance components
+# Extracting variance components
 vc <- as.data.frame(VarCorr(m_final))
 
 cat("Variance Components:\n")
@@ -146,7 +146,7 @@ cat("Club (τ²_club)    :", round(vc$vcov[vc$grp == "club_id"], 5), "\n")
 cat("Player (τ²_player):", round(vc$vcov[vc$grp == "player_id"], 5), "\n")
 cat("Residual (σ²_e)   :", round(vc$vcov[vc$grp == "Residual"], 5), "\n\n")
 
-# Calculate ICC
+# Calculating ICC
 total_var <- sum(vc$vcov)
 icc_club <- vc$vcov[vc$grp == "club_id"] / total_var
 icc_player <- vc$vcov[vc$grp == "player_id"] / total_var
@@ -170,7 +170,7 @@ cat("there are other club-level factors beyond prestige that affect valuations.\
 ### 2.1 Impact of UEFA on Club Variance
 
 ```{r uefa_impact}
-# Compare with model without UEFA
+# Comparing with model without UEFA
 m_without_uefa <- lmer(
   log(usd_revenue_2024) ~ 
     season_year + yellow_cards + goals + assists +
@@ -231,7 +231,7 @@ cat("BIC:", round(BIC(m_final), 2), "\n")
 ```{r position_effects}
 cat("\n=== POSITION EFFECTS ===\n\n")
 
-# Extract position coefficients
+# Extracting position coefficients
 pos_coefs <- fixed_df %>%
   filter(grepl("position", term)) %>%
   select(term, estimate, pct_change, p.value, sig) %>%
@@ -247,7 +247,7 @@ print(pos_coefs %>% select(Position, pct_change, p.value, sig), row.names = FALS
 
 cat("\n")
 if(all(pos_coefs$p.value < 0.001)) {
-  cat("✓ All positions are significantly different from goalkeepers (p < 0.001)\n")
+  cat("All positions are significantly different from goalkeepers (p < 0.001)\n")
 }
 
 # Estimated marginal means
@@ -262,12 +262,12 @@ print(summary(pairs_position))
 ### 4.1 Visualize Position Effects
 
 ```{r position_viz, fig.width=10, fig.height=6}
-# Get factor levels from data
+# Getting factor levels from data
 pos_levels <- levels(clean_player_df$position)
 region_levels <- levels(clean_player_df$Region)
 citizen_levels <- levels(clean_player_df$citizen_of_club_country)
 
-# Create typical player profiles by position
+# Creating typical player profiles by position
 pred_data <- data.frame(
   season_year = 2024,
   position = factor(c("Attack", "Midfield", "Defender", "Goalkeeper"),
@@ -282,7 +282,7 @@ pred_data <- data.frame(
   uefa_coef_cen = 0  # Average UEFA coefficient
 )
 
-# Generate predictions
+# Generating predictions
 pred_data$log_pred <- predict(m_final, newdata = pred_data, re.form = NA)
 pred_data$market_value <- exp(pred_data$log_pred)
 
@@ -315,7 +315,7 @@ ggplot(pred_data, aes(x = position, y = market_value, fill = position)) +
 ```{r regional_effects}
 cat("\n=== REGIONAL EFFECTS ===\n\n")
 
-# Extract region coefficients
+# Extracting region coefficients
 region_coefs <- fixed_df %>%
   filter(grepl("Region", term)) %>%
   select(term, estimate, pct_change, p.value, sig) %>%
@@ -348,17 +348,17 @@ print(emm_region_df %>%
 ## 6. UEFA Coefficient Effect Visualization
 
 ```{r uefa_viz, fig.width=10, fig.height=7}
-# Get factor levels
+# Getting factor levels
 region_levels <- levels(clean_player_df$Region)
 citizen_levels <- levels(clean_player_df$citizen_of_club_country)
 pos_levels <- levels(clean_player_df$position)
 
-# Create prediction grid across UEFA range
+# Creating prediction grid across UEFA range
 uefa_range <- seq(min(clean_player_df$uefa_coefficient, na.rm = TRUE),
                   max(clean_player_df$uefa_coefficient, na.rm = TRUE),
                   length.out = 50)
 
-# Center based on original mean
+# Centering based on original mean
 uefa_mean <- mean(clean_player_df$uefa_coefficient, na.rm = TRUE)
 
 pred_uefa <- data.frame(
@@ -379,7 +379,7 @@ pred_uefa <- data.frame(
 pred_uefa$log_pred <- predict(m_final, newdata = pred_uefa, re.form = NA)
 pred_uefa$market_value <- exp(pred_uefa$log_pred)
 
-# Add actual club data points
+# Adding actual club data points
 club_means <- clean_player_df %>%
   group_by(Club, uefa_coefficient, uefa_rank) %>%
   summarise(
@@ -600,7 +600,3 @@ kable(findings,
 3. **Multilevel Structure is Essential:** The conditional R² (`r round(r2_vals[2], 3)`) is much higher than marginal R² (`r round(r2_vals[1], 3)`), indicating that accounting for player and club random effects is crucial for accurate modeling.
 
 4. **Practical Value:** The model provides actionable insights for transfer strategies, player development priorities, and long-term club investment in competitive success.
-
----
-
-**For Next Steps:** See `05_descriptive_statistics.qmd` for detailed sample characteristics and `06_final_report.qmd` for the complete manuscript.
