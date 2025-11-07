@@ -1,0 +1,40 @@
+```{r}
+library(arrow)
+library(tidyverse)
+
+# Setting repo path
+repo_path <- "/Users/namomac/Desktop/Moneyball_FC/"
+
+# Read the UEFA standings data
+uefa_standings <- read_parquet(paste0(repo_path, "inputs/uefa_standing.parquet"))
+
+# Inspect the structure
+glimpse(uefa_standings)
+```
+```{r}
+# CreatingUEFA data for merging
+club_uefa <- uefa_standings %>%
+  select(
+    Club,
+    Country,
+    uefa_rank = Pos,           # Renaming for clarity
+    uefa_coefficient = Total_Pts  # Renaming for clarity
+  ) %>%
+  mutate(
+    # Centering UEFA coefficient for interpretation
+    uefa_coef_cen = uefa_coefficient - mean(uefa_coefficient, na.rm = TRUE),
+    
+    # Creating categorical tiers based on ranking
+    uefa_tier = case_when(
+      uefa_rank <= 5 ~ "Elite (Top 5)",
+      uefa_rank <= 10 ~ "Top 10",
+      uefa_rank <= 15 ~ "Top 15",
+      TRUE ~ "Top 21"
+    ),
+    uefa_tier = factor(uefa_tier, levels = c("Elite (Top 5)", "Top 10", 
+                                               "Top 15", "Top 21"))
+  )
+
+# Displaying the prepared data
+print(club_uefa)
+```
