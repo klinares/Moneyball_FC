@@ -1,0 +1,347 @@
+---
+title: "FinalProject_SURV687"
+author: "Jianing Zou"
+format: pdf
+editor: visual
+---
+
+```{r}
+library(arrow)
+library(lme4)
+library(lmerTest)    
+library(dplyr)
+library(performance) 
+library(broom.mixed) 
+library(jtools) # new package
+
+options(scipen = 999)
+```
+
+```{r}
+# Read .parquet file
+data <- read_parquet("player_df.parquet")
+
+# View the data
+glimpse(data)
+
+```
+
+# Data Structure
+
+Level 1 (time): season_year: season-year within player Level 2 (player): name: players Level 3 (club): club_id: clubs
+
+L1 time-varying: season_year, yellow_cards, red_cards, goals, assists, minutes_played L2 player-invariant: country_of_birth, sub_position, position, height_in_cm L3 club-invariant: season_year
+
+seanson_year: 2013, 2014, 2015, 2016, 2017, 2018, 2020, 2021, 2022, 2023, 2024.
+
+position: Attack, Defender, Goalkeeper, Midfield.
+
+Region: East Asia & Pacific, Europe & Central Asia, Latin America & Caribbean, Middle East & North Africa, North America, Sub-Saharan Africa.
+
+citizen_of_club_country: YES, NO.
+
+
+```{r}
+
+player_df <- data %>%
+  mutate(
+    player_id = factor(player_id),
+    club_id   = factor(club_id),
+    position = factor(position),
+    Region = factor(Region),
+    citizen_of_club_country = factor(citizen_of_club_country)
+    
+  )
+```
+
+-   Check missing values.
+```{r}
+# Which variable has missing value
+colSums(is.na(player_df))
+
+# Which observation has missing values
+player_df %>%
+  filter(!complete.cases(.))
+
+# Exclude all missing values, only 7023 observations now
+clean_player_df <- na.omit(player_df)
+
+```
+
+-   Intercept only model: We want to model `r usd_revenue_2024` because market value is accounting for inflation and converted to 2024 US dollars.
+
+
+# Fit the model
+
+## Cross or nested?
+
+-   The player went to different clubs across years, thus they are cross-clubs, not nested in one club.
+
+-   So we use (1 | club_id) + (1|player_id) here, not (1 | club_id) + (1|club_id : player_id) here, since the latter one is used only when player are nested in the clubs.
+
+```{r}
+
+
+clean_player_df %>%
+  distinct(player_id, club_id) %>%      
+  count(player_id, name = "num_clubs") %>%  
+  filter(num_clubs > 1) %>%              
+  arrange(desc(num_clubs))
+
+```
+
+
+```{r}
+intercept_only <-  lmer(
+  usd_revenue_2024 ~ (1 | club_id) +(1|player_id),  
+  data = clean_player_df, REML = TRUE)
+
+summ(intercept_only)
+```
+
+
+# Multilevel Model (Nested)
+
+-   Look at this [link](https://rpsychologist.com/r-guide-longitudinal-lme-lmer)
+
+Do we need centering for time-varying covariates so L1 effects are “purely within-person"?
+
+Where to put seanson_year?
+
+Do we finally make the decision that we use nested model not cross-classfied model?
+
+We need to also consider whether we need to put random slopes and interaction term or not. If we do, then which variable need to be considered?
+
+1.  only random intercept model.baseline
+2.  add new variables step by step.
+
+
+-   Noticed that the club id only accounts for 7% of the variance in market value, while the player id accounts for 53% as expected. But what happens to the ICC if we model these data on the log scale?
+
+```{r}
+intercept_only_log <-  lmer(
+  log(usd_revenue_2024) ~ (1 | club_id) + (1|player_id),  
+  data = clean_player_df, REML = TRUE)
+
+summ(intercept_only_log)
+```
+
+-   As expected, logged US dollars tends to normalize values, and our ICC jumped to 81%, while the AIC and BIC dropped.
+
+```{r}
+compare_performance(intercept_only, intercept_only_log,
+                    metrics = c("AIC", "BIC", "R2", "ICC", "RMSE"))
+```
+
+### Centering
+
+
+-   To make our model interpretable, we need to center age and height variable
+
+-   Center age and height_in_cm variable here.
+
+```{r}
+
+clean_player_df <- clean_player_df %>%
+  mutate(
+    mean_age = mean(Age),
+    mean_height = mean(height_in_cm),
+    age_cen  = Age - mean_age,
+    height_cen = height_in_cm - mean_height
+  )
+```
+
+### Including predictors
+
+
+#### Add position and season year
+
+-   Both AIC and BIC of model adding position and season year are smaller than that of intercept-only model.
+
+```{r}
+# Orginal model. Set REML = FALSE to compare fixed effects
+intercept_only_log <-  lmer(
+  log(usd_revenue_2024) ~ (1 | club_id) + (1|player_id),  
+  data = clean_player_df, REML = FALSE)
+
+m1 <- lmer(
+  log(usd_revenue_2024)  ~ 
+    # Level-1 (within-player, time-varying)
+    season_year +
+    # Level-2 (player-invariant)
+    position +
+   (1 | club_id) + (1| player_id),
+  data = clean_player_df, REML = FALSE
+)
+
+summ(m1)
+
+anova(intercept_only_log, m1)
+
+```
+
+#### Add centering age and centering height
+
+-   After adding age, AIC and BIC 
+
+```{r}
+
+m2 <- lmer(
+  log(usd_revenue_2024)  ~ 
+    # Level-1 (within-player, time-varying)
+    season_year + 
+    # Level-2 (player-invariant)
+    position + age_cen + height_cen +
+   (1 | club_id) + (1| player_id),
+  data = clean_player_df, REML = FALSE
+)
+
+summ(m2)
+
+anova(m1,m2)
+
+```
+#### Add yellow_cards, red_cards
+
+-   The model adding only yellow cards fit the data better, because both AIC and BIC are smallest among all three models here.
+
+```{r}
+
+m3 <- lmer(
+  log(usd_revenue_2024)  ~ 
+    # Level-1 (within-player, time-varying)
+    season_year +  yellow_cards + 
+    # Level-2 (player-invariant)
+    position + age_cen + height_cen +
+   (1 | club_id) + (1| player_id),
+  data = clean_player_df, REML = FALSE
+)
+
+m4 <- lmer(
+  log(usd_revenue_2024)  ~ 
+    # Level-1 (within-player, time-varying)
+    season_year +  yellow_cards + red_cards +
+    # Level-2 (player-invariant)
+    position + age_cen + height_cen +
+   (1 | club_id) + (1| player_id),
+  data = clean_player_df, REML = FALSE
+)
+
+
+
+anova(m2,m3,m4)
+```
+
+#### Add goals, assists
+
+-   The model adding goals and assists fit the data better
+
+```{r}
+m5 <- lmer(
+  log(usd_revenue_2024)  ~ 
+    # Level-1 (within-player, time-varying)
+    season_year +  yellow_cards + goals + 
+    # Level-2 (player-invariant)
+    position + age_cen + height_cen +
+   (1 | club_id) + (1| player_id),
+  data = clean_player_df, REML = FALSE
+)
+
+m6 <- lmer(
+  log(usd_revenue_2024)  ~ 
+    # Level-1 (within-player, time-varying)
+    season_year +  yellow_cards + goals + assists +
+    # Level-2 (player-invariant)
+    position + age_cen + height_cen +
+   (1 | club_id) + (1| player_id),
+  data = clean_player_df, REML = FALSE
+)
+
+
+anova(m3,m5,m6)
+
+summ(m6)
+  
+```
+
+#### Adding Region and citizen_of_club_country
+
+-   Adding region and citizen_of_club_country yield better AIC and BIC.
+
+```{r}
+
+m7 <- lmer(
+  log(usd_revenue_2024)  ~ 
+    # Level-1 (within-player, time-varying)
+    season_year +  yellow_cards + goals + assists +
+    # Level-2 (player-invariant)
+    position + age_cen + height_cen + Region + 
+   (1 | club_id) + (1| player_id),
+  data = clean_player_df, REML = FALSE
+)
+
+m8  <- lmer(
+  log(usd_revenue_2024)  ~ 
+    # Level-1 (within-player, time-varying)
+    season_year +  yellow_cards + goals + assists +
+    # Level-2 (player-invariant)
+    position + age_cen + height_cen + Region + citizen_of_club_country + 
+   (1 | club_id) + (1| player_id),
+  data = clean_player_df, REML = FALSE
+)
+
+anova(m6,m7,m8)
+
+```
+
+#### Adding foreign_players
+
+-   m8 has higher AIC but lower BIC.
+
+-   m9 has lower AIC but lower BIC.
+
+-   By considering both good fit and complexity, we choose m8, the model without foreign_players.
+
+```{r}
+
+m9  <- lmer(
+  log(usd_revenue_2024)  ~ 
+    # Level-1 (within-player, time-varying)
+    season_year +  yellow_cards + goals + assists +
+    # Level-2 (player-invariant)
+    position + age_cen + height_cen + Region + citizen_of_club_country + 
+    foreign_players +
+   (1 | club_id) + (1| player_id),
+  data = clean_player_df, REML = FALSE
+)
+
+anova(m8,m9)
+```
+
+
+#### Final model
+
+```{r}
+
+
+
+m_final  <- lmer(
+  log(usd_revenue_2024)  ~ 
+    # Level-1 (within-player, time-varying)
+    season_year +  yellow_cards + goals + assists +
+    # Level-2 (player-invariant)
+    position + age_cen + height_cen + Region + citizen_of_club_country + 
+    # Random intercepts: club and player-within-club
+   (1 | club_id) + (1| player_id),
+  data = clean_player_df, REML = TRUE
+)
+
+
+summ(m_final)
+```
+
+-   NEXT, figure out which variables to center overall and by club such as (height - mean(height) by club and or year. The idea is to help us interpret the coefficients.
+
+-   Think about other variables to include. Let me know which ones and I can add them to the dataframe such as average height by club X year.
+
+

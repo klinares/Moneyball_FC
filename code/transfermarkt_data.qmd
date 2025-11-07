@@ -19,23 +19,30 @@ toc-depth: 2
 
 ```{r}
 #| echo: FALSE
+#| 
 
-pacman::p_load(arrow, gt, ggthemes, zoo, tidyverse)
+pacman::p_load(arrow, gt, ggthemes, zoo, patchwork,  lubridate, countrycode,
+               priceR, tidyverse)
 
 # path to repo
 repo_path <- "D:/repos/Moneyball_FC/"
 
 options(scipen=999)
+
+# for the exchange rate API, make a free api key 
+# https://exchangerate.host/dashboard
+api_key <- read_csv("D:/repos/api-keys.csv") |> 
+  filter(key_id == "exchangerate.host") |> 
+  pull(key)
+
+Sys.setenv("EXCHANGERATEHOST_ACCESS_KEY"=api_key)
 ```
 
 This project started with the intention of using the [worldfootballR](https://jaseziv.github.io/worldfootballR/articles/load-scraped-data.html) package to scrap data from [Transfermarkt](https://www.transfermarkt.us/marktwertetop/wertvollstespieler). However, there are several limitations to this package such as time out api requests and failure to capture dynamic java tables on a web page. Luckily, kaggle already contains the data we need for this project under "[**Football Data from Transfermarkt**](https://www.kaggle.com/datasets/davidcariboo/player-scores?resource=download)**.**" The only thing needed is to merge tables and generate club level predictors to build a multilevel model to explain variation in team and player market value growth curves.
 
 -   This code can be found at <https://github.com/klinares/Moneyball_FC>.
-
-<!-- -->
-
+-   
 -   First, we compiled a table from [UEFA](https://www.uefa.com/nationalassociations/uefarankings/tenyears/?year=2025) containing rankings of European teams based on their 10 year coefficient ranking. We select the first 21 teams to only focus on the top teams in Western Europe.
-
     -   The UEFA club coefficient is a ranking system that measures the performance of clubs in UEFA competitions over the previous five seasons. Clubs earn points for wins, draws, and reaching certain stages of tournaments, and the total is used to determine seeding for future competition draws.
 
     -   Here we print the top 21 teams by rank. Note, this table (team_urls_df.parquet) also contains transfermarkt team URLS to be used with the worldfootballR package to enrich this data if needed.
@@ -73,8 +80,7 @@ We now read in data from kaggle and begin to structure in a way to be used in ou
     -   Overall, from 2013-2024 we are left with 2,215 players.
 
 ```{r}
-#| echo: FALSE
-#| message: FALSE
+#| echo: false
 
 # player_valuations contains market values during their seasons
 # players is a table that has biographic data
@@ -139,6 +145,33 @@ player_df <- players_appearance |>
   
 ```
 
+We use the priceR package to convert euros to dollars, and take the yearly average from 2013-2024. Following the exchange rate conversion, we have to adjust for inflation. We use the same package and for each row US nominal dollar (values of the dollar for the specific year) we convert to real dollars (value of the dollar in a constant year) in our case to the most recent year of 2024. The below code chunk makes request to the exchange API and is a long process. The below code chunk makes request to the exchange API and is a long process.
+
+```{r}
+#| message: false
+#| warning: false
+
+
+yearly_exchange_rates <- tibble(
+  season_year = as.double(seq(2013, 2024)),
+  year_ex_rate = c(
+    1.33, 1.33, 1.11, 1.11, 1.13, 1.18, 1.12, 1.14, 1.18, 1.05, 1.08, 1.08)
+)
+  
+player_df <- player_df |> 
+  left_join(yearly_exchange_rates) |> 
+  mutate(market_value_ave_usd = market_value_ave * year_ex_rate) |> 
+  mutate(
+    # Create the new column
+    usd_revenue_2024 = adjust_for_inflation(
+      price = market_value_ave_usd, # The nominal dollar amount to convert
+      from_date = season_year,    # The year the money was from
+      country = "US",      # The country for the inflation index
+      to_date = 2024       # The target year you want to convert to
+    )
+  ) 
+```
+
 We explore the average player's time points and find an average of 3.24 (SD=2.88) seasons played. If we drop players with less than 2 seasons, we drop down to 1,341 players.
 
 ```{r}
@@ -180,13 +213,16 @@ player_df |>
   theme_hc()
 ```
 
-Next, we explore the average market value over time and can see a lot of variability, with some players valued very high.
+Next, we explore the average market value over time and can see a lot of variability, with some players valued very high. The first plot are in euros followed by US dollars in plot 2. The third plot is in US 2024 dollars adjusted for inflation and we can see slight changes from nominal values. The final plot is in log 2024 US dollars, which spreads lower salary values.
 
 ```{r}
 #| echo: FALSE
 #| message: FALSE
+#| fig-width: 8
+#| fig-height: 16
 
-player_df |> 
+
+p_1 <- player_df |> 
   ggplot(aes(x = season_year, y = market_value_ave)) +
   geom_jitter( alpha = 0.75, width = .60, size = .50) +
   stat_summary(fun = mean, geom = "line", alpha=.8,
@@ -200,30 +236,84 @@ player_df |>
        x = "Season", y = "Market Value (in Euros)") +
   theme_hc()
 
+p_2 <-  player_df |> 
+  ggplot(aes(x = season_year, y = market_value_ave_usd)) +
+  geom_jitter( alpha = 0.75, width = .60, size = .50) +
+  stat_summary(fun = mean, geom = "line", alpha=.8,
+              linewidth = 1.5, color="dodgerblue") + 
+  scale_x_continuous(breaks = player_df$season_year, 
+                     labels = as.character(player_df$season_year)) +
+  scale_y_continuous(labels =  scales::dollar) +
+  labs(subtitle = 
+         "Blue line: Average Season Market Value.",
+       x = "Season", y = "Market Value (in USD)") +
+  theme_hc()
+
+p_3 <-  player_df |> 
+  ggplot(aes(x = season_year, y = usd_revenue_2024 )) +
+  geom_jitter( alpha = 0.75, width = .60, size = .50) +
+  stat_summary(fun = mean, geom = "line", alpha=.8,
+              linewidth = 1.5, color="dodgerblue") + 
+  scale_x_continuous(breaks = player_df$season_year, 
+                     labels = as.character(player_df$season_year)) +
+  scale_y_continuous(labels = scales::dollar) +
+  labs(subtitle = 
+         "Blue line: Average Season Market Value.",
+       x = "Season", y = "Market Value (in 2024 USD)") +
+  theme_hc()
+
+p_4 <-  player_df |> 
+  ggplot(aes(x = season_year, y = log(usd_revenue_2024))) +
+  geom_jitter( alpha = 0.75, width = .60, size = .50) +
+  stat_summary(fun = mean, geom = "line", alpha=.8,
+              linewidth = 1.5, color="dodgerblue") + 
+  scale_x_continuous(breaks = player_df$season_year, 
+                     labels = as.character(player_df$season_year)) +
+  scale_y_continuous(labels = scales::dollar) +
+  labs(subtitle = 
+         "Blue line: Average Season Market Value.",
+       x = "Season", y = "Market Value (in 2024 USD log)") +
+  theme_hc()
+
+p_1 / p_2 / p_3 / p_4
 ```
 
 \
 
-Below we plot each team's average yearly market value and find that most teams have some growth but perhaps were impacted during the pandemic time frame more than other teams. We may need to consider transformation for these data as they do not appear linear nor normally distributed.
+Below we plot each team's average yearly market value in 2024 USD and on the log scale (second graph) and find that most teams have some growth but perhaps were impacted during the pandemic time frame more than other teams. We can see that on the log scale, for instance Man City, the trend line gets slightly smoothed out compared to the raw scale.
 
 ```{r}
 #| echo: FALSE
 #| message: FALSE
+#| fig-width: 12
+#| fig-height: 18
 #| 
 # generate a plot
-player_df |> 
+p_1 <- player_df |> 
   group_by(Club, season_year) |> 
-  reframe(ave_yearly_market_value = mean(market_value_ave)) |> 
+  reframe(ave_yearly_market_value = mean(usd_revenue_2024)) |>
   ggplot(aes(x=season_year, y=ave_yearly_market_value)) +
   geom_line() +
   scale_y_continuous(
     breaks = seq(from = 100000, to = 200000000, by = 15000000), 
-    labels = scales::dollar_format(suffix = "€", prefix = "")
-  ) +
+    labels = scales::dollar) +
   scale_x_continuous(breaks=seq(2013, 2024, 4)) +
-  labs(y="Market Value in Euros", x="Season") +
+  labs(y="Market Value in 2024 USD ", x="Season") +
   facet_wrap(~Club) +
   theme_hc()
+
+p_2 <- player_df |> 
+  group_by(Club, season_year) |> 
+  reframe(ave_yearly_market_value = log(mean(usd_revenue_2024))) |> 
+  ggplot(aes(x=season_year, y=ave_yearly_market_value)) +
+  geom_line() +
+  scale_y_continuous(labels = scales::dollar) +
+  scale_x_continuous(breaks=seq(2013, 2024, 4)) +
+  labs(y="Market Value in 2024 USD log", x="Season") +
+  facet_wrap(~Club) +
+  theme_hc()
+
+p_1 / p_2
 
 ```
 
@@ -234,6 +324,8 @@ We plot the number of players per year that contribute to the total market value
 ```{r}
 #| echo: FALSE
 #| message: FALSE
+#| fig-width: 8
+#| fig-height: 10
 #| 
 player_df |>  
   group_by(Club, season_year) |> 
@@ -250,15 +342,19 @@ player_df |>
 
 \
 
-We plot age by yearly market value (on the log scale) for each team and observe almost an upside down u shape. The average overall age was 26.5 (SD=4.58) among these players.
+We plot age by yearly market 2024 USD value (on the log scale) for each team and observe almost an upside down u shape. The average overall age was 26.5 (SD=4.58) among these players. As you get older you are valued less in the market, same for younger players.
 
 ```{r}
 #| echo: FALSE
 #| message: FALSE
+#| warning: FALSE
+#| fig-width: 8
+#| fig-height: 12
 #| 
 player_df |> 
-  ggplot(aes(x=Age, y=log(market_value_ave))) +
+  ggplot(aes(x=Age, y=log(usd_revenue_2024))) +
   geom_point() +
+  geom_smooth(method="loess", color="dodgerblue") +
   facet_wrap(~Club) +
    labs(y="Log Player Market Value", x="Age") +
   theme_hc()
@@ -295,6 +391,76 @@ club_predictors |>
 ```
 
 \
+
+### There are too many countries represented in the dataframe in terms of country of birth
+
+```{r}
+player_df |> distinct(country_of_birth) |> count()
+
+```
+
+-   We can use the countrycode package to group countries into regions.
+
+```{r}
+#| echo: FALSE
+
+# First this package does not recognize england or wales as country, but part of the UK
+## we will need to recode some countries
+
+country_of_birth_list <- player_df |> 
+  distinct(country_of_birth) |> 
+  mutate(country_of_birth_fixed = case_when(
+    country_of_birth == "England" ~ "United Kingdom",
+    country_of_birth == "Wales" ~ "United Kingdom",
+    country_of_birth == "Scotland" ~ "United Kingdom",
+    country_of_birth == "Northern Ireland" ~ "United Kingdom",
+    country_of_birth == "CSSR" ~ "Czechoslovak Socialist Republic",
+    country_of_birth == "UdSSR" ~ "Union of Soviet Socialist Republics",
+    country_of_birth == "Jugoslawien (SFR)" ~ "Yugoslavia",
+    country_of_birth == "Réunion" ~ "France",
+    .default = as.character(country_of_birth)
+  )) |> 
+  # get the regions for each country
+  mutate(Region = countrycode(country_of_birth_fixed, 
+                               origin="country.name", destination="region")) 
+
+# merge regions to the player_df
+player_df <- player_df |> left_join(country_of_birth_list)
+
+player_df |> 
+    distinct(player_id, Region) |>
+    group_by(Region) |> 
+    count() |> 
+    drop_na() |> 
+    ungroup() |> 
+    mutate(prop = n/sum(n), Region = fct_reorder(Region, prop, max)) |> 
+    ggplot(aes(x=Region, y=prop, fill=Region)) +
+    geom_col() +
+    coord_flip() +
+    scale_y_continuous(labels = scales::percent) +
+    scale_fill_viridis_d(option = "B", end=.85) 
+  
+  
+```
+
+-   We also want to create a binary variable that tells us if the player is a citizen of the country they play in.
+
+```{r}
+player_df <- player_df |> 
+  mutate(citizen_of_club_country = ifelse(country_of_citizenship==Country, 
+                                          "Yes", "No")) 
+
+player_df |> 
+  group_by(player_id) |> 
+  distinct(citizen_of_club_country) |> 
+  ungroup() |> 
+  count(citizen_of_club_country) |> 
+  drop_na() |> 
+  mutate(Percent = (n/sum(n)*100)) |> 
+  gt()
+```
+
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\
 
 At the player level (level 2) our predictors will include:
 
