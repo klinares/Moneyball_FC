@@ -17,7 +17,7 @@ library(gt)
 library(tidyr)
 library(ggplot2)
 
-# Read data
+# Reading data
 repo_path <- "/Users/namomac/Desktop/Moneyball_FC/"
 player_df <- read_parquet(paste0(repo_path, "inputs/player_df_with_uefa.parquet"))
 ```
@@ -94,7 +94,7 @@ level1_vars %>%
 ### Panel B: Level 2 - Player Characteristics
 
 ```{r table1b}
-# Create player-level dataset
+# Creating player-level dataset
 player_level <- player_df %>%
   group_by(player_id) %>%
   slice(1) %>%
@@ -242,7 +242,7 @@ mobility_summary <- player_clubs %>%
 obs_per_player <- player_df %>%
   count(player_id, name = "n_obs")
 
-# Create summary table
+# Creating summary table
 structure_summary <- data.frame(
   Characteristic = c(
     "**Data Structure**",
@@ -426,5 +426,3 @@ This dataset contains **`r format(nrow(player_df), big.mark=",")`** observations
 - **Market value range**: `r scales::dollar(min(player_df$usd_revenue_2024))` to `r scales::dollar(max(player_df$usd_revenue_2024))`
 - **Average player age**: `r round(mean(player_df$Age), 1)` years
 - **Position distribution**: Relatively balanced across Attack (`r round(100*sum(player_df$position=='Attack')/nrow(player_df), 1)`%), Midfield (`r round(100*sum(player_df$position=='Midfield')/nrow(player_df), 1)`%), Defender (`r round(100*sum(player_df$position=='Defender')/nrow(player_df), 1)`%), and Goalkeeper (`r round(100*sum(player_df$position=='Goalkeeper')/nrow(player_df), 1)`%)
-
-This dataset is well-suited for multilevel modeling to examine individual performance effects and club-level contextual factors on player market valuations.
