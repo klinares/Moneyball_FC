@@ -469,11 +469,11 @@ cat("\n=== MODEL PERFORMANCE METRICS ===\n\n")
 # R-squared measures
 r2_vals <- MuMIn::r.squaredGLMM(m_final_reml)
 
-cat("Marginal R² (fixed effects only):", round(r2_vals[1], 4), "\n")
+cat("Marginal $R²$ (fixed effects only):", round(r2_vals[1], 4), "\n")
 cat("  → Fixed predictors explain", 
     round(r2_vals[1] * 100, 2), "% of variance\n\n")
 
-cat("Conditional R² (fixed + random):", round(r2_vals[2], 4), "\n")
+cat("Conditional $R²$ (fixed + random):", round(r2_vals[2], 4), "\n")
 cat("  → Full model explains",
     round(r2_vals[2] * 100, 2), "% of variance\n\n")
 
