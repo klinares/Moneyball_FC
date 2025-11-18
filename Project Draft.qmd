@@ -75,13 +75,13 @@ Our study addresses three primary objectives:
 
 ## Theoretical Framework
 
-Our theoretical framework integrates human capital theory with signaling theory. Human capital theory posits that market value reflects an individual's productivity potential, operationalized through observable performance metrics. In football, this translates to goals, assists, playing time, and other measurable outputs that directly contribute to team success.
+Our theoretical framework integrates human capital theory with signaling theory. Human capital theory will posit that market value reflects an individual's productivity potential, operationalized through observable performance metrics. In football, this translates to goals, assists, playing time, and other measurable outputs that directly contribute to team success.
 
-Signaling theory complements this by suggesting that club affiliation serves as a quality signal to the market. Playing for elite clubs with strong UEFA coefficients signals higher player quality, even controlling for observed performance, because these clubs face intense competitive scrutiny and maintain higher selection standards. This "halo effect" may inflate valuations for players at prestigious clubs relative to equivalent performers at lower-tier organizations.
+Signaling theory will then complement this by suggesting that club affiliation serves as a quality signal to the market. So, playing for elite clubs with strong UEFA coefficients signals higher player quality, even controlling for observed performance, because these clubs face intense competitive scrutiny and maintain higher selection standards. This halo effect may inflate valuations for players at prestigious clubs relative to equivalent performers at lower-tier organizations.
 
 ## Study Contribution
 
-This research makes several contributions to the literature. Methodologically, we demonstrate proper handling of cross-classified random effects structures, which are necessary when players transfer between clubs but rarely implemented in sports analytics. Substantively, we provide the first comprehensive assessment of UEFA coefficient effects on player valuations using longitudinal data spanning 12 seasons. Practically, our findings inform transfer strategies by quantifying the valuation premiums associated with club prestige, enabling clubs to identify potentially overvalued or undervalued players based on contextual factors.
+This research further makes several contributions to the literature. Methodologically, we demonstrate proper handling of cross-classified random effects structures, which are necessary when players transfer between clubs but rarely implemented in sports analytics. Substantively, we provide the first comprehensive assessment of UEFA coefficient effects on player valuations using longitudinal data spanning 12 seasons. Practically, our findings inform transfer strategies by quantifying the valuation premiums associated with club prestige, enabling clubs to identify potentially overvalued or undervalued players based on contextual factors.
 
 \newpage
 
@@ -89,25 +89,25 @@ This research makes several contributions to the literature. Methodologically, w
 
 ## Valuation in Sports Economics
 
-The seminal work by @herm2014 established the validity of crowd-sourced market valuations in football. Their analysis of Transfermarkt data revealed that community-generated estimates correlate strongly with actual transfer fees, with correlations exceeding 0.90 for established players. Importantly, they identified the key attributes that influence crowd assessments: current performance statistics, age, contract situation, injury history, and club prestige. Their findings justify the use of Transfermarkt valuations as dependent variables in econometric models while highlighting the need to control for these confounding factors.
+The seminal work by @herm2014 established the validity of crowd-sourced market valuations in football. Their analysis of Transfermarkt data revealed that community-generated estimates correlate strongly with actual transfer fees, with correlations exceeding 0.90 for established players. Importantly, they identified the key attributes that influence crowd assessments i.e., current performance statistics, age, contract situation, injury history, and club prestige. Their findings justify the use of Transfermarkt valuations as dependent variables in econometric models while also highlighting the need to control for these confounding factors.
 
-Subsequent research has explored specific determinants of player valuations. Performance metrics consistently emerge as significant predictors, with goal-scoring ability commanding particular premiums for attacking players. However, the relative importance of different performance dimensions (e.g., goals vs. assists vs. defensive contributions) remains contested, partly because previous studies rarely employ multilevel models capable of properly attributing variance to individual versus team-level factors.
+Subsequent research has explored specific determinants of player valuations. We saw that performance metrics consistently emerge as significant predictors, with goal-scoring ability commanding particular premiums for attacking players. However, the relative importance of different performance dimensions (e.g., goals vs. assists vs. defensive contributions) remains contested, partly because previous studies rarely employ multilevel models capable of properly attributing variance to individual versus team-level factors.
 
 ## Multilevel Effects in Sports
 
-@franck2012 provided crucial evidence for multilevel determinants of player compensation. Their analysis of German Bundesliga data demonstrated that approximately 15-20% of salary variance operates at the team level, reflecting factors such as club revenue, market size, and brand value. Critically, they found that individual talent effects (measured through performance metrics) and team popularity effects (measured through attendance and media coverage) independently contribute to compensation, suggesting that club context creates valuation premiums beyond individual productivity.
+@franck2012 provided crucial evidence for multilevel determinants of player compensation. Their analysis of German Bundesliga data demonstrated that approximately 15-20% of salary variance operates at the team level, reflecting factors such as club revenue, market size, and brand value. Critically, they also found that individual talent effects (which was measured through performance metrics) and team popularity effects (whcih was measured through attendance and media coverage) independently contribute to compensation, suggesting that club context creates valuation premiums beyond individual productivity.
 
-However, most prior research treats club affiliation as a fixed effect or omits team-level predictors entirely. This approach conflates club-specific effects with unmeasured individual characteristics, potentially biasing estimates of both individual and contextual effects. Moreover, few studies account for player mobility across clubs, which violates the strict nesting assumptions of traditional hierarchical models.
+However, most prior research treats club affiliation as a fixed effect or omits team-level predictors entirely. This approach conflates club-specific effects with unmeasured individual characteristics, potentially biasing estimates of both individual and contextual effects. Moreover, we also observed that few studies account for player mobility across clubs, which violates the strict nesting assumptions of traditional hierarchical models.
 
 ## UEFA Coefficient as Prestige Measure
 
-The UEFA coefficient provides an objective, quantitative measure of club prestige based on historical performance in European competitions over a 10-year rolling window. Unlike subjective reputation measures or volatile single-season performance indicators, UEFA coefficients aggregate sustained competitive success, capturing both current strength and historical legacy.
+The UEFA coefficient provides an objective, quantitative measure of club prestige based on historical performance in European competitions over a 10-year rolling window. Unlike subjective reputation measures or say volatile single-season performance indicators, UEFA coefficients aggregate sustained competitive success, capturing both current strength and historical legacy.
 
-To our knowledge, no prior research has explicitly incorporated UEFA coefficients into player valuation models. This represents a significant gap, as UEFA rankings directly influence clubs' access to prestigious competitions (Champions League, Europa League), which in turn affect revenue, visibility, and talent attraction. We hypothesize that UEFA coefficients will explain substantial between-club variance in player valuations, serving as a comprehensive proxy for the "halo effect" of club prestige.
+To our knowledge, no prior research has explicitly incorporated UEFA coefficients into player valuation models. This represents a significant gap, as UEFA rankings directly influence clubs' access to prestigious competitions (like Champions League, Europa League), which in turn affect revenue, visibility, and talent attraction. We, hence, hypothesize that UEFA coefficients will explain substantial between-club variance in player valuations, serving as a comprehensive proxy for the halo effect of club prestige.
 
 ## Hypothesis Development
 
-Based on the literature reviewed, we propose the following formal hypotheses:
+So, based on the literature reviewed, we propose the following formal hypotheses:
 
 **H1 (Performance Effects):** Player performance metrics (goals, assists) will exhibit significant positive associations with market value, with effect sizes varying by position.
 
@@ -123,7 +123,7 @@ Based on the literature reviewed, we propose the following formal hypotheses:
 
 ## Data Source and Sample
 
-Data were obtained from Transfermarkt (transfermarkt.com), a comprehensive crowd-sourced database of player statistics and market valuations, and from UEFA's official coefficient rankings. The sample consists of **7,023 season-year observations** representing **2,215 unique players** across **21 elite European football clubs** during the period from 2013 to 2024 (12 seasons).
+Our data for this project were obtained from Transfermarkt (transfermarkt.com), a comprehensive crowd-sourced database of player statistics and market valuations, and from UEFA's official coefficient rankings. The sample consists of **7,023 season-year observations** representing **2,215 unique players** across **21 elite European football clubs** during the period from 2013 to 2024 (12 seasons).
 
 Club selection criteria required clubs to be consistently ranked within the top UEFA coefficient rankings and to maintain participation in elite European competitions (Champions League or Europa League) throughout the study period. This sampling strategy focuses analysis on players and clubs operating at the highest competitive levels, where market valuations are most transparent and consequential.
 
@@ -131,7 +131,7 @@ Club selection criteria required clubs to be consistently ranked within the top 
 
 ### Outcome Variable
 
-**Market Value (2024 USD):** Player market value assessed by the Transfermarkt community, adjusted for inflation to 2024 US dollars. This variable was log-transformed (*log(market value)*) to address severe right skewness and to enable interpretation of coefficients as percentage changes.
+**Market Value (2024 USD):** Player market value assessed by the Transfermarkt community, adjusted for inflation to 2024 US dollars. Now, this variable was log-transformed (**log(market value)**) to address severe right skewness and to enable interpretation of coefficients as percentage changes.
 
 ### Level 1 Predictors (Time-Varying, Within-Player)
 
@@ -145,7 +145,7 @@ Club selection criteria required clubs to be consistently ranked within the top 
 - **Position:** Categorical variable with four levels (Goalkeeper [reference], Defender, Midfield, Attack).
 - **Age (centered):** Player age in years, grand-mean centered at 26.5 years.
 - **Height (centered):** Player height in centimeters, grand-mean centered at 182.4 cm.
-- **Birth Region:** Categorical variable indicating player's birth region (East Asia & Pacific [reference], Europe & Central Asia, Latin America & Caribbean, Middle East & North Africa, North America, South Asia, Sub-Saharan Africa).
+- **Birth Region:** Categorical variable indicating player's birth region (East Asia & Pacific [this is used as reference], Europe & Central Asia, Latin America & Caribbean, Middle East & North Africa, North America, South Asia, Sub-Saharan Africa).
 - **Citizen of Club Country:** Binary indicator (Yes/No) for whether player holds citizenship in the country where the club is based.
 
 ### Level 3 Predictor (Club-Level)
@@ -189,7 +189,7 @@ level1_summary <- clean_player_df %>%
 **Sample Characteristics**
 
 ```{r table1, results='asis'}
-# Creating formatted descriptive table - ensuring all vectors have same length
+# Creating formatted descriptive table which ensures all vectors have same length
 level_col <- c(
   "**Level 1: Measurement Occasions**", 
   "", "", "", "",
@@ -262,7 +262,7 @@ kable(desc_df,
 
 ## Data Structure
 
-The data exhibit a **cross-classified** structure rather than purely hierarchical nesting. While measurements (Level 1) are nested within players (Level 2), players are not strictly nested within clubs because 456 players (20.6%) transferred to different clubs during the 12-year observation window. Consequently, we model player and club as **crossed random effects** using the specification `(1 | player_id) + (1 | club_id)` rather than nested effects `(1 | club_id/player_id)`.
+The data above exhibits a **cross-classified** structure rather than purely hierarchical nesting. While measurements (Level 1) are nested within players (Level 2), players are not strictly nested within clubs because 456 players (20.6%) transferred to different clubs during the 12-year observation window. Consequently, we model player and club as **crossed random effects** using the specification `(1 | player_id) + (1 | club_id)` rather than nested effects `(1 | club_id/player_id)`.
 
 ## Statistical Model
 
