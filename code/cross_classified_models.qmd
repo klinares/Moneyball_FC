@@ -1,0 +1,296 @@
+---
+title: "cross_classified_models"
+author: "Jianing Zou"
+format: pdf
+editor: visual
+---
+
+```{r}
+library(arrow)
+library(lme4)
+library(lmerTest)    
+library(dplyr)
+library(performance) 
+library(broom.mixed) 
+library(jtools) # new package
+
+options(scipen = 999)
+```
+
+```{r}
+
+# Setting repository path
+#repo_path <- "/Users/namomac/Desktop/Moneyball_FC/inputs/"
+repo_path <- "D:/repos/Moneyball_FC/inputs/"
+# Reading data
+dat <- read_parquet(paste0(repo_path, "player_df.parquet")) 
+
+
+# View the data
+glimpse(dat)
+
+```
+
+# Data Structure
+
+Level 1 (time): season_year: season-year within player Level 2 (player): name: players Level 3 (club): club_id: clubs
+
+L1 time-varying: season_year, yellow_cards, red_cards, goals, assists, minutes_played L2 player-invariant: country_of_birth, sub_position, position, height_in_cm L3 club-invariant: season_year
+
+seanson_year: 2013, 2014, 2015, 2016, 2017, 2018, 2020, 2021, 2022, 2023, 2024.
+
+position: Attack, Defender, Goalkeeper, Midfield.
+
+Region: East Asia & Pacific, Europe & Central Asia, Latin America & Caribbean, Middle East & North Africa, North America, Sub-Saharan Africa.
+
+citizen_of_club_country: YES, NO.
+
+```{r}
+
+player_df <- dat %>%
+  mutate(
+    player_id = factor(player_id),
+    club_id   = factor(club_id),
+    position = factor(position),
+    Region = factor(Region),
+    citizen_of_club_country = factor(citizen_of_club_country),
+    usd_revenue_2024_log = log(usd_revenue_2024),
+    # convert season_year to 0, 1, 2, etc.
+    season_year_c = season_year - min(season_year)
+  )
+```
+
+-   Check missing values.
+
+```{r}
+# Which variable has missing value
+colSums(is.na(player_df))
+
+# Which observation has missing values
+player_df %>%
+  filter(!complete.cases(.))
+
+# Exclude all missing values, only 7023 observations now
+clean_player_df <- na.omit(player_df)
+
+```
+
+-   Intercept only model: We want to model usd_revenue_2024 because market value is accounting for inflation and converted to 2024 US dollars.
+
+# Fit the model
+
+## Cross-classified
+
+-   The player went to different clubs across years, thus they are cross-clubs, not nested in one club.
+
+-   So we use (1 \| club_id) + (1\|player_id) here, not (1 \| club_id) + (1\|club_id : player_id) here, since the latter one is used only when player are nested in the clubs.
+
+```{r}
+
+
+clean_player_df %>%
+  distinct(player_id, club_id) %>%      
+  count(player_id, name = "num_clubs") %>%  
+  filter(num_clubs > 1) %>%              
+  arrange(desc(num_clubs))
+
+```
+
+## We will now add a fixed effect for year and allow it to vary by club.
+
+-   Recall that year has been centered at 0, so that 2013=0, 2024 = 11. This is because `lmer` struggles when predictors are on vastly different scales than the outcome. If `season_year` is recorded as "2020, 2021, 2022," these numbers are huge compared to the log-revenue variance. This causes the gradient calculation to fail.
+
+```{r}
+fixed_year <-  lmer(
+  usd_revenue_2024_log ~ 
+    # first level fixed effect
+    season_year_c +
+    # random effects
+      (1|player_id) + (1|club_id), ,  
+  data = clean_player_df, REML = TRUE)
+
+summ(fixed_year)
+```
+
+-   We can see that player_id accounts for about 76% of market value while club_id accounts for 3%.
+
+-   we also fit a random slope for year to compare.
+
+    -   To estimate a random slope `(1 + year_centered | player_id)`, the model needs multiple data points for *every* player to calculate their individual trajectory. But many players only appear in our data for 1 or 2 years, and the model struggles to distinguish the "player slope" from the "residual error," causing these convergence issues. Clubs, however, have many playuers and many years of historical market value data so a random slope for clubs is more robust to fit.
+
+```{r}
+random_year <-  lmer(
+  usd_revenue_2024_log ~ 
+    # first level fixed effect
+    season_year_c +
+    # random effects
+      (1|player_id) + (1+season_year_c|club_id), 
+  data = clean_player_df, REML = TRUE)
+
+summ(random_year)
+```
+
+-   AIC and BIC values are lower with the random slope of year.
+
+```{r}
+calculate_lrt_mixture <- function(reduced_model, full_model) {
+  
+  # 1. Extract Log-Likelihoods
+  ll_reduced <- as.numeric(logLik(reduced_model))
+  ll_full    <- as.numeric(logLik(full_model))
+  
+  # 2. Calculate LRT Statistic
+  # Formula: -2 * (LL_reduced - LL_full)
+  lrt_stat <- -2 * (ll_reduced - ll_full)
+  
+  # 3. Calculate Difference in Parameters (df)
+  # This tells us how many params we added
+  df_reduced <- attr(logLik(reduced_model), "df")
+  df_full    <- attr(logLik(full_model), "df")
+  df_diff    <- df_full - df_reduced
+  
+  # 4. Calculate P-Value based on the difference
+  # If we added a slope + covariance, df_diff should be 2.
+  # The mixture is 0.5 * ChiSq(1) + 0.5 * ChiSq(2)
+  
+  if (df_diff == 2) {
+    p_val <- 0.5 * pchisq(lrt_stat, df = 1, lower.tail = FALSE) + 
+             0.5 * pchisq(lrt_stat, df = 2, lower.tail = FALSE)
+    
+    msg <- "Mixture of ChiSq(1) and ChiSq(2)"
+    
+  } else if (df_diff == 1) {
+    # If we added a parameter with NO covariance (e.g. diag structure)
+    p_val <- 0.5 * pchisq(lrt_stat, df = 0, lower.tail = FALSE) + 
+             0.5 * pchisq(lrt_stat, df = 1, lower.tail = FALSE)
+    
+    msg <- "Mixture of ChiSq(0) and ChiSq(1)"
+    
+  } else {
+    # Fallback for non-standard comparisons
+    p_val <- pchisq(lrt_stat, df = df_diff, lower.tail = FALSE)
+    msg <- paste0("Standard ChiSq(", df_diff, ")")
+  }
+  
+  # Output
+  cat("LRT Statistic:", round(lrt_stat, 4), "\n")
+  cat("Parameter Diff:", df_diff, "\n")
+  cat("Distribution:  ", msg, "\n")
+  cat("P-Value:       ", format.pval(p_val, eps = .0001), "\n")
+}
+
+# Run the comparison
+calculate_lrt_mixture(fixed_year, random_year)
+```
+
+-   We use a helper function to print the p-value for the LRT difference, and find a p-value \<.0001 and we reject the Null, (with .5 × 𝜒2(1) + .5 × 𝜒2(2 mixture) and conclude that there is strong evidence for club variation in market value trajectories and therefore we should keep this random slope in the model.
+
+```{r}
+compare_performance(fixed_year, random_year, metrics = c("AIC", "BIC"))
+```
+
+\
+
+## Adding first level player and club predictors
+
+-   We first want to group center minutes played for each for each club by year.
+
+```{r}
+clean_player_df <- clean_player_df |> 
+  group_by(season_year_c, club_id) |> 
+  mutate(minutes_played_c = minutes_played - mean(minutes_played, na.rm=TRUE)) |> 
+  ungroup()
+```
+
+-   We may want to use age at start of career and center it. We also need to account for the quadratic relationship between age and market value.
+
+    -   We include the first age observed for each player, centered, and squared and find a slightly better fit based on AIC and BIC.
+
+```{r}
+clean_player_df <- clean_player_df |> 
+  group_by(player_id) |> 
+  mutate(first_age = first(Age)) |> 
+  ungroup() |> 
+  mutate(first_age_c = (first_age - mean(first_age, na.rm=TRUE))^2 )
+```
+
+```{r}
+player_varying_predictors <-  lmer(
+  usd_revenue_2024_log ~ season_year_c +
+    # first level predictors
+    yellow_cards + red_cards + goals + 
+    assists + minutes_played + first_age_c +
+    # random effects
+      (1|player_id) + (season_year_c|club_id), 
+  data = clean_player_df, REML = TRUE)
+
+summ(player_varying_predictors)
+```
+
+### We next add first level club predictors
+
+-   We want to center player height in inches across years. We also want to center uefa coefficients by year.
+
+```{r}
+clean_player_df <- clean_player_df |> 
+  group_by(season_year) |> 
+  mutate(height_in_cm_c = height_in_cm - mean(height_in_cm, na.rm=TRUE),
+         uefa_coefficient_c = uefa_coefficient - 
+           mean(uefa_coefficient)) |> 
+  ungroup()
+  
+```
+
+```{r}
+player_club_varying_predictors <-  lmer(
+  usd_revenue_2024_log ~ season_year_c +
+    # first level player predictors
+    yellow_cards + red_cards + goals + 
+    assists + minutes_played + first_age_c +
+    # first level club predictors
+    height_in_cm_c + foreign_players + uefa_coefficient_c +
+    # second level predictors
+    position  + Region + citizen_of_club_country+
+      # random effects
+      (1|player_id) + (1|club_id), 
+  data = clean_player_df, REML = TRUE)
+
+summ(player_club_varying_predictors)
+```
+
+### Adding level 2 predictors 
+
+-   We want to center height in inches across years.
+
+```{r}
+clean_player_df <- clean_player_df |> 
+  group_by(season_year_c) |> 
+  mutate(height_in_cm_c = height_in_cm - mean(height_in_cm, na.rm=TRUE)) |> 
+  ungroup()
+  
+```
+
+```{r}
+player_club_predictors <-  lmer(
+  usd_revenue_2024_log ~ season_year_c +
+    # first level player predictors
+    yellow_cards + red_cards + goals + 
+    assists + minutes_played + first_age_c +
+    # first level club predictors
+    height_in_cm_c + foreign_players + uefa_coefficient_c +
+    # second level predictors
+    position  + Region + citizen_of_club_country+
+      # random effects
+      (1|player_id) + (season_year_c|club_id), 
+  data = clean_player_df, REML = TRUE)
+
+summ(player_club_predictors)
+```
+
+```{r}
+export_summs(random_year, player_varying_predictors,
+             player_club_varying_predictors, player_club_predictors, 
+             exp=TRUE, digits=3, r.squared=FALSE, confint = TRUE,
+             error_format = "[{conf.low}, {conf.high}]",
+             model.names = c("M1", "M2", "M3", "M4"))
+```
