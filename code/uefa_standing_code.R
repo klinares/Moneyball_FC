@@ -11,10 +11,11 @@ library(tidyverse)
 # path to repo
 repo_path <- "D:/repos/Moneyball_FC/"
 
+
 # --- 1. Recreate the 'all_coeffs' tibble from the website ---
 all_coeffs <- tribble(
-  ~Pos, ~Club, ~`15/16`, ~`16/17`, ~`17/18`, ~`18/19`, ~`19/20`, ~`20/21`, ~`21/22`,
-  ~`22/23`, ~`23/24`, ~`24/25`, ~Total_Pts, ~Assoc_Coeff, ~Country,
+  ~Pos, ~Club, ~`2015`, ~`2016`, ~`2017`, ~`2018`, ~`2019`, ~`2020`, ~`2021`,
+  ~`2022`, ~`2023`, ~`2024`, ~Total_Pts, ~Assoc_Coeff, ~Country,
   3, "Man City", 26, 18, 22, 25, 10, 35, 27, 33, 28, 14.75, 253.75, 41.131, "England",
   6, "Liverpool", 22, NA, 30, 29, 18, 24, 33, 19, 20, 29.5, 224.5, 41.131, "England",
   8, "Man Utd", 13, 26, 20, 19, 22, 26, 18, 19, 7, 32.5, 202.5, 41.131, "England",
@@ -36,7 +37,10 @@ all_coeffs <- tribble(
   13, "Roma", 14, 13, 25, 17, 11, 24, 23, 22, 21, 14.5, 184.5, 33.576, "Italy",
   14, "Inter", NA, 4, NA, 15, 25, 9, 18, 29, 20, 40.25, 160.25, 33.576, "Italy",
   20, "Napoli", 13, 17, 10, 18, 19, 10, 9, 25, 17, NA, 138, 33.576, "Italy",
-)
+) |> 
+  # repeat 2015 for 2013 and 2014
+  mutate('2013' = `2015`,
+         '2014' = `2015`)
 
 # --- 2. Recreate the 'team_urls_df' tibble ---
 team_urls_df <- tribble(
@@ -68,11 +72,15 @@ team_urls_df <- tribble(
 # --- 3. Combine the two tables ---
 all_coeffs_with_urls <- left_join(all_coeffs, 
                                   team_urls_df, by = c("Club", "Country")) |> 
-  select(Pos, Club, Country, Total_Pts, team_url)
+  pivot_longer(-c("Pos", "Club", "Country", "Total_Pts", "Assoc_Coeff",  "team_url"), 
+               names_to = "season_year", values_to = "uefa_coefficient") |> 
+  # if NA for coefficient replace with mean
+  group_by(Club) |> 
+  mutate(uefa_coefficient = replace_na(uefa_coefficient, mean(uefa_coefficient, na.rm=TRUE)),
+         season_year = as.double(season_year)) 
+  
 
 # --- 4. Print the final, combined table ---
 write_parquet(all_coeffs_with_urls, str_c(
   repo_path, "inputs/uefa_standing.parquet")
 )
-
-

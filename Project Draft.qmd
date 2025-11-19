@@ -49,7 +49,7 @@ theme_set(theme_minimal())
 
 # Abstract
 
-This project study here investigates the determinants of player market values in elite European football using a three-level cross-classified mixed-effects model. We analyzed 7,023 season-year observations of 2,215 players across 21 elite clubs from 2013 to 2024. Our primary research question examines how individual performance metrics, player characteristics, and club-level prestige jointly predict market valuations. The results demonstrate that club prestige, measured by UEFA's 10-year coefficient, explains 47.85% of between-club variance in player values (*p* < 0.001), even after controlling for individual performance. Each goal scored increases market value by 3.75% (*p* < 0.001), while each assist adds 4.95% (*p* < 0.001). Not only that but positional effects reveal attackers command approximately 71.1% premiums over goalkeepers (*p* < 0.001). The full model here achieves a conditional $$R²$$ of 0.7928, indicating that 79.3% of variance in player market values is explained by the combination of fixed predictors and random effects. These findings provide evidence for a substantial **halo effect** whereby players at elite clubs command valuation premiums independent of individual performance, with important implications for transfer strategies and talent investment.
+This project study here investigates the determinants of player market values in elite European football using a three-level cross-classified mixed-effects model. We analyzed 7,023 season-year observations of 2,215 players across 21 elite clubs from 2013 to 2024. Our primary research question examines how individual performance metrics, player characteristics, and club-level prestige jointly predict market valuations. The results demonstrate that club prestige, measured by UEFA's 10-year coefficient, explains 47.85% of between-club variance in player values (*p* \< 0.001), even after controlling for individual performance. Each goal scored increases market value by 3.75% (*p* \< 0.001), while each assist adds 4.95% (*p* \< 0.001). Not only that but positional effects reveal attackers command approximately 71.1% premiums over goalkeepers (*p* \< 0.001). The full model here achieves a conditional $$R²$$ of 0.7928, indicating that 79.3% of variance in player market values is explained by the combination of fixed predictors and random effects. These findings provide evidence for a substantial **halo effect** whereby players at elite clubs command valuation premiums independent of individual performance, with important implications for transfer strategies and talent investment.
 
 **Keywords:** football economics, multilevel modeling, player valuation, club prestige, UEFA coefficient, sports analytics
 
@@ -59,7 +59,7 @@ This project study here investigates the determinants of player market values in
 
 Now the global football transfer market has grown exponentially over the past two decades, with annual transfer expenditures exceeding €7 billion in recent years. That's why, understanding the determinants of player market values has become increasingly critical for clubs seeking competitive advantages through strategic talent acquisition and development. While one can say that the traditional scouting emphasized subjective assessments of skill and potential, the rise of sports analytics has enabled more systematic approaches to player valuation.
 
-So, the "Moneyball" revolution in baseball demonstrated that data-driven approaches could identify undervalued players by focusing on objective performance metrics rather than traditional scouting heuristics [@herm2014]. This paradigm has gradually permeated football, where crowd-sourced platforms like **Transfermarkt** provide real-time market valuations based on collective assessments of player worth. Research validates these crowd-sourced valuations as highly correlated with actual transfer fees (r > 0.90), establishing their legitimacy as proxies for true market value [@herm2014].
+So, the "Moneyball" revolution in baseball demonstrated that data-driven approaches could identify undervalued players by focusing on objective performance metrics rather than traditional scouting heuristics [@herm2014]. This paradigm has gradually permeated football, where crowd-sourced platforms like **Transfermarkt** provide real-time market valuations based on collective assessments of player worth. Research validates these crowd-sourced valuations as highly correlated with actual transfer fees (r \> 0.90), establishing their legitimacy as proxies for true market value [@herm2014].
 
 However, one needs to keep in mind that player market values in football likely reflect not only individual performance but also contextual factors such as club reputation, competitive success, and market visibility. Previous research suggests that approximately 15-20% of salary variation as per closely related to market value, can be attributed to team-level factors rather than individual talent [@franck2012]. This raises a critical question i.e., to what extent do club-level characteristics create this **halo effect** on player valuations, whereby individuals at elite clubs command premiums independent of their actual performance?
 
@@ -67,11 +67,11 @@ However, one needs to keep in mind that player market values in football likely 
 
 Our study addresses three primary objectives:
 
-1. **Quantify individual performance effects:** Determining the marginal impact of measurable performance metrics (goals, assists, disciplinary records) on player market values across different positions.
+1.  **Quantify individual performance effects:** Determining the marginal impact of measurable performance metrics (goals, assists, disciplinary records) on player market values across different positions.
 
-2. **Assess club prestige effects:** Estimating the extent to which club-level prestige, operationalized through UEFA coefficients reflecting historical success in European competitions, influences player valuations beyond individual characteristics.
+2.  **Assess club prestige effects:** Estimating the extent to which club-level prestige, operationalized through UEFA coefficients reflecting historical success in European competitions, influences player valuations beyond individual characteristics.
 
-3. **Model multilevel structure appropriately:** Accounting for the nested and cross-classified nature of football data, where repeated measurements are nested within players, and players can transfer between clubs over time.
+3.  **Model multilevel structure appropriately:** Accounting for the nested and cross-classified nature of football data, where repeated measurements are nested within players, and players can transfer between clubs over time.
 
 ## Theoretical Framework
 
@@ -135,22 +135,22 @@ Club selection criteria required clubs to be consistently ranked within the top 
 
 ### Level 1 Predictors (Time-Varying, Within-Player)
 
-- **Season Year:** Calendar year of the season (2013-2024), capturing secular time trends in valuations.
-- **Goals:** Number of goals scored during the season.
-- **Assists:** Number of assists recorded during the season.
-- **Yellow Cards:** Number of yellow cards received, reflecting disciplinary record.
+-   **Season Year:** Calendar year of the season (2013-2024), capturing secular time trends in valuations.
+-   **Goals:** Number of goals scored during the season.
+-   **Assists:** Number of assists recorded during the season.
+-   **Yellow Cards:** Number of yellow cards received, reflecting disciplinary record.
 
 ### Level 2 Predictors (Player-Invariant)
 
-- **Position:** Categorical variable with four levels (Goalkeeper [reference], Defender, Midfield, Attack).
-- **Age (centered):** Player age in years, grand-mean centered at 26.5 years.
-- **Height (centered):** Player height in centimeters, grand-mean centered at 182.4 cm.
-- **Birth Region:** Categorical variable indicating player's birth region (East Asia & Pacific [this is used as reference], Europe & Central Asia, Latin America & Caribbean, Middle East & North Africa, North America, South Asia, Sub-Saharan Africa).
-- **Citizen of Club Country:** Binary indicator (Yes/No) for whether player holds citizenship in the country where the club is based.
+-   **Position:** Categorical variable with four levels (Goalkeeper \[reference\], Defender, Midfield, Attack).
+-   **Age (centered):** Player age in years, grand-mean centered at 26.5 years.
+-   **Height (centered):** Player height in centimeters, grand-mean centered at 182.4 cm.
+-   **Birth Region:** Categorical variable indicating player's birth region (East Asia & Pacific \[this is used as reference\], Europe & Central Asia, Latin America & Caribbean, Middle East & North Africa, North America, South Asia, Sub-Saharan Africa).
+-   **Citizen of Club Country:** Binary indicator (Yes/No) for whether player holds citizenship in the country where the club is based.
 
 ### Level 3 Predictor (Club-Level)
 
-- **UEFA Coefficient (centered):** The 10-year UEFA club coefficient (2015-2025), representing cumulative points from European competition performance. This variable was grand-mean centered at 194.36 points. Higher values indicate more prestigious clubs with greater historical success.
+-   **UEFA Coefficient (centered):** The 10-year UEFA club coefficient (2015-2025), representing cumulative points from European competition performance. This variable was grand-mean centered at 194.36 points. Higher values indicate more prestigious clubs with greater historical success.
 
 ```{r descriptive_stats}
 # Creating Table 1: Sample Characteristics
@@ -310,11 +310,11 @@ Models were estimated using restricted maximum likelihood (REML) in R with the `
 
 We evaluated the following assumptions:
 
-1. **Linearity:** Addressed through log-transformation of the outcome.
-2. **Normality of residuals:** Assessed via Q-Q plots of level-1 residuals.
-3. **Normality of random effects:** Assessed via Q-Q plots of empirical Bayes estimates.
-4. **Homoscedasticity:** Evaluated through residual plots against fitted values.
-5. **Multicollinearity:** Checked using variance inflation factors (VIF < 5 criterion).
+1.  **Linearity:** Addressed through log-transformation of the outcome.
+2.  **Normality of residuals:** Assessed via Q-Q plots of level-1 residuals.
+3.  **Normality of random effects:** Assessed via Q-Q plots of empirical Bayes estimates.
+4.  **Homoscedasticity:** Evaluated through residual plots against fitted values.
+5.  **Multicollinearity:** Checked using variance inflation factors (VIF \< 5 criterion).
 
 ```{r fit_models, cache=TRUE}
 # Fitting models
@@ -363,9 +363,9 @@ m_final_reml <- lmer(
 
 Finally, we estimated three nested models to evaluate the contribution of predictor sets:
 
-- **M0 (Null Model):** Random intercepts only (ICC estimation)
-- **M1 (Without UEFA):** All predictors except UEFA coefficient
-- **M2 (Full Model):** All predictors including UEFA coefficient
+-   **M0 (Null Model):** Random intercepts only (ICC estimation)
+-   **M1 (Without UEFA):** All predictors except UEFA coefficient
+-   **M2 (Full Model):** All predictors including UEFA coefficient
 
 ```{r model_comparison}
 # Likelihood ratio test
@@ -532,23 +532,23 @@ kable(fx_table,
 
 ### Performance Effects (H1)
 
-As shown, both goals and assists demonstrated highly significant positive effects on market value. Each additional goal scored increased market value by **`r round(fixed_df$pct_change[fixed_df$term=="goals"], 2)`%** (*p* < 0.001), while each assist added **`r round(fixed_df$pct_change[fixed_df$term=="assists"], 2)`%** (*p* < 0.001). Hence, these findings strongly support **H1**, confirming that measurable performance metrics significantly predict player valuations.
+As shown, both goals and assists demonstrated highly significant positive effects on market value. Each additional goal scored increased market value by **`r round(fixed_df$pct_change[fixed_df$term=="goals"], 2)`%** (*p* \< 0.001), while each assist added **`r round(fixed_df$pct_change[fixed_df$term=="assists"], 2)`%** (*p* \< 0.001). Hence, these findings strongly support **H1**, confirming that measurable performance metrics significantly predict player valuations.
 
-Interestingly, yellow cards also showed a significant positive effect (`r round(fixed_df$pct_change[fixed_df$term=="yellow_cards"], 2)`% per card, *p* < 0.001), which may reflect that more playing time and aggressive playing styles both increase disciplinary records and market visibility.
+Interestingly, yellow cards also showed a significant positive effect (`r round(fixed_df$pct_change[fixed_df$term=="yellow_cards"], 2)`% per card, *p* \< 0.001), which may reflect that more playing time and aggressive playing styles both increase disciplinary records and market visibility.
 
 ### Club Prestige Effect (H2)
 
-The UEFA coefficient exhibited a highly significant positive effect (β = `r sprintf("%.5f", fixed_df$estimate[fixed_df$term=="uefa_coef_cen"])`, *p* < 0.001). Each 1-point increase in UEFA coefficient corresponds to a **`r sprintf("%.3f", fixed_df$pct_change[fixed_df$term=="uefa_coef_cen"])`%** increase in market value. 
+The UEFA coefficient exhibited a highly significant positive effect (β = `r sprintf("%.5f", fixed_df$estimate[fixed_df$term=="uefa_coef_cen"])`, *p* \< 0.001). Each 1-point increase in UEFA coefficient corresponds to a **`r sprintf("%.3f", fixed_df$pct_change[fixed_df$term=="uefa_coef_cen"])`%** increase in market value.
 
 To contextualize this effect i.e., the difference between the highest-ranked club in our sample (Real Madrid, UEFA coefficient = 277.5) and the lowest-ranked (Villarreal, coefficient = 138) implies a **`r round(fixed_df$pct_change[fixed_df$term=="uefa_coef_cen"] * (277.5 - 138), 1)`%** difference in player valuations, holding all else constant. So, combined with the variance reduction analysis, this provides compelling evidence for **H2**.
 
 ### Age Effect (H3)
 
-Age demonstrated a significant negative effect (β = `r sprintf("%.4f", fixed_df$estimate[fixed_df$term=="age_cen"])`, *p* < 0.001), indicating that each year beyond the sample mean of 26.5 years is associated with a **`r sprintf("%.2f", fixed_df$pct_change[fixed_df$term=="age_cen"])`%** decrease in market value. This supports **H3** and aligns with life-cycle theories of athlete value, where declining physical capabilities and shorter remaining career lengths reduce valuations for older players.
+Age demonstrated a significant negative effect (β = `r sprintf("%.4f", fixed_df$estimate[fixed_df$term=="age_cen"])`, *p* \< 0.001), indicating that each year beyond the sample mean of 26.5 years is associated with a **`r sprintf("%.2f", fixed_df$pct_change[fixed_df$term=="age_cen"])`%** decrease in market value. This supports **H3** and aligns with life-cycle theories of athlete value, where declining physical capabilities and shorter remaining career lengths reduce valuations for older players.
 
 ### Positional Effects (H4)
 
-Relative to goalkeepers (reference category), all field positions commanded significant premiums. Attackers exhibited the largest premium (**`r round(fixed_df$pct_change[fixed_df$term=="positionAttack"], 1)`%**, *p* < 0.001), followed by midfielders (**`r round(fixed_df$pct_change[fixed_df$term=="positionMidfield"], 1)`%**, *p* < 0.001) and defenders (**`r round(fixed_df$pct_change[fixed_df$term=="positionDefender"], 1)`%**, *p* < 0.001). These findings support **H4**, reflecting market preferences for goal-scoring potential and offensive contributions.
+Relative to goalkeepers (reference category), all field positions commanded significant premiums. Attackers exhibited the largest premium (**`r round(fixed_df$pct_change[fixed_df$term=="positionAttack"], 1)`%**, *p* \< 0.001), followed by midfielders (**`r round(fixed_df$pct_change[fixed_df$term=="positionMidfield"], 1)`%**, *p* \< 0.001) and defenders (**`r round(fixed_df$pct_change[fixed_df$term=="positionDefender"], 1)`%**, *p* \< 0.001). These findings support **H4**, reflecting market preferences for goal-scoring potential and offensive contributions.
 
 \newpage
 
@@ -556,8 +556,8 @@ Relative to goalkeepers (reference category), all field positions commanded sign
 
 The full model achieved excellent fit statistics:
 
-- **Marginal $R²$** (fixed effects only) = `r round(r2_vals[1], 4)` (`r round(100*r2_vals[1], 1)`%)
-- **Conditional $R²$** (fixed + random) = `r round(r2_vals[2], 4)` (`r round(100*r2_vals[2], 1)`%)
+-   **Marginal** $R²$ (fixed effects only) = `r round(r2_vals[1], 4)` (`r round(100*r2_vals[1], 1)`%)
+-   **Conditional** $R²$ (fixed + random) = `r round(r2_vals[2], 4)` (`r round(100*r2_vals[2], 1)`%)
 
 The conditional $R²$ indicates that the full model explains **`r round(100*r2_vals[2], 1)`%** of variance in log-transformed market values. The substantial difference between marginal and conditional $R²$ (`r round(100*(r2_vals[2] - r2_vals[1]), 1)` percentage points) underscores the importance of accounting for player- and club-level random effects.
 
@@ -694,12 +694,11 @@ Perhaps the most striking finding is that UEFA coefficient—our operationalizat
 
 To contextualize this effect: two otherwise identical players (same age, position, performance metrics) would differ in market value by approximately 70% if one played for Real Madrid (UEFA coefficient = 277.5) versus Villarreal (coefficient = 138). This finding extends previous research [@franck2012] by demonstrating that club prestige effects are not merely artifacts of correlated individual talent, but rather represent genuine contextual influences on market perceptions.
 
-Several mechanisms may explain this halo effect:
-1) Firstly, elite clubs provide greater visibility through regular participation in prestigious competitions (Champions League), extensive media coverage, and global fan bases. This visibility may lead to inflated perceptions of player quality among both crowds generating Transfermarkt valuations and professional scouts.
+Several mechanisms may explain this halo effect: 1) Firstly, elite clubs provide greater visibility through regular participation in prestigious competitions (Champions League), extensive media coverage, and global fan bases. This visibility may lead to inflated perceptions of player quality among both crowds generating Transfermarkt valuations and professional scouts.
 
-2) Secondly, playing for elite clubs serves as a quality signal, as these organizations maintain rigorous selection standards and developmental resources. So, the market may rationally infer higher unobserved quality for players who secure positions at prestigious clubs. 
+2)  Secondly, playing for elite clubs serves as a quality signal, as these organizations maintain rigorous selection standards and developmental resources. So, the market may rationally infer higher unobserved quality for players who secure positions at prestigious clubs.
 
-3) Finally, elite clubs' greater financial resources enable them to pay higher transfer fees, creating self-fulfilling valuation dynamics.
+3)  Finally, elite clubs' greater financial resources enable them to pay higher transfer fees, creating self-fulfilling valuation dynamics.
 
 ### Performance Metrics Matter, But Differentially
 
@@ -723,31 +722,31 @@ The negative age effect (**H3**) aligns with human capital theory predictions. E
 
 Our findings suggest systematic opportunities for value-conscious clubs. Specifically:
 
-1. **Target players at lower-prestige clubs:** The 47.85% of variance explained by UEFA coefficient implies that equivalent performers at lower-ranked clubs may be systematically undervalued. Clubs can exploit this by identifying high-performing players at clubs with low UEFA coefficients.
+1.  **Target players at lower-prestige clubs:** The 47.85% of variance explained by UEFA coefficient implies that equivalent performers at lower-ranked clubs may be systematically undervalued. Clubs can exploit this by identifying high-performing players at clubs with low UEFA coefficients.
 
-2. **Consider positional arbitrage:** The substantial goalkeeper discount suggests that elite goalkeepers may be undervalued relative to their contributions. Investing in top goalkeeper talent could yield competitive advantages at lower cost.
+2.  **Consider positional arbitrage:** The substantial goalkeeper discount suggests that elite goalkeepers may be undervalued relative to their contributions. Investing in top goalkeeper talent could yield competitive advantages at lower cost.
 
-3. **Time purchases strategically around age:** The -3.28% annual depreciation implies that acquiring players in their early-to-mid 20s maximizes value retention, while acquiring players aged 28+ requires careful assessment of remaining productive years.
+3.  **Time purchases strategically around age:** The -3.28% annual depreciation implies that acquiring players in their early-to-mid 20s maximizes value retention, while acquiring players aged 28+ requires careful assessment of remaining productive years.
 
 ### For Selling Clubs
 
 Conversely, clubs seeking to maximize transfer revenues should:
 
-1. **Leverage prestige premiums:** Elite clubs can command substantial premiums even for bench players due to the halo effect. This suggests strategic value in loan arrangements that maintain player affiliation with prestigious clubs.
+1.  **Leverage prestige premiums:** Elite clubs can command substantial premiums even for bench players due to the halo effect. This suggests strategic value in loan arrangements that maintain player affiliation with prestigious clubs.
 
-2. **Market offensive players aggressively:** The 71.1% attacker premium implies that investing in striker development yields highest valuation returns.
+2.  **Market offensive players aggressively:** The 71.1% attacker premium implies that investing in striker development yields highest valuation returns.
 
-3. **Sell before value depreciation:** Given accelerating age-related depreciation, clubs should proactively market players around age 27-28 before steep declines commence.
+3.  **Sell before value depreciation:** Given accelerating age-related depreciation, clubs should proactively market players around age 27-28 before steep declines commence.
 
 ## Limitations and Future Directions
 
-Okay so several limitations warrant acknowledgment. 
+Okay so several limitations warrant acknowledgment.
 
-1) Firstly, our sample focuses exclusively on elite clubs, limiting generalizability to lower-tier organizations where different valuation dynamics may operate. 
+1)  Firstly, our sample focuses exclusively on elite clubs, limiting generalizability to lower-tier organizations where different valuation dynamics may operate.
 
-2) Secondly, while Transfermarkt valuations correlate highly with actual transfer fees [@herm2014], they may not capture private information available to clubs during negotiations. 
+2)  Secondly, while Transfermarkt valuations correlate highly with actual transfer fees [@herm2014], they may not capture private information available to clubs during negotiations.
 
-3) Finally, we cannot fully rule out reverse causality—elite players may disproportionately join prestigious clubs, conflating selection effects with genuine halo effects. Hence, future research employing instrumental variables or natural experiments (e.g., exogenous club prestige shocks from Champions League qualification) could strengthen causal claims.
+3)  Finally, we cannot fully rule out reverse causality—elite players may disproportionately join prestigious clubs, conflating selection effects with genuine halo effects. Hence, future research employing instrumental variables or natural experiments (e.g., exogenous club prestige shocks from Champions League qualification) could strengthen causal claims.
 
 Additionally, we lacked data on several potentially relevant factors including injury history, social media following, contract details, and marketing potential. Incorporating these variables could explain additional variance and potentially attenuate UEFA coefficient effects. Finally, the COVID-19 pandemic (2020-2021) likely disrupted normal market dynamics, yet our model assumes constant effects across the full 2013-2024 period. Sensitivity analyses examining pre- and post-pandemic subsamples could illuminate temporal heterogeneity.
 

@@ -1,0 +1,122 @@
+---
+title: "Multilevel Determinants of Player Market Value in Elite European Football: The Role of Performance, Club Prestige, and Player Characteristics"
+format:
+  jasa-pdf:
+    keep-tex: true  
+    journal:
+      blinded: false
+    linestretch: 2
+date: 'today'
+author:
+  - name: Sagnik Chakrava
+  - name: Jianing Zou
+  - name: Kevin Linares
+  - name: Namit Shrivastava
+    affiliations:
+      - name: University of Maryland
+abstract: |
+  This study investigates the determinants of player market values in elite European football using a three-level cross-classified mixed-effects model. We analyzed 7,023 season-year observations of 2,215 players across 21 elite clubs from 2013 to 2024. The primary research question examines how individual performance metrics, player characteristics, and club-level prestige jointly predict market valuations. Results demonstrate that club prestige, measured by the UEFA 10-year coefficient, explains 47.9% of between-club variance in player values (p<0.001), independent of individual performance. Additionally, each goal scored increases market value by 3.75% (p<0.001), while each assist adds 4.95% (p<0.001). Positional effects reveal that attackers command approximately 71.1% premiums over goalkeepers (p<0.001). The full model achieves a conditional R2 of 0.793. These findings provide evidence for a substantial "halo effect," whereby players at elite clubs command valuation premiums independent of individual performance. 
+  
+editor: 
+  markdown: 
+    wrap: sentence
+    
+keywords: 
+   football economics, multilevel modeling, player valuation, club prestige, UEFA coefficient, sports analytics
+---
+
+```{r include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, error = FALSE, comment = FALSE)
+
+library(arrow)
+library(lme4)
+library(lmerTest)
+library(broom.mixed)
+library(dplyr)
+library(ggplot2)
+library(emmeans)
+library(performance)
+library(jtools)
+library(knitr)
+library(kableExtra)
+library(tidyr)
+library(gt)
+library(MuMIn)
+
+options(scipen=999)
+
+
+# Setting repository path
+#repo_path <- "/Users/namomac/Desktop/Moneyball_FC/inputs/"
+repo_path <- "D:/repos/Moneyball_FC/inputs/"
+# Reading data
+clean_player_df <- read_parquet(paste0(repo_path, "player_df_with_uefa.parquet"))
+
+
+# Setting plot theme
+theme_set(theme_minimal())
+```
+
+## Introduction {#sec-intro}
+
+The global football transfer market has grown exponentially, with annual expenditures exceeding €7 billion.
+Consequently, understanding the determinants of player market values is critical for clubs seeking competitive advantages.
+While traditional scouting emphasized subjective assessments, the "Moneyball" revolution demonstrated that data-driven approaches could identify undervalued players by focusing on objective metrics (Herm et al., 2014).
+Crowd-sourced platforms like Transfermarkt provide real-time valuations that correlate strongly (r\>0.90) with actual transfer fees (Herm et al., 2014).
+
+However, player market values likely reflect contextual factors such as club reputation and competitive success, in addition to individual performance.
+Previous research suggests that 15-20% of salary variation is attributable to team-level factors (Franck & Nüesch, 2012).
+This raises a critical question: to what extent do club-level characteristics create a "halo effect" on player valuations?
+This study addresses three objectives:
+
+1.  **Quantify individual performance effects:** Determine the marginal impact of measurable metrics (goals, assists) on market values.
+2.  **Assess club prestige effects:** Estimate the influence of club-level prestige (UEFA coefficients) on valuations beyond individual characteristics.
+3.  **Model multilevel structure:** Account for the cross-classified nature of football data, where repeated measurements are nested within players, and players transfer between clubs.
+
+## **Theoretical Framework**
+
+We integrate human capital theory with signaling theory.
+Human capital theory posits that market value reflects an individual's productivity potential (goals, assists).
+Signaling theory suggests that club affiliation serves as a quality signal; playing for elite clubs indicates higher quality because these clubs maintain higher selection standards.
+
+Herm et al. (2014) established the validity of crowd-sourced market valuations, identifying performance, age, and club prestige as key attributes.
+While performance metrics consistently emerge as significant predictors, the relative importance of different dimensions remains contested.
+Furthermore, prior research rarely employs multilevel models capable of attributing variance to individual versus team-level factors.
+
+Franck and Nüesch (2012) demonstrated that team-level factors like brand value significantly influence compensation.
+However, most research treats club affiliation as a fixed effect or omits it, potentially biasing estimates.
+Additionally, few studies account for player mobility, which violates strict nesting assumptions.
+To address this, we utilize the UEFA coefficient as an objective measure of club prestige based on historical performance.
+We propose the following hypotheses:
+
+-   **H1:** Player performance metrics will exhibit significant positive associations with market value.
+
+-   **H2:** Club-level UEFA coefficients will predict player market values beyond individual characteristics.
+
+-   **H3:** Player age will demonstrate a negative relationship with market value.
+
+-   **H4:** Attacking players will command significant premiums over defensive players.
+
+## Methods
+
+**Data Source and Sample**
+Data were obtained from Transfermarkt and UEFA official rankings.
+The sample consists of 7,023 season-year observations representing 2,215 unique players across 21 elite European football clubs from 2013 to 2024.
+Clubs were selected based on consistent presence in top UEFA rankings.
+
+**Variables**
+
+-   **Outcome:** *Market Value* (2024 USD), log-transformed to address right skewness.
+
+-   **Level 1 Predictors (Time-Varying):** *Season Year* (2013-2024), *Goals*, *Assists*, and *Yellow Cards*.
+
+-   **Level 2 Predictors (Player-Invariant):** *Position* (Goalkeeper, Defender, Midfield, Attack), *Age* (grand-mean centered at 26.5), *Height* (grand-mean centered at 182.4 cm), *Birth Region*, and *Citizenship of Club Country*.
+
+-   **Level 3 Predictor (Club-Level):** *UEFA Coefficient* (grand-mean centered at 194.36).
+
+**Data Structure**
+The data exhibit a cross-classified structure.
+Measurements (Level 1) are nested within players (Level 2).
+However, players are not strictly nested within clubs because 456 players (20.6%) transferred clubs during the observation window.
+We model player and club as crossed random effects: (1∣player_id)+(1∣club_id).

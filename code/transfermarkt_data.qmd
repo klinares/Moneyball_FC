@@ -57,9 +57,15 @@ team_urls_df <- read_parquet(str_c(
   mutate(club_id = str_extract(team_url, "(?<=verein/)\\d+(?=/saison_id)"),
          club_id = as.double(club_id))
 
+Clubs <- team_urls_df |> 
+  group_by(Club, Country) |> 
+  distinct(club_id) |> 
+  ungroup()
+
 team_urls_df |>
-  select(-team_url) |> 
-  arrange(Pos) |> 
+  filter(season_year == 2024) |> 
+  select(Country, Total_Pts, club_id) |> 
+  arrange(desc(Total_Pts)) |> 
   gt()
 ```
 
@@ -114,7 +120,7 @@ players_appearance <- read_parquet(str_c(
   # create a year variable
   mutate(year_month = zoo::as.yearmon(date),
          year_played = year(date)) |> 
-  filter(club_id %in% team_urls_df$club_id) |> 
+  filter(club_id %in% Clubs$club_id) |> 
   # create season dates
   mutate(season_year = ifelse(str_detect(
     year_month, "Aug|Sep|Oct|Nov|Dec"),
@@ -139,7 +145,7 @@ player_df <- players_appearance |>
   # drop if outcome is NA
   filter(!is.na(market_value_ave)) |> 
   # bring in club names
-  left_join(team_urls_df |> select(club_id, Club, Country))
+  left_join(Clubs |> select(club_id, Club, Country))
   
 
   
@@ -378,7 +384,10 @@ club_predictors <- player_df |>
   # these are all averages 
   reframe(foreign_players = 
             mean(ifelse(country_of_birth != Country, 
-                                             1, 0 ), na.rm=TRUE))
+                                             1, 0 ), na.rm=TRUE)) |> 
+  # join eufa coefficients
+  left_join(team_urls_df |> 
+              select(club_id, season_year, uefa_coefficient))
 
 # merge to player_df
 player_df <- player_df |> 
@@ -523,6 +532,8 @@ This is the proposed modeling framework so that we may model individual player g
 -   **Level 2: The Individual.** This is the **player**. Predictors at this level are time-invariant (e.g., a player's primary position or country of birth does not change).
 
 -   **Level 3: The Contextual Group.** This is the **club**. Players are nested within clubs, and club-level characteristics (like the proportion of foreign players or the country the club plays in) can influence player value.
+
+    -   New: We added UEFA yearly coefficients for each team.
 
 \
 
