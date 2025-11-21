@@ -4,7 +4,6 @@ author: "Jianing Zou"
 format: pdf
 editor: visual
 execute:
-  echo: false
   warning: false
   message: false
 ---
@@ -18,6 +17,7 @@ library(performance)
 library(broom.mixed) 
 library(ggplot2)
 library(jtools) # new package
+library(tidyverse)
 
 options(scipen = 999)
 ```
@@ -26,11 +26,11 @@ options(scipen = 999)
 
 # Setting repository path
 #repo_path <- "/Users/namomac/Desktop/Moneyball_FC/inputs/"
-# repo_path <- "D:/repos/Moneyball_FC/inputs/"
+repo_path <- "D:/repos/Moneyball_FC/inputs/"
 
 # Reading data
-#dat <- read_parquet(paste0(repo_path, "player_df.parquet")) 
-dat <- read_parquet("player_df.parquet") 
+dat <- read_parquet(str_c(repo_path, "player_df.parquet")) 
+#dat <- read_parquet("player_df.parquet") 
 
 
 # View the data
@@ -400,14 +400,11 @@ augmented_data |>
   head()
 ```
 
-
-
 ### 3. Model Diagnostics
 
 #### Linearity
 
-In the overall spaghetti plot, the lines vary widely across players, showing considerable between-player heterogeneity in log market value. Within most players, the slopes
-appear mostly flat, but some of them change up and down dramatically.
+In the overall spaghetti plot, the lines vary widely across players, showing considerable between-player heterogeneity in log market value. Within most players, the slopes appear mostly flat, but some of them change up and down dramatically.
 
 The loess smoother plot shows a non-linear averaged trend (curvature) in log-transformed market value (usd_revenue_2024_log) over centered season year (season_year_c). We can clearly see a peak at about season year 6 to 7, and the shape of the loess line is a wave pattern.
 
@@ -435,7 +432,6 @@ ggplot(clean_player_df, aes(x = season_year_c,
 ##### Linear, Quadratic, and Curic
 
 By comparing AIC and BIC of these three models, we can conclude that the multilevel model with cubic terms of centered season year can better fit the data. Therefore, we decide to consider cubic term in out final model.
-
 
 ```{r}
 
@@ -504,10 +500,9 @@ BIC(final_fit, final_quad, final_cub)
 
 ```
 
-
 ##### Two level model
 
-In this two level model, we only consider level 1 variables that are time-variant, and level 2 variables that constant within each player. 
+In this two level model, we only consider level 1 variables that are time-variant, and level 2 variables that constant within each player.
 
 Here we also center the minutes played, age and height of the players, but only center them by average age and height across all the season years.
 
@@ -549,12 +544,11 @@ BIC(final_cub, final_two)
 
 ```
 
-
 #### Normality
 
 By comparing the QQ-line and QQ-plot (both residuals and random effects) we can find that both model plots look good on normality, except some outliers. By comparing the residual-fitted value plot, we can find that both model show the same spread pattern, the dots are evenly spread across zero-mean line up and down.
 
-By comparing EBLUPs plots, we can see that most of the points lie deviate from the  diagonal at both tails, and the lower side is more downward, suggesting moderate departures from normality in the random slopes and random intercepts, which indicates possible skewness and outliers.Thus, we cannot say the normal random effects assumption in the multilevel model are met.
+By comparing EBLUPs plots, we can see that most of the points lie deviate from the diagonal at both tails, and the lower side is more downward, suggesting moderate departures from normality in the random slopes and random intercepts, which indicates possible skewness and outliers.Thus, we cannot say the normal random effects assumption in the multilevel model are met.
 
 ?How to explain the outliers?
 
@@ -572,9 +566,6 @@ plot(resid(final_cub),fitted(final_cub))
 
 ```
 
-
-
-
 ```{r}
 
 
@@ -590,7 +581,3 @@ qqnorm(ranef(final_cub)$club_id[,2]) # group factor
 qqline(ranef(final_cub)$club_id[,2])
 
 ```
-
-
-
-

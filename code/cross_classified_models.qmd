@@ -300,15 +300,11 @@ final_fit <-  lmer(
 summ(final_fit)
 ```
 
-
 ### 1. The Mathematical Equation (LaTeX)
 
 This is a **cross-classified multilevel model** with random intercepts for players and random slopes for clubs.
 
-Let:
-* $t$ index the **Time** (Season Year).
-* $i$ index the **Player**.
-* $j$ index the **Club**.
+Let: \* $t$ index the **Time** (Season Year). \* $i$ index the **Player**. \* $j$ index the **Club**.
 
 The log-transformed market value $Y_{tij}$ is modeled as:
 
@@ -332,7 +328,7 @@ u_{0i} &\sim N(0, \sigma^2_{\text{player}}) \quad &\text{(Player Intercept)} \\
 \end{aligned}
 $$
 
----
+------------------------------------------------------------------------
 
 ### 2. Interpretation of the Final Model
 
@@ -340,41 +336,36 @@ Here is how you interpret the specific coefficients, especially given the custom
 
 #### **A. Fixed Effects (The "Average" Effects)**
 
-* **Intercept ($\beta_0$):**
-    The expected log market value for a baseline player (likely a Forward/Midfielder from the reference Region) who has **average performance**, is of **average age relative to their team**, and plays for an **average club** at the starting year ($t=0$).
+-   **Intercept (**$\beta_0$): The expected log market value for a baseline player (likely a Forward/Midfielder from the reference Region) who has **average performance**, is of **average age relative to their team**, and plays for an **average club** at the starting year ($t=0$).
 
-* **Season Year ($\beta_1$):**
-    This is the **global trend**. It tells you the average annual growth rate in player market value across the entire dataset, holding performance constant. A positive value means the market is inflating generally.
+-   **Season Year (**$\beta_1$): This is the **global trend**. It tells you the average annual growth rate in player market value across the entire dataset, holding performance constant. A positive value means the market is inflating generally.
 
-* **Player Performance (Goals, Assists, etc.):**
-    These are standard interpretations. For every 1 additional goal scored, market value increases by $\beta_2$ (or $\approx \beta_2 \times 100\%$ since the outcome is logged), holding all else constant.
+-   **Player Performance (Goals, Assists, etc.):** These are standard interpretations. For every 1 additional goal scored, market value increases by $\beta_2$ (or $\approx \beta_2 \times 100\%$ since the outcome is logged), holding all else constant.
 
-* **$\text{Age}_{tij} - \bar{\text{Age}}_{tj}$ (Group-Mean Centered):**
-    **Crucial Distinction:** Because you centered by club and year, this does *not* measure the effect of getting older in general. It measures the effect of being **older relative to your teammates**.
-    * *Positive Coeff:* "Being the veteran on the team increases your value."
-    * *Negative Coeff:* "Being older than your average teammate decreases your value" (likely true for soccer players past their prime).
+-   $\text{Age}_{tij} - \bar{\text{Age}}_{tj}$ (Group-Mean Centered): **Crucial Distinction:** Because you centered by club and year, this does *not* measure the effect of getting older in general. It measures the effect of being **older relative to your teammates**.
 
-* **$\text{UEFA}_{tj} - \bar{\text{UEFA}}_{t}$ (Year-Centered):**
-    This measures the prestige of the club **relative to other clubs that season**. By centering by year, you removed the "grade inflation" of UEFA coefficients over time. A positive coefficient means playing for a club that is currently outperforming the European average boosts a player's value.
+    -   *Positive Coeff:* "Being the veteran on the team increases your value."
+    -   *Negative Coeff:* "Being older than your average teammate decreases your value" (likely true for soccer players past their prime).
+
+-   $\text{UEFA}_{tj} - \bar{\text{UEFA}}_{t}$ (Year-Centered): This measures the prestige of the club **relative to other clubs that season**. By centering by year, you removed the "grade inflation" of UEFA coefficients over time. A positive coefficient means playing for a club that is currently outperforming the European average boosts a player's value.
 
 #### **B. Random Effects (The "Variance" Components)**
 
-* **Player Random Intercept ($u_{0i}$):**
-    This captures **innate player quality** ("Superstar Effect"). Even if two players have the exact same goals, assists, and age, Player A might consistently have a higher market value than Player B due to unmeasured factors (marketing potential, leadership, brand).
-    * *High $\sigma^2_{player}$:* Suggests market value is driven heavily by who the player *is*, not just what they did this year.
+-   **Player Random Intercept (**$u_{0i}$): This captures **innate player quality** ("Superstar Effect"). Even if two players have the exact same goals, assists, and age, Player A might consistently have a higher market value than Player B due to unmeasured factors (marketing potential, leadership, brand).
 
-* **Club Random Intercept ($v_{0j}$):**
-    This captures the **baseline club premium**. Playing for Real Madrid or Man City likely adds a baseline value to a player regardless of their performance.
+    -   *High* $\sigma^2_{player}$: Suggests market value is driven heavily by who the player *is*, not just what they did this year.
 
-* **Club Random Slope ($v_{1j}$):**
-    This is the most interesting part. It captures **Club Development Trajectories**.
-    * A club with a *high positive random slope* ($v_{1j} > 0$) is an "incubator" or "value creator." Players at this club see their market value rise faster over time than the global average.
-    * A club with a *negative random slope* ($v_{1j} < 0$) might be a place where player values tend to stagnate or decline faster than the market.
+-   **Club Random Intercept (**$v_{0j}$): This captures the **baseline club premium**. Playing for Real Madrid or Man City likely adds a baseline value to a player regardless of their performance.
 
-* **Covariance ($\sigma_{cov}$):**
-    This tells you the relationship between the Club Intercept and Slope.
-    * *Positive Correlation:* Rich clubs (high intercept) are also better at growing player value (high slope).
-    * *Negative Correlation:* Rich clubs start high but grow slowly (diminishing returns), while smaller clubs start low but grow player value quickly (development clubs).
+-   **Club Random Slope (**$v_{1j}$): This is the most interesting part. It captures **Club Development Trajectories**.
+
+    -   A club with a *high positive random slope* ($v_{1j} > 0$) is an "incubator" or "value creator." Players at this club see their market value rise faster over time than the global average.
+    -   A club with a *negative random slope* ($v_{1j} < 0$) might be a place where player values tend to stagnate or decline faster than the market.
+
+-   **Covariance (**$\sigma_{cov}$): This tells you the relationship between the Club Intercept and Slope.
+
+    -   *Positive Correlation:* Rich clubs (high intercept) are also better at growing player value (high slope).
+    -   *Negative Correlation:* Rich clubs start high but grow slowly (diminishing returns), while smaller clubs start low but grow player value quickly (development clubs).
 
 ```{r}
 export_summs(random_year, player_varying_predictors,
