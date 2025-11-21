@@ -1,0 +1,596 @@
+---
+title: "cross_classified_models"
+author: "Jianing Zou"
+format: pdf
+editor: visual
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+library(arrow)
+library(lme4)
+library(lmerTest)    
+library(dplyr)
+library(performance) 
+library(broom.mixed) 
+library(ggplot2)
+library(jtools) # new package
+
+options(scipen = 999)
+```
+
+```{r}
+
+# Setting repository path
+#repo_path <- "/Users/namomac/Desktop/Moneyball_FC/inputs/"
+# repo_path <- "D:/repos/Moneyball_FC/inputs/"
+
+# Reading data
+#dat <- read_parquet(paste0(repo_path, "player_df.parquet")) 
+dat <- read_parquet("player_df.parquet") 
+
+
+# View the data
+glimpse(dat)
+
+```
+
+# Data Structure
+
+Level 1 (time): season_year: season-year within player Level 2 (player): name: players Level 3 (club): club_id: clubs
+
+L1 time-varying: season_year, yellow_cards, red_cards, goals, assists, minutes_played L2 player-invariant: country_of_birth, sub_position, position, height_in_cm L3 club-invariant: season_year
+
+seanson_year: 2013, 2014, 2015, 2016, 2017, 2018, 2020, 2021, 2022, 2023, 2024.
+
+position: Attack, Defender, Goalkeeper, Midfield.
+
+Region: East Asia & Pacific, Europe & Central Asia, Latin America & Caribbean, Middle East & North Africa, North America, Sub-Saharan Africa.
+
+citizen_of_club_country: YES, NO.
+
+```{r}
+
+player_df <- dat %>%
+  mutate(
+    player_id = factor(player_id),
+    club_id   = factor(club_id),
+    position = factor(position),
+    Region = factor(Region),
+    citizen_of_club_country = factor(citizen_of_club_country),
+    usd_revenue_2024_log = log(usd_revenue_2024),
+    # convert season_year to 0, 1, 2, etc.
+    season_year_c = season_year - min(season_year)
+  )
+```
+
+-   Check missing values.
+
+```{r}
+# Which variable has missing value
+colSums(is.na(player_df))
+
+# Which observation has missing values
+player_df %>%
+  filter(!complete.cases(.))
+
+# Exclude all missing values, only 7023 observations now
+clean_player_df <- na.omit(player_df)
+
+```
+
+-   Intercept only model: We want to model usd_revenue_2024 because market value is accounting for inflation and converted to 2024 US dollars.
+
+# Fit the model
+
+## Cross-classified
+
+-   The player went to different clubs across years, thus they are cross-clubs, not nested in one club.
+
+-   So we use (1 \| club_id) + (1\|player_id) here, not (1 \| club_id) + (1\|club_id : player_id) here, since the latter one is used only when player are nested in the clubs.
+
+```{r}
+
+
+clean_player_df %>%
+  distinct(player_id, club_id) %>%      
+  count(player_id, name = "num_clubs") %>%  
+  filter(num_clubs > 1) %>%              
+  arrange(desc(num_clubs))
+
+```
+
+## We will now add a fixed effect for year and allow it to vary by club.
+
+-   Recall that year has been centered at 0, so that 2013=0, 2024 = 11. This is because `lmer` struggles when predictors are on vastly different scales than the outcome. If `season_year` is recorded as "2020, 2021, 2022," these numbers are huge compared to the log-revenue variance. This causes the gradient calculation to fail.
+
+```{r}
+fixed_year <-  lmer(
+  usd_revenue_2024_log ~ 
+    # first level fixed effect
+    season_year_c +
+    # random effects
+      (1|player_id) + (1|club_id), ,  
+  data = clean_player_df, REML = TRUE)
+
+summ(fixed_year)
+```
+
+-   We can see that player_id accounts for about 76% of market value while club_id accounts for 3%.
+
+-   we also fit a random slope for year to compare.
+
+    -   To estimate a random slope `(1 + year_centered | player_id)`, the model needs multiple data points for *every* player to calculate their individual trajectory. But many players only appear in our data for 1 or 2 years, and the model struggles to distinguish the "player slope" from the "residual error," causing these convergence issues. Clubs, however, have many players and many years of historical market value data so a random slope for clubs is more robust to fit.
+
+```{r}
+random_year <-  lmer(
+  usd_revenue_2024_log ~ 
+    # first level fixed effect
+    season_year_c +
+    # random effects
+      (1|player_id) + (1+season_year_c|club_id), 
+  data = clean_player_df, REML = TRUE)
+
+summ(random_year)
+```
+
+-   AIC and BIC values are lower with the random slope of year.
+
+```{r}
+calculate_lrt_mixture <- function(reduced_model, full_model) {
+  
+  # 1. Extract Log-Likelihoods
+  ll_reduced <- as.numeric(logLik(reduced_model))
+  ll_full    <- as.numeric(logLik(full_model))
+  
+  # 2. Calculate LRT Statistic
+  # Formula: -2 * (LL_reduced - LL_full)
+  lrt_stat <- -2 * (ll_reduced - ll_full)
+  
+  # 3. Calculate Difference in Parameters (df)
+  # This tells us how many params we added
+  df_reduced <- attr(logLik(reduced_model), "df")
+  df_full    <- attr(logLik(full_model), "df")
+  df_diff    <- df_full - df_reduced
+  
+  # 4. Calculate P-Value based on the difference
+  # If we added a slope + covariance, df_diff should be 2.
+  # The mixture is 0.5 * ChiSq(1) + 0.5 * ChiSq(2)
+  
+  if (df_diff == 2) {
+    p_val <- 0.5 * pchisq(lrt_stat, df = 1, lower.tail = FALSE) + 
+             0.5 * pchisq(lrt_stat, df = 2, lower.tail = FALSE)
+    
+    msg <- "Mixture of ChiSq(1) and ChiSq(2)"
+    
+  } else if (df_diff == 1) {
+    # If we added a parameter with NO covariance (e.g. diag structure)
+    p_val <- 0.5 * pchisq(lrt_stat, df = 0, lower.tail = FALSE) + 
+             0.5 * pchisq(lrt_stat, df = 1, lower.tail = FALSE)
+    
+    msg <- "Mixture of ChiSq(0) and ChiSq(1)"
+    
+  } else {
+    # Fallback for non-standard comparisons
+    p_val <- pchisq(lrt_stat, df = df_diff, lower.tail = FALSE)
+    msg <- paste0("Standard ChiSq(", df_diff, ")")
+  }
+  
+  # Output
+  cat("LRT Statistic:", round(lrt_stat, 4), "\n")
+  cat("Parameter Diff:", df_diff, "\n")
+  cat("Distribution:  ", msg, "\n")
+  cat("P-Value:       ", format.pval(p_val, eps = .0001), "\n")
+}
+
+# Run the comparison
+calculate_lrt_mixture(fixed_year, random_year)
+```
+
+-   We use a helper function to print the p-value for the LRT difference, and find a p-value \<.0001 and we reject the Null, (with .5 × 𝜒2(1) + .5 × 𝜒2(2 mixture) and conclude that there is strong evidence for club variation in market value trajectories and therefore we should keep this random slope in the model.
+
+```{r}
+compare_performance(fixed_year, random_year, metrics = c("AIC", "BIC"))
+```
+
+\
+
+## Adding first level player and club predictors
+
+-   We first want to group center minutes played for each for each club by year. We also need to account for the quadratic relationship between age and market value, by centering age by year by club.
+
+```{r}
+clean_player_df <- clean_player_df |> 
+  group_by(season_year_c, club_id) |> 
+  mutate(minutes_played_c = minutes_played - mean(minutes_played, na.rm=TRUE),
+         age_c = (Age - mean(Age, na.rm=TRUE))^2) |> 
+  ungroup()
+```
+
+```{r}
+player_varying_predictors <-  lmer(
+  usd_revenue_2024_log ~ season_year_c +
+    # first level predictors
+    yellow_cards + red_cards + goals + 
+    assists + minutes_played + age_c +
+    # random effects
+      (1|player_id) + (season_year_c|club_id), 
+  data = clean_player_df, REML = TRUE)
+
+summ(player_varying_predictors)
+```
+
+### We next add first level club predictors
+
+-   We want to center player height in inches across years. We also want to center uefa coefficients by year.
+
+```{r}
+clean_player_df <- clean_player_df |> 
+  group_by(season_year_c) |> 
+  mutate(height_in_cm_c = height_in_cm - mean(height_in_cm, na.rm=TRUE),
+         uefa_coefficient_c = uefa_coefficient - 
+           mean(uefa_coefficient)) |> 
+  ungroup()
+  
+```
+
+```{r}
+player_club_varying_predictors <-  lmer(
+  usd_revenue_2024_log ~ season_year_c +
+    # first level player predictors
+    yellow_cards + red_cards + goals + 
+    assists + minutes_played + age_c +
+    # first level club predictors
+    height_in_cm_c + foreign_players + uefa_coefficient_c +
+    # second level predictors
+    position  + Region + citizen_of_club_country+
+      # random effects
+      (1|player_id) + (1|club_id), 
+  data = clean_player_df, REML = TRUE)
+
+summ(player_club_varying_predictors)
+```
+
+### Adding level 2 predictors
+
+-   We want to center height in inches across years and clubs.
+
+### Why This Syntax Works for Cross-Classification
+
+In `lme4`, you do not need special "cross-classified" syntax commands. The structure is defined by how you request the random effects:
+
+1.  **Cross-Classification:** By using `(1 | player_id) + (1 | club_id)`, you are telling R that `player_id` is **not** a subset of `club_id`. R treats them as two independent sources of variation that cross over each other (since players move between clubs).
+
+2.  **The Random Slope:** By using `(1 + season_year_c | club_id)`, you are specifically testing the hypothesis that **Club A** might be great at increasing player value over time (steep positive slope), while **Club B** might be stagnant (flat slope), even if they start with different intercepts.
+
+```{r}
+
+#Using bobyqa to handle the complex random effects structure and avoid gradient warnings
+strict_control <- lmerControl(optimizer = "bobyqa",
+                              optCtrl = list(maxfun = 200000))
+
+final_fit <-  lmer(
+ usd_revenue_2024_log ~ 
+    # --- Fixed Effects: Time ---
+    season_year_c +
+    
+    # --- Fixed Effects: Player Level ---
+    yellow_cards + 
+    red_cards + 
+    goals + 
+    assists + 
+    minutes_played_c + # centered by year & club
+    age_c +   # centered by year & club
+    
+    # --- Fixed Effects: Club Level ---
+    height_in_cm_c +     # centered by year
+    foreign_players + 
+    uefa_coefficient_c + # centered by year
+    
+    # --- Fixed Effects: Categorical ---
+    position + 
+    Region + 
+    citizen_of_club_country +
+    
+    # --- Random Effects (Cross-Classified) ---
+    (1 | player_id) +                 
+    (1 + season_year_c | club_id),
+  data = clean_player_df, REML = TRUE, control = strict_control)
+
+summ(final_fit)
+```
+
+### 1. The Mathematical Equation (LaTeX)
+
+This is a **cross-classified multilevel model** with random intercepts for players and random slopes for clubs.
+
+Let: \* $t$ index the **Time** (Season Year). \* $i$ index the **Player**. \* $j$ index the **Club**.
+
+The log-transformed market value $Y_{tij}$ is modeled as:
+
+$$
+\begin{aligned}
+Y_{tij} &= \beta_0 + \beta_1(\text{Year}_{tij}) \\
+&\quad + \underbrace{\beta_2\text{Goals}_{tij} + \beta_3\text{Assists}_{tij} + \dots + \beta_k(\text{Age}_{tij} - \bar{\text{Age}}_{tj})}_{\text{Player Fixed Effects (Time-Varying)}} \\
+&\quad + \underbrace{\beta_m(\text{Height}_{tij} - \bar{\text{Height}}_{tj}) + \beta_n\text{Foreign}_{tj} + \beta_p(\text{UEFA}_{tj} - \bar{\text{UEFA}}_{t})}_{\text{Club/Context Fixed Effects}} \\
+&\quad + \underbrace{\beta_q\text{Pos}_{i} + \beta_r\text{Region}_{i} + \dots}_{\text{Time-Invariant Controls}} \\
+&\quad + \underbrace{u_{0i}}_{\text{Player RE}} + \underbrace{v_{0j} + v_{1j}(\text{Year}_{tij})}_{\text{Club RE}} + \epsilon_{tij}
+\end{aligned}
+$$
+
+**Where the Random Effects are distributed as:**
+
+$$
+\begin{aligned}
+u_{0i} &\sim N(0, \sigma^2_{\text{player}}) \quad &\text{(Player Intercept)} \\
+\begin{pmatrix} v_{0j} \\ v_{1j} \end{pmatrix} &\sim N \left( \begin{pmatrix} 0 \\ 0 \end{pmatrix}, \begin{pmatrix} \sigma^2_{\text{club\_int}} & \sigma_{\text{cov}} \\ \sigma_{\text{cov}} & \sigma^2_{\text{club\_slope}} \end{pmatrix} \right) \quad &\text{(Club Intercept \& Slope)} \\
+\epsilon_{tij} &\sim N(0, \sigma^2_{\epsilon}) \quad &\text{(Residual)}
+\end{aligned}
+$$
+
+------------------------------------------------------------------------
+
+### 2. Interpretation of the Final Model
+
+Here is how you interpret the specific coefficients, especially given the custom centering you applied.
+
+#### **A. Fixed Effects (The "Average" Effects)**
+
+-   **Intercept (**$\beta_0$): The expected log market value for a baseline player (likely a Forward/Midfielder from the reference Region) who has **average performance**, is of **average age relative to their team**, and plays for an **average club** at the starting year ($t=0$).
+
+-   **Season Year (**$\beta_1$): This is the **global trend**. It tells you the average annual growth rate in player market value across the entire dataset, holding performance constant. A positive value means the market is inflating generally.
+
+-   **Player Performance (Goals, Assists, etc.):** These are standard interpretations. For every 1 additional goal scored, market value increases by $\beta_2$ (or $\approx \beta_2 \times 100\%$ since the outcome is logged), holding all else constant.
+
+-   $\text{Age}_{tij} - \bar{\text{Age}}_{tj}$ (Group-Mean Centered): **Crucial Distinction:** Because you centered by club and year, this does *not* measure the effect of getting older in general. It measures the effect of being **older relative to your teammates**.
+
+    -   *Positive Coeff:* "Being the veteran on the team increases your value."
+    -   *Negative Coeff:* "Being older than your average teammate decreases your value" (likely true for soccer players past their prime).
+
+-   $\text{UEFA}_{tj} - \bar{\text{UEFA}}_{t}$ (Year-Centered): This measures the prestige of the club **relative to other clubs that season**. By centering by year, you removed the "grade inflation" of UEFA coefficients over time. A positive coefficient means playing for a club that is currently outperforming the European average boosts a player's value.
+
+#### **B. Random Effects (The "Variance" Components)**
+
+-   **Player Random Intercept (**$u_{0i}$): This captures **innate player quality** ("Superstar Effect"). Even if two players have the exact same goals, assists, and age, Player A might consistently have a higher market value than Player B due to unmeasured factors (marketing potential, leadership, brand).
+
+    -   *High* $\sigma^2_{player}$: Suggests market value is driven heavily by who the player *is*, not just what they did this year.
+
+-   **Club Random Intercept (**$v_{0j}$): This captures the **baseline club premium**. Playing for Real Madrid or Man City likely adds a baseline value to a player regardless of their performance.
+
+-   **Club Random Slope (**$v_{1j}$): This is the most interesting part. It captures **Club Development Trajectories**.
+
+    -   A club with a *high positive random slope* ($v_{1j} > 0$) is an "incubator" or "value creator." Players at this club see their market value rise faster over time than the global average.
+    -   A club with a *negative random slope* ($v_{1j} < 0$) might be a place where player values tend to stagnate or decline faster than the market.
+
+-   **Covariance (**$\sigma_{cov}$): This tells you the relationship between the Club Intercept and Slope.
+
+    -   *Positive Correlation:* Rich clubs (high intercept) are also better at growing player value (high slope).
+    -   *Negative Correlation:* Rich clubs start high but grow slowly (diminishing returns), while smaller clubs start low but grow player value quickly (development clubs).
+
+```{r}
+export_summs(random_year, player_varying_predictors,
+             player_club_varying_predictors,
+              digits=3, r.squared=FALSE, confint = TRUE,
+             error_format = "[{conf.low}, {conf.high}]",
+             model.names = c("M1", "M2", "M3"))
+
+export_summs(final_fit, 
+              digits=3, r.squared=FALSE, confint = TRUE,
+             error_format = "[{conf.low}, {conf.high}]",
+             model.names = c("M4"))
+```
+
+If we want to back log transform we may need to use the broom package.
+
+```{r}
+library(broom)
+
+final_mod_back_transform <- augment(final_fit, clean_player_df)
+
+augmented_data <- final_mod_back_transform |> 
+  mutate(
+    fitted_original_scale = exp(.fitted),
+  )
+
+augmented_data |> 
+  select(usd_revenue_2024, fitted_original_scale) |> 
+  head()
+```
+
+
+
+### 3. Model Diagnostics
+
+#### Linearity
+
+In the overall spaghetti plot, the lines vary widely across players, showing considerable between-player heterogeneity in log market value. Within most players, the slopes
+appear mostly flat, but some of them change up and down dramatically.
+
+The loess smoother plot shows a non-linear averaged trend (curvature) in log-transformed market value (usd_revenue_2024_log) over centered season year (season_year_c). We can clearly see a peak at about season year 6 to 7, and the shape of the loess line is a wave pattern.
+
+Thus, we can try to fit model with polynomial terms like quadratic and cubic terms of season_year_c, instead of assuming linearity.
+
+```{r}
+
+ggplot(clean_player_df) +
+geom_line(aes(x = season_year_c, y = usd_revenue_2024_log, group = player_id),color = "black", alpha = 0.15)
+
+
+ggplot(clean_player_df, aes(x = season_year_c, 
+                            y = usd_revenue_2024_log)) +
+  
+  # LOESS smoother (overall trend)
+  geom_smooth(method = "loess",
+              color = "lightblue", size = 1.2, se = FALSE) +
+  labs(x = "Centered Season Year",
+       y = "Log Revenue",
+       title = "Spaghetti Plot with LOESS Trend") +
+  theme_minimal(base_size = 12)
+
+```
+
+##### Linear, Quadratic, and Curic
+
+By comparing AIC and BIC of these three models, we can conclude that the multilevel model with cubic terms of centered season year can better fit the data. Therefore, we decide to consider cubic term in out final model.
+
+
+```{r}
+
+final_quad <-  lmer(
+ usd_revenue_2024_log ~ 
+    # --- Fixed Effects: Time ---
+    season_year_c + I(season_year_c^2) + 
+    
+    # --- Fixed Effects: Player Level ---
+    yellow_cards + 
+    red_cards + 
+    goals + 
+    assists + 
+    minutes_played_c + # centered by year & club
+    age_c +   # centered by year & club
+    
+    # --- Fixed Effects: Club Level ---
+    height_in_cm_c +     # centered by year
+    foreign_players + 
+    uefa_coefficient_c + # centered by year
+    
+    # --- Fixed Effects: Categorical ---
+    position + 
+    Region + 
+    citizen_of_club_country +
+    
+    # --- Random Effects (Cross-Classified) ---
+    (1 | player_id) +                 
+    (1 + season_year_c | club_id),
+  data = clean_player_df, REML = TRUE, control = strict_control)
+
+
+final_cub <-  lmer(
+ usd_revenue_2024_log ~ 
+    # --- Fixed Effects: Time ---
+    season_year_c + I(season_year_c^2) + I(season_year_c^3) +
+    
+    # --- Fixed Effects: Player Level ---
+    yellow_cards + 
+    red_cards + 
+    goals + 
+    assists + 
+    minutes_played_c + # centered by year & club
+    age_c +   # centered by year & club
+    
+    # --- Fixed Effects: Club Level ---
+    height_in_cm_c +     # centered by year
+    foreign_players + 
+    uefa_coefficient_c + # centered by year
+    
+    # --- Fixed Effects: Categorical ---
+    position + 
+    Region + 
+    citizen_of_club_country +
+    
+    # --- Random Effects (Cross-Classified) ---
+    (1 | player_id) +                 
+    (1 + season_year_c | club_id),
+  data = clean_player_df, REML = TRUE, control = strict_control)
+
+
+AIC(final_fit, final_quad, final_cub)
+BIC(final_fit, final_quad, final_cub)
+
+
+
+```
+
+
+##### Two level model
+
+In this two level model, we only consider level 1 variables that are time-variant, and level 2 variables that constant within each player. 
+
+Here we also center the minutes played, age and height of the players, but only center them by average age and height across all the season years.
+
+We compare AIC and BIC between the two level model with the cubic three level model which consider both player level and club level. The output shows that the two level model better fit the data because both AIC and BIC are lower than the three level model.
+
+```{r}
+
+clean_player_df <- clean_player_df |> 
+  mutate(minutes_played_c_two = minutes_played - mean(minutes_played, na.rm=TRUE),
+         age_c_two = (Age - mean(Age, na.rm=TRUE))^2, height_in_cm_c_two = height_in_cm - mean(height_in_cm, na.rm=TRUE)) |> 
+  ungroup()
+
+final_two <-  lmer(
+ usd_revenue_2024_log ~ 
+    # --- Fixed Effects: Time ---
+    season_year_c + I(season_year_c^2) + I(season_year_c^3) +
+    
+    # --- Fixed Effects: Player Level ---
+    yellow_cards + 
+    red_cards + 
+    goals + 
+    assists + 
+    minutes_played_c_two + # centered
+    age_c_two +   # centered
+    
+    # --- Fixed Effects: Club Level ---
+    height_in_cm_c_two +     # centered by year
+    
+    # --- Fixed Effects: Categorical ---
+    position + 
+    Region + 
+    # --- Random Effects (Only Players) ---
+    (1 | player_id), 
+  data = clean_player_df, REML = TRUE, control = strict_control)
+
+AIC(final_cub, final_two)
+BIC(final_cub, final_two)
+
+
+```
+
+
+#### Normality
+
+By comparing the QQ-line and QQ-plot (both residuals and random effects) we can find that both model plots look good on normality, except some outliers. By comparing the residual-fitted value plot, we can find that both model show the same spread pattern, the dots are evenly spread across zero-mean line up and down.
+
+By comparing EBLUPs plots, we can see that most of the points lie deviate from the  diagonal at both tails, and the lower side is more downward, suggesting moderate departures from normality in the random slopes and random intercepts, which indicates possible skewness and outliers.Thus, we cannot say the normal random effects assumption in the multilevel model are met.
+
+?How to explain the outliers?
+
+```{r}
+
+# Q-Q plot of residuals of the model
+
+qqnorm(resid(final_cub))
+qqline(resid(final_cub))
+
+plot(resid(final_cub),fitted(final_cub))
+
+
+
+
+```
+
+
+
+
+```{r}
+
+
+# slopes
+qqnorm(ranef(final_cub)$player_id[,1]) # group factor
+qqline(ranef(final_cub)$player_id[,1])
+
+
+qqnorm(ranef(final_cub)$club_id[,1]) # group factor
+qqline(ranef(final_cub)$club_id[,1])
+
+qqnorm(ranef(final_cub)$club_id[,2]) # group factor
+qqline(ranef(final_cub)$club_id[,2])
+
+```
+
+
+
+
