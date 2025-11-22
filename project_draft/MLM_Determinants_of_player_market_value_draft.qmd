@@ -100,8 +100,7 @@ We propose the following hypotheses:
 
 ## Methods
 
-**Data Source and Sample**
-Data were obtained from Transfermarkt and UEFA official rankings.
+**Data Source and Sample** Data were obtained from Transfermarkt and UEFA official rankings.
 The sample consists of 7,023 season-year observations representing 2,215 unique players across 21 elite European football clubs from 2013 to 2024.
 Clubs were selected based on consistent presence in top UEFA rankings.
 
@@ -115,8 +114,7 @@ Clubs were selected based on consistent presence in top UEFA rankings.
 
 -   **Level 3 Predictor (Club-Level):** *UEFA Coefficient* (grand-mean centered at 194.36).
 
-**Data Structure**
-The data exhibit a cross-classified structure.
+**Data Structure** The data exhibit a cross-classified structure.
 Measurements (Level 1) are nested within players (Level 2).
 However, players are not strictly nested within clubs because 456 players (20.6%) transferred clubs during the observation window.
 We model player and club as crossed random effects: (1∣player_id)+(1∣club_id).
