@@ -13,7 +13,7 @@ format: pdf
 
 ```{r}
 pacman::p_load(arrow, lme4, lmerTest, performance, broom, broom.mixed,
-               knitr, jtools, tidyverse)
+               knitr, jtools, ggeffects, tidyverse)
 
 options(scipen = 999)
 
@@ -444,7 +444,7 @@ anova(Model_3.2, Model_5)
 ```{r}
 export_summs(Model_2.3, Model_3.2, Model_4,
               digits=3, r.squared=FALSE, 
-             model.names = c("Model_2.3", "Model_3.2", "Model_4"))
+             model.names = c("Model_2.3", "Model_3.2", "Model_4")) 
 
 
 final_model <- Model_3.2
@@ -514,15 +514,18 @@ The final model specification for the log-transformed market value, $Y_{tij}$, i
 
 $$
 \begin{aligned}
-\log(\text{Revenue})_{tij} &= \beta_0 + \underbrace{\beta_1(\text{Year}_{t}) + \beta_2(\text{Year}^2_{t})}_{\text{Time Trends}} \\
-&\quad + \underbrace{\beta_3(\text{Height}_{i} - \bar{\text{Height}}) + \beta_4(\text{Citizen}_{ij}) + \beta_5(\text{Age}_{it} - \bar{\text{Age}}) + \beta_6(\text{Age}^2_{it})}_{\text{Player Fixed Effects (Traits \& Demographics)}} \\
-&\quad + \underbrace{\sum_{p=1}^{P-1} \beta_{Pos, p}(\mathbb{I}_{\text{Position}_i = p}) + \sum_{r=1}^{R-1} \beta_{Reg, r}(\mathbb{I}_{\text{Region}_i = r})}_{\text{Categorical Controls}} \\
-&\quad + \underbrace{\beta_7\text{Goals}_{it} + \beta_8\text{Assists}_{it} + \beta_9\text{Red}_{it} + \beta_{10}\text{Yellow}_{it} + \beta_{11}(\text{Mins}_{it} - \bar{\text{Mins}}_{tj})}_{\text{Performance \& Status (Time-Varying)}} \\
-&\quad + \underbrace{u_{0i}}_{\text{Player RE}} + \underbrace{v_{0j} + v_{1j}(\text{Year}_{t})}_{\text{Club RE}} + \epsilon_{tij}
+\log(\text{Revenue})_{tij} &= \beta_0 
+  + \underbrace{\beta_1(\text{Year}_{t}) + \beta_2(\text{Year}^2_{t})}_{\text{Time Trends}} \\
+  &\quad + \underbrace{\beta_3(\text{Height}_{i} - \bar{H}) + \beta_4(\text{Citizen}_{ij}) + \beta_5(\text{Age}_{it} - \bar{A}) + \beta_6(\text{Age}^2_{it})}_{\text{Player Fixed Effects (Traits \& Demographics)}} \\
+  &\quad + \underbrace{\sum_{p} \beta_{Pos, p}(\mathbb{I}_{\text{Position}_i = p}) + \sum_{r} \beta_{Reg, r}(\mathbb{I}_{\text{Region}_i = r})}_{\text{Categorical Controls}} \\
+  &\quad + \underbrace{\beta_7\text{Goals}_{it} + \beta_8\text{Assists}_{it} + \beta_9\text{Red}_{it} + \beta_{10}\text{Yellow}_{it} + \beta_{11}(\text{Mins}_{Z, it})}_{\text{Performance \& Status (Time-Varying)}} \\
+  &\quad + \underbrace{u_{0i}}_{\text{Player Random Intercept}} \\
+  &\quad + \underbrace{v_{0j} + v_{1j}(\text{Year}_{t})}_{\text{Club Random Effects}} \\
+  &\quad + \epsilon_{tij}
 \end{aligned}
 $$
 
-**Where the random effects are distributed as:**
+**Variance-Covariance Structure:**
 
 $$
 \begin{aligned}
@@ -536,15 +539,55 @@ $$
 
 ### Fixed Effects (Average Predictors)
 
-* **Intercept ($\beta_0 = 16.75$):** The estimated log market value for a baseline player (Attacker from Europe/Central Asia) with average physical traits and career status at the start of the study period (2013).
-* **Market Trajectory ($\beta_1 = 0.10, \beta_2 = -0.01$):** The significant positive linear term indicates the transfer market grew substantially over the decade. However, the significant negative quadratic term ($\beta_2$) reveals a **market deceleration**, where the rapid inflation of the early 2010s has slowed or plateaued in recent years.
-* **Player Status ($\beta_{11} = 0.36$):** We centered *Minutes Played* relative to the specific club and year. The positive coefficient indicates that being a **"Starter"** (playing more minutes than the average teammate) is associated with a significant premium in market value, independent of the club's prestige.
-* **Biological Age ($\beta_5 = 0.02, \beta_6 = -0.02$):** Using grand-mean centering, we observe a classic parabolic career arc. Value increases as a player moves from "Prospect" to "Prime," but the negative quadratic term confirms that value declines significantly as players enter their "Veteran" years.
-* **Homegrown Effect ($\beta_4 = -0.19$):** The variable `citizen_of_club_country` serves as a proxy for domestic status. The negative coefficient implies a **"Foreign Premium"** (or domestic discount), where non-citizen players are valued approximately 19% higher than domestic players, likely reflecting the recruitment costs associated with importing talent.
+-   **Intercept (**$\beta_0 = 16.75$): The estimated log market value for a baseline player (Attacker from Europe/Central Asia) with average physical traits and career status at the start of the study period (2013).
+
+-   **Market Trajectory (**$\beta_1 = 0.10, \beta_2 = -0.01$): The significant positive linear term indicates the transfer market grew substantially over the decade. However, the significant negative quadratic term ($\beta_2$) reveals a **market deceleration**. The peak of this quadratic curve occurs roughly at Year 5 (2018), aligning with the historical "post-Neymar" boom followed by a correction period.
+
+-   **Player Status (**$\beta_{11} = 0.36$): The variable `minutes_played` was standardized (Z-scored) to improve model convergence. The positive coefficient indicates that a **one standard deviation increase** in playing time is associated with a 36% increase in market value, holding all else constant. This confirms that active "Squad Status" is a primary driver of valuation.
+
+-   **Biological Age (**$\beta_5 = 0.02, \beta_6 = -0.02$): Using grand-mean centering, we observe a classic parabolic career arc. Value increases as a player moves from "Prospect" to "Prime," but the negative quadratic term confirms that value declines significantly as players enter their "Veteran" years.
+
+-   **Homegrown Effect (**$\beta_4 = -0.19$): The variable `citizen_of_club_country` serves as a proxy for domestic status. The negative coefficient indicates that citizens are valued lower than their non-citizen counterparts. Converting from the log scale ($e^{-0.19} - 1 \approx -0.173$), we find that **domestic players are valued approximately 17.3% lower** than foreign players, likely reflecting the premium paid to import talent from abroad.
+
+-   **Physical Traits (**$\beta_3 = 0.01$): We observe a small but significant **Physical Premium**. For every 1cm a player is taller than the global average, their market value increases by approximately 1%, suggesting the market favors physical stature.
 
 ### Random Effects (Variance Components)
 
-* **Player Heterogeneity ($\sigma_{player} = 0.95$):** The substantial random intercept for players (ICC $\approx$ 0.77) suggests that **reputation and brand** ("The Superstar Effect") drive the majority of market value variance, rather than just annual performance statistics.
-* **Club Trajectories ($\sigma_{slope} = 0.02$):** The significant random slope for `season_year` confirms that clubs do not share a parallel growth path. Some clubs act as "Incubators" (accelerating player value faster than the market), while others remain stagnant.
-* **The "Catch-Up" Effect ($r = -0.35$):** The negative correlation between the Club Intercept and Club Slope suggests that clubs starting with lower baseline values (smaller clubs) often see steeper relative growth rates in their assets compared to established super-clubs, likely due to their role in developing talent for resale.
+-   **Player Heterogeneity (**$\sigma_{player} = 0.95$): The substantial random intercept for players (ICC $\approx$ 0.77) suggests that **reputation and brand** ("The Superstar Effect") drive the majority of market value variance, rather than just annual performance statistics.
 
+-   **Club Trajectories (**$\sigma_{slope} = 0.02$): The significant random slope for `season_year` confirms that clubs do not share a parallel growth path. Some clubs act as "Incubators" (accelerating player value faster than the market), while others remain stagnant.
+
+-   **The "Catch-Up" Effect (**$r = -0.35$): The negative correlation between the Club Intercept and Club Slope suggests that clubs starting with lower baseline values (smaller clubs) often see steeper relative growth rates in their assets compared to established super-clubs.
+
+### Visualization of Marginal Effects
+
+To better visualize the non-linear effect of Age on Market Value, we computed marginal effects holding all other predictors at their mean.
+
+```{r}
+#| message: false
+#| warning: false
+
+
+# Visualize the Quadratic Age Effect
+# We select representative ages (18 to 38) to show the curve
+age_pred <- ggpredict(Model_3.2, terms = c("age_c [all]", "position"))
+
+plot(age_pred) +
+  labs(
+    title = "Predicted Market Value over Career Cycle",
+    y = "Log Market Value (2024 USD)",
+    x = "Age (Centered)"
+  ) 
+```
+
+\
+
+### Limitations
+
+While our model demonstrates strong predictive power (R2≈0.89), several limitations warrant mention:
+
+1.  **Small Cluster Size for Random Slopes:** We estimated random slopes for `Club`, but our dataset contains only 21 unique clubs. While the Likelihood Ratio Test supported the inclusion of this slope (p\<.001), variance estimates from small numbers of clusters should be interpreted with caution.
+
+2.  **Normality of Residuals:** Diagnostic plots (QQ plots) indicated deviation from normality in the extreme tails of the distribution. While the large sample size (N=7023) ensures robust estimation of fixed effects, future iterations could employ robust standard errors or a Gamma GLMM to better handle these extremes.
+
+3.  **Endogeneity:** Predictors such as `minutes_played` are likely endogenous (better players get more minutes). The coefficient for this variable should be interpreted as an association reflecting "Squad Status" rather than a purely causal effect of playing time.
