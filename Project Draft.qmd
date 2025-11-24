@@ -685,7 +685,7 @@ Figure 3 here displays predicted market values by position for players with posi
 ```{r fig4, fig.width=10, fig.height=6, fig.cap="Performance Effects Vary by Position: Goals and Assists"}
 library(patchwork)
 
-# Create expanded prediction grid for performance by position
+# Creating expanded prediction grid for performance by position
 perf_grid <- expand.grid(
   season_year = 2024,
   position = c("Attack", "Midfield", "Defender", "Goalkeeper"),
