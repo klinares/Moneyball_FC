@@ -63,9 +63,7 @@ dat <- read_parquet(str_c(repo_path, "player_df.parquet"))
 
 -   **minutes_played_c**: Market value is driven by a player's status within their team. This metric isolates whether a player is a "Starter" (positive value) or a "Bench Player" (negative value) relative to their specific squad in that specific season. It removes the noise of "teams that rotate more" vs "teams that don't," focusing purely on the player's hierarchy in the squad.
 
-    
     -   Q: Does being a key player (playing more than the average teammate) increase market value?
-
 
 ### **Position centering:**
 
@@ -293,7 +291,7 @@ ggplot(clean_player_df, aes(x = season_year_c,
 
     -   Model 2.2: Adding quadratic terms for season year
 
-    -   Model 3.3: Adding cubic term for season year
+    -   Model 2.3: Adding cubic term for season year
 
     -   Model 2.4 Adding random slope of season_year_c
 
@@ -334,7 +332,7 @@ Model_1 <-  lmer(
 summ(digits = 4,  Model_1)
 ```
 
--   We can see that player_id accounts for about 76% of market value while club_id accounts for 3%.
+-   We can see that player_id accounts for about 75% of market value while club_id accounts for 3%.
 
 \
 
@@ -712,36 +710,93 @@ check_model(final_model)
 
 \newpage
 
-
 ## Final Model Specification
 
-To test our hypotheses regarding the determinants of player market value, we fitted a **cross-classified multilevel model** (Model 4). This structure accounts for the non-hierarchical nature of the data, where players ($i$) move between different clubs ($j$) over time ($t$).
+To formally describe our analysis, we utilize a **hierarchical notation** system that decomposes the model into observation, player, and club levels. This presentation clarifies how the cross-classified structure ($i$ players crossed with $j$ clubs) contributes to the variance in market value.
 
-The final model specification for the log-transformed market value, $Y_{tij}$, is formally expressed as:
+**Level 1: Observation Model (Time-Varying Effects)**
+
+At the observation level (time $t$, player $i$, club $j$), the log-transformed market value is a function of a player-club specific intercept ($\pi_{0ij}$), temporal trends, biological aging, and dynamic performance metrics:
 
 $$
 \begin{aligned}
-\log(\text{Revenue})_{tij} &= \beta_0 
-  + \underbrace{\beta_1(\text{Year}_{t}) + \beta_2(\text{Year}^2_{t}) + \beta_3(\text{Year}^3_{t})}_{\text{Cubic Time Trends}} \\
-  &\quad + \underbrace{\beta_4(\text{Height}_{i} - \bar{H}) + \beta_5(\text{Citizen}_{ij}) + \beta_6(\text{Age}_{it} - \bar{A}) + \beta_7(\text{Age}^2_{it})}_{\text{Player Fixed Effects}} \\
-  &\quad + \underbrace{\sum_{p} \beta_{Pos, p}(\mathbb{I}_{\text{Position}_i = p}) + \sum_{r} \beta_{Reg, r}(\mathbb{I}_{\text{Region}_i = r})}_{\text{Categorical Controls}} \\
-  &\quad + \underbrace{\beta_8(\text{Goals}^*_{it}) + \beta_9(\text{Assists}^*_{it}) + \beta_{10}\text{Red}_{it} + \beta_{11}\text{Yellow}_{it} + \beta_{12}(\text{Mins}_{Z, it})}_{\text{Performance \& Status}} \\
-  &\quad + \underbrace{\beta_{13}(\text{Foreign}_{tj} - \bar{F})}_{\text{Club Fixed Effect}} \\
-  &\quad + u_{0i} + v_{0j} + v_{1j}(\text{Year}_{t}) + \epsilon_{tij}
+\log(\text{Revenue})_{tij} &= \pi_{0ij} \\
+&+ \pi_{1j}(\text{Year}_{t}) + \pi_{2}(\text{Year}^2_{t}) + \pi_{3}(\text{Year}^3_{t}) \\
+&+ \pi_{4}(\text{Age}_{it} - \bar{A}) + \pi_{5}(\text{Age}_{it} - \bar{A})^2 \\
+&+ \pi_{6}(\text{Mins}_{Z,it}) + \pi_{7}(\text{Goals}^*_{it}) + \pi_{8}(\text{Assists}^*_{it}) \\
+&+ \pi_{9}(\text{Red}_{it}) + \pi_{10}(\text{Yellow}_{it}) \\
+&+ \epsilon_{tij}
 \end{aligned}
 $$
 
+where $\epsilon_{tij} \sim N(0, \sigma^2_{\epsilon})$.
 
+**Level 2a: Player Model (Time-Invariant Traits)**
+
+The player-club intercept ($\pi_{0ij}$) is determined by static physical and demographic characteristics, citizenship status relative to the club, and a player-specific random effect:
+
+$$
+\pi_{0ij} = \beta_{0j} + \gamma_{1}(\text{Height}_{i} - \bar{H}) + \gamma_{2}(\text{Citizen}_{ij}) + \sum_{p} \gamma_{p} \mathbb{1}_{\text{Position}_i=p} + \sum_{r} \gamma_{r} \mathbb{1}_{\text{Region}_i=r} + u_{0i}
+$$
+
+where $u_{0i} \sim N(0, \sigma^2_{u})$.
+
+**Level 2b: Club Model (Contextual Effects)**
+
+The club-level baseline ($\beta_{0j}$) and the linear time slope ($\pi_{1j}$) are modeled as functions of club internationalization and club-specific random effects:
+
+$$
+\begin{aligned}
+\beta_{0j} &= \delta_{00} + \delta_{01}(\text{Foreign}_{tj} - \bar{F}) + v_{0j} \\
+\pi_{1j} &= \delta_{10} + v_{1j} \\
+\pi_{2} &= \delta_{20} \quad \text{(fixed across clubs)} \\
+\pi_{3} &= \delta_{30} \quad \text{(fixed across clubs)}
+\end{aligned}
+$$
+
+where $\begin{pmatrix} v_{0j} \\ v_{1j} \end{pmatrix} \sim N \left( \mathbf{0}, \boldsymbol{\Sigma}_{club} \right)$, with $\boldsymbol{\Sigma}_{club} = \begin{pmatrix} \sigma^2_{v_0} & \sigma_{v_0v_1} \\ \sigma_{v_0v_1} & \sigma^2_{v_1} \end{pmatrix}$.
+
+---
+
+**Interpretation of Cross-Classification:**
+
+- **Player effects** ($u_{0i}$): Capture persistent individual heterogeneity (e.g., reputation, marketability) that follows a player across clubs.
+- **Club effects** ($v_{0j}, v_{1j}$): Capture the baseline prestige and temporal trajectory of the club itself, which affects all players on the roster.
+- **Cross-classified structure**: A player's market value at time $t$ depends on both their intrinsic "brand" ($u_{0i}$) and the club they are currently with ($v_{0j} + v_{1j} \cdot \text{Year}_t$).
+
+---
+
+**Notation Key:**
+
+| Symbol | Meaning |
+|--------|---------|
+| $\text{Year}_t$ | Season year, centered at 2013 |
+| $\text{Age}_{it}$ | Player age, grand-mean centered |
+| $\text{Mins}_{Z,it}$ | Minutes played, standardized (Z-score) within year-club |
+| $\text{Goals}^*_{it}$, $\text{Assists}^*_{it}$ | Centered within position group |
+| $\text{Foreign}_{tj}$ | Proportion of foreign players, grand-mean centered |
+| $\text{Citizen}_{ij}$ | Binary: 1 if player is citizen of club's country |
 
 ## Interpretation of Results
 
-* **Market Trajectory (Cubic Trend):** The model identifies a complex, non-linear market trajectory with a significant cubic term ($\beta_3 \approx -0.002, p < .001$). This "S-shaped" curve suggests the market initially stagnated (2013-2014), accelerated rapidly during the "boom" years (2015-2019), and has recently plateaued in the post-2020 era.
+**Model Fit and Structure**
+The analysis culminates in **Model 4**, a cross-classified multilevel model that partitions variance across observations (Level 1), players (Level 2a), and clubs (Level 2b). The model explains approximately 89% of the total variance in market value ($Pseudo\text{-}R^2_{total} = 0.89$), with the majority of unobserved heterogeneity attributable to the player level (ICC $\approx$ 0.78), confirming that individual reputation ("The Superstar Effect") outweighs club context in determining valuation.
 
-* **Club Internationalization ($\beta_{13} = 0.20$):** We find a significant premium for club diversity. A **10 percentage point increase** in the proportion of foreign players is associated with approximately a **2% increase** in player value. This suggests that clubs with higher international representation—likely a proxy for global reach—elevate the valuation of their entire squad.
+**Temporal Dynamics (Level 1)**
+The model reveals a complex, non-linear evolution of the transfer market. The significant cubic term for Season Year ($\pi_3 \approx -0.002, p < .001$) describes an "S-shaped" trajectory: an initial period of stagnation (2013–2014), followed by a rapid inflationary "boom" (2015–2019), and a subsequent deceleration or plateau in the post-2020 era.
 
-* **Player Status ($\beta_{12} = 0.35$):** The variable `minutes_played` was standardized (Z-scored). The positive coefficient indicates that a **one standard deviation increase** in playing time is associated with a **35% increase** in market value, confirming that "Squad Status" (Starter vs. Bench) is a primary driver of valuation.
+**Biological Career Arc (Level 1)**
+Consistent with human capital theory, player value follows a quadratic "Inverted-U" trajectory with respect to Age. Value accelerates as players transition from "Prospects" to their "Prime" (peaking at approximately age 27), before declining significantly as they enter the "Veteran" stage ($\pi_5 = -0.02, p < .001$).
 
-* **Homegrown Effect ($\beta_5 = -0.19$):** Domestic players (`citizen` = Yes) are valued lower than their non-citizen counterparts. Converting from the log scale ($e^{-0.19} - 1 \approx -17\%$), we find that **domestic players are valued approximately 17% lower** than foreign players.
+**Performance and Status (Level 1)**
+Squad status serves as a primary driver of valuation. The variable `minutes_played` was standardized (Z-scored) relative to the club-year context. The coefficient ($\pi_6 = 0.35$) indicates that a **one standard deviation increase** in playing time—effectively moving from a rotation player to a key starter—is associated with an approximately **42% increase** in market value ($e^{0.35} - 1 \approx 0.42$), holding performance metrics constant.
+
+**Contextual Effects (Level 2b)**
+We identify a significant **"Diversity Premium"** associated with club internationalization. For every **10 percentage point increase** in a club's proportion of foreign players, the average market value of its squad members rises by approximately **2%** ($\delta_{01} = 0.20$). This suggests that globally diverse clubs—likely a proxy for financial power and recruitment reach—confer a valuation bonus on their players.
+
+**The Foreign Premium (Level 2a)**
+Conversely, at the individual level, we observe a "Domestic Discount." Players who are citizens of the club's country are valued approximately **17% lower** than comparable non-citizen (foreign) players ($\gamma_2 = -0.19$; $e^{-0.19} - 1 \approx -0.17$). This aligns with the "Foreign Premium" hypothesis, where clubs pay a premium to import talent from abroad.
+
 
 
 \newpage
