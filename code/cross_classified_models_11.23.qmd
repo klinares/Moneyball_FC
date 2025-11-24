@@ -722,7 +722,7 @@ $$
 \begin{aligned}
 \log(\text{Revenue})_{tij} &= \pi_{0ij} \\
 &+ \pi_{1j}(\text{Year}_{t}) + \pi_{2}(\text{Year}^2_{t}) + \pi_{3}(\text{Year}^3_{t}) \\
-&+ \pi_{4}(\text{Age}_{it} - \bar{A}) + \pi_{5}(\text{Age}_{it} - \bar{A})^2 \\
+&+ \pi_{4}(\text{Age}_{it}) + \pi_{5}(\text{Age}_{it})^2 \\
 &+ \pi_{6}(\text{Mins}_{Z,it}) + \pi_{7}(\text{Goals}^*_{it}) + \pi_{8}(\text{Assists}^*_{it}) \\
 &+ \pi_{9}(\text{Red}_{it}) + \pi_{10}(\text{Yellow}_{it}) \\
 &+ \epsilon_{tij}
@@ -736,7 +736,7 @@ where $\epsilon_{tij} \sim N(0, \sigma^2_{\epsilon})$.
 The player-club intercept ($\pi_{0ij}$) is determined by static physical and demographic characteristics, citizenship status relative to the club, and a player-specific random effect:
 
 $$
-\pi_{0ij} = \beta_{0j} + \gamma_{1}(\text{Height}_{i} - \bar{H}) + \gamma_{2}(\text{Citizen}_{ij}) + \sum_{p} \gamma_{p} \mathbb{1}_{\text{Position}_i=p} + \sum_{r} \gamma_{r} \mathbb{1}_{\text{Region}_i=r} + u_{0i}
+\pi_{0ij} = \beta_{0j} + \gamma_{1}(\text{Height}_{i}) + \gamma_{2}(\text{Citizen}_{ij}) + \sum_{p} \gamma_{p} \mathbb{1}_{\text{Position}_i=p} + \sum_{r} \gamma_{r} \mathbb{1}_{\text{Region}_i=r} + u_{0i}
 $$
 
 where $u_{0i} \sim N(0, \sigma^2_{u})$.
@@ -747,7 +747,7 @@ The club-level baseline ($\beta_{0j}$) and the linear time slope ($\pi_{1j}$) ar
 
 $$
 \begin{aligned}
-\beta_{0j} &= \delta_{00} + \delta_{01}(\text{Foreign}_{tj} - \bar{F}) + v_{0j} \\
+\beta_{0j} &= \delta_{00} + \delta_{01}(\text{Foreign}_{tj}) + v_{0j} \\
 \pi_{1j} &= \delta_{10} + v_{1j} \\
 \pi_{2} &= \delta_{20} \quad \text{(fixed across clubs)} \\
 \pi_{3} &= \delta_{30} \quad \text{(fixed across clubs)}
