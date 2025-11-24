@@ -13,7 +13,7 @@ format: pdf
 
 ```{r}
 pacman::p_load(arrow, lme4, lmerTest, performance, broom, broom.mixed, patchwork,
-               viridis, knitr, jtools, ggeffects, ggdist, gt, tidyverse)
+               arm, viridis, knitr, jtools, ggeffects, ggdist, gt, tidyverse)
 
 options(scipen = 999)
 
@@ -712,7 +712,7 @@ check_model(final_model)
 
 ## Final Model Specification
 
-To formally describe our analysis, we utilize a **hierarchical notation** system that decomposes the model into observation, player, and club levels. This presentation clarifies how the cross-classified structure ($i$ players crossed with $j$ clubs) contributes to the variance in market value.
+To formally describe our analysis, we utilize a **hierarchical notation** system that decomposes the model into observation, player, and club levels. This analysis clarifies how the cross-classified structure ($i$ players crossed with $j$ clubs) contributes to the variance in market value.
 
 **Level 1: Observation Model (Time-Varying Effects)**
 
@@ -756,20 +756,20 @@ $$
 
 where $\begin{pmatrix} v_{0j} \\ v_{1j} \end{pmatrix} \sim N \left( \mathbf{0}, \boldsymbol{\Sigma}_{club} \right)$, with $\boldsymbol{\Sigma}_{club} = \begin{pmatrix} \sigma^2_{v_0} & \sigma_{v_0v_1} \\ \sigma_{v_0v_1} & \sigma^2_{v_1} \end{pmatrix}$.
 
----
+------------------------------------------------------------------------
 
 **Interpretation of Cross-Classification:**
 
-- **Player effects** ($u_{0i}$): Capture persistent individual heterogeneity (e.g., reputation, marketability) that follows a player across clubs.
-- **Club effects** ($v_{0j}, v_{1j}$): Capture the baseline prestige and temporal trajectory of the club itself, which affects all players on the roster.
-- **Cross-classified structure**: A player's market value at time $t$ depends on both their intrinsic "brand" ($u_{0i}$) and the club they are currently with ($v_{0j} + v_{1j} \cdot \text{Year}_t$).
+-   **Player effects** ($u_{0i}$): Capture persistent individual heterogeneity (e.g., reputation, marketability) that follows a player across clubs.
+-   **Club effects** ($v_{0j}, v_{1j}$): Capture the baseline prestige and temporal trajectory of the club itself, which affects all players on the roster.
+-   **Cross-classified structure**: A player's market value at time $t$ depends on both their intrinsic "brand" ($u_{0i}$) and the club they are currently with ($v_{0j} + v_{1j} \cdot \text{Year}_t$).
 
----
+------------------------------------------------------------------------
 
 **Notation Key:**
 
 | Symbol | Meaning |
-|--------|---------|
+|----------------------------------|--------------------------------------|
 | $\text{Year}_t$ | Season year, centered at 2013 |
 | $\text{Age}_{it}$ | Player age, grand-mean centered |
 | $\text{Mins}_{Z,it}$ | Minutes played, standardized (Z-score) within year-club |
@@ -779,25 +779,35 @@ where $\begin{pmatrix} v_{0j} \\ v_{1j} \end{pmatrix} \sim N \left( \mathbf{0}, 
 
 ## Interpretation of Results
 
-**Model Fit and Structure**
-The analysis culminates in **Model 4**, a cross-classified multilevel model that partitions variance across observations (Level 1), players (Level 2a), and clubs (Level 2b). The model explains approximately 89% of the total variance in market value ($Pseudo\text{-}R^2_{total} = 0.89$), with the majority of unobserved heterogeneity attributable to the player level (ICC $\approx$ 0.78), confirming that individual reputation ("The Superstar Effect") outweighs club context in determining valuation.
+**Model Fit and Structure** The analysis culminates in **Model 4**, a cross-classified multilevel model that partitions variance across observations (Level 1), players (Level 2a), and clubs (Level 2b). The model explains approximately 89% of the total variance in market value ($Pseudo\text{-}R^2_{total} = 0.89$), with the majority of unobserved heterogeneity attributable to the player level (ICC $\approx$ 0.78), confirming that individual reputation ("The Superstar Effect") outweighs club context in determining valuation.
 
-**Temporal Dynamics (Level 1)**
-The model reveals a complex, non-linear evolution of the transfer market. The significant cubic term for Season Year ($\pi_3 \approx -0.002, p < .001$) describes an "S-shaped" trajectory: an initial period of stagnation (2013–2014), followed by a rapid inflationary "boom" (2015–2019), and a subsequent deceleration or plateau in the post-2020 era.
+**Temporal Dynamics (Level 1)** The model reveals a complex, non-linear evolution of the transfer market. The significant cubic term for Season Year ($\pi_3 \approx -0.002, p < .001$) describes an "S-shaped" trajectory: an initial period of stagnation (2013–2014), followed by a rapid inflationary "boom" (2015–2019), and a subsequent deceleration or plateau in the post-2020 era.
 
-**Biological Career Arc (Level 1)**
-Consistent with human capital theory, player value follows a quadratic "Inverted-U" trajectory with respect to Age. Value accelerates as players transition from "Prospects" to their "Prime" (peaking at approximately age 27), before declining significantly as they enter the "Veteran" stage ($\pi_5 = -0.02, p < .001$).
+```{r}
+#| echo: false
 
-**Performance and Status (Level 1)**
-Squad status serves as a primary driver of valuation. The variable `minutes_played` was standardized (Z-scored) relative to the club-year context. The coefficient ($\pi_6 = 0.35$) indicates that a **one standard deviation increase** in playing time—effectively moving from a rotation player to a key starter—is associated with an approximately **42% increase** in market value ($e^{0.35} - 1 \approx 0.42$), holding performance metrics constant.
+# average age
+mean_age <- clean_player_df |> reframe(mean(Age, na.rm=TRUE)) |> pull()
 
-**Contextual Effects (Level 2b)**
-We identify a significant **"Diversity Premium"** associated with club internationalization. For every **10 percentage point increase** in a club's proportion of foreign players, the average market value of its squad members rises by approximately **2%** ($\delta_{01} = 0.20$). This suggests that globally diverse clubs—likely a proxy for financial power and recruitment reach—confer a valuation bonus on their players.
+# Simulate from the estimated sampling distribution
+# "-b1/(2*b2)" Report with confidence interval using delta method
+sims <- sim(final_model, n.sims = 1000)
+peak_sims <- sims@fixef[, "poly(age_c, 2, raw = TRUE)1"] / 
+  (2 * sims@fixef[, "poly(age_c, 2, raw = TRUE)2"]) 
 
-**The Foreign Premium (Level 2a)**
-Conversely, at the individual level, we observe a "Domestic Discount." Players who are citizens of the club's country are valued approximately **17% lower** than comparable non-citizen (foreign) players ($\gamma_2 = -0.19$; $e^{-0.19} - 1 \approx -0.17$). This aligns with the "Foreign Premium" hypothesis, where clubs pay a premium to import talent from abroad.
+# Empirical CI
+mean_age + mean(peak_sims)
 
+# The delta method uses calculus (specifically, Taylor series approximation) to propagate uncertainty through nonlinear transformations.
+```
 
+**Biological Career Arc (Level 1)** Consistent with human capital theory, player value follows a quadratic "Inverted-U" trajectory with respect to Age. Value accelerates as players transition from "Prospects" to their "Prime" (peaking at approximately age 26.1), before declining significantly as they enter the "Veteran" stage ($\pi_5 = -0.02, p < .001$).
+
+**Performance and Status (Level 1)** Squad status serves as a primary driver of valuation. The variable `minutes_played` was standardized (Z-scored) relative to the club-year context. The coefficient ($\pi_6 = 0.35$) indicates that a **one standard deviation increase** in playing time—effectively moving from a rotation player to a key starter—is associated with an approximately **42% increase** in market value ($e^{0.35} - 1 \approx 0.42$), holding performance metrics constant.
+
+**Contextual Effects (Level 2b)** We identify a significant **"Diversity Premium"** associated with club internationalization. For every **10 percentage point increase** in a club's proportion of foreign players, the average market value of its squad members rises by approximately **2%** ($\delta_{01} = 0.20$). This suggests that globally diverse clubs—likely a proxy for financial power and recruitment reach—confer a valuation bonus on their players.
+
+**The Foreign Premium (Level 2a)** Conversely, at the individual level, we observe a "Domestic Discount." Players who are citizens of the club's country are valued approximately **17% lower** than comparable non-citizen (foreign) players ($\gamma_2 = -0.19$; $e^{-0.19} - 1 \approx -0.17$). This aligns with the "Foreign Premium" hypothesis, where clubs pay a premium to import talent from abroad.
 
 \newpage
 
@@ -836,8 +846,6 @@ effect_plot(final_model, pred = age_c, interval = TRUE,
        subtitle = "Quadratic fit: Value peaks at approx. 27 years old") +
   theme(plot.title = element_text(face = "bold"))
 ```
-
-\
 
 ### Q3: Squad Status
 
@@ -904,6 +912,191 @@ plot_summs(final_model,
   geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") +
   theme(plot.title = element_text(face = "bold"))
 ```
+
+\
+
+Figure X displays the estimated club random effects from our cross-classified model. Substantial heterogeneity exists in both baseline valuations and temporal trajectories.
+
+```{r}
+#| echo: false
+#| fig-width: 8
+#| fig-height: 7
+
+
+# extract random effects from the final model
+club_ranef <- ranef(final_model, condVar = TRUE)$club_id 
+
+club_random_results <- club_ranef |> 
+  as.data.frame() |>
+  rownames_to_column() |> 
+  rename(club_id=1, Intercept=2, Slope=3) |> 
+  # add club names from the dataframe
+  left_join(
+    clean_player_df |> 
+      distinct(club_id, Club)) |> 
+  relocate(Club) |> 
+  select(-club_id) |> 
+  tibble()
+
+# Extract posterior variances (stored as an attribute)
+post_var <- attr(club_ranef, "postVar")
+
+# post_var is a 3D array: [effect, effect, club]
+# post_var[1,1,] = variance of intercept for each club
+# post_var[2,2,] = variance of slope for each club
+# post_var[1,2,] = covariance between intercept and slope
+
+# add standard errors to club_random_results
+club_random_results <- club_random_results |> 
+  mutate(se_intercept = sqrt(post_var[1, 1, ]),
+         se_slope = sqrt(post_var[2, 2, ]),
+         # calculate 95% CI
+         Intercept_lower = Intercept - 1.96 * se_intercept,
+         Intercept_upper = Intercept + 1.96 * se_intercept,
+         Slope_lower = Slope - 1.96 * se_slope,
+         Slope_upper = Slope + 1.96 * se_slope
+         ) |> 
+  # convert to %
+  mutate(across(where(is.double), ~ exp(.x) - 1)) |> 
+  select(-starts_with("se_")) |> 
+  # prepare structure for ggplot
+  mutate(Club = fct_reorder(Club, Intercept, max)) |> 
+  pivot_longer(-Club, names_to = "Stat", values_to = "Est") |> 
+  mutate(Coeff = if_else(str_detect(Stat, "Intercept"), "Intercept", "Slope"),
+         Type = if_else(str_detect(Stat, "lower"), "lower", 
+                        if_else(str_detect(Stat, "upper"), "upper", "Coefficient"))
+  ) |> 
+  select(-Stat) |> 
+  pivot_wider(names_from = Type, values_from = Est) 
+  
+
+# build catapiler visual of random effects
+club_random_results |> 
+  ggplot(aes(x = Club, y = Coefficient, color=Coeff)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray40", size = 0.5) +
+  geom_point(show.legend = FALSE) +
+  geom_errorbar(aes(ymin=lower, ymax=upper), show.legend = FALSE) +
+  facet_grid(~Coeff, scales="free") +
+  coord_flip() +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Club-Level Market Value Premium",
+    x = NULL,
+    y = "Random Intercept (log market value deviation)",
+    caption = 
+      "Error bars show 95% confidence intervals. Dashed line = league average.") +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    axis.text.y = element_text(size = 10),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank()) + 
+   scale_color_viridis_d(option = "E", begin = .2, end = .8)
+
+  
+```
+
+## Club-Level Heterogeneity
+
+Figure X displays the estimated club random effects from our cross-classified model. Substantial heterogeneity exists in both baseline valuations and temporal trajectories.
+
+### Baseline Premiums and Discounts
+
+Six clubs command statistically significant market premiums (Table X). Manchester United exhibits the largest effect: controlling for age, position, and performance, United players are valued 68% higher than league average (β₀ⱼ = 0.52, 95% CI \[0.31, 0.76\]). Barcelona (+56%, 95% CI \[29%, 93%\]), Paris Saint-Germain (+26%, 95% CI \[6%, 53%\]), Chelsea (+25%, 95% CI \[7%, 50%\]), Manchester City (+24%, 95% CI \[5%, 49%\]), and Bayern Munich (+22%, 95% CI \[4%, 48%\]) also show significant premiums.
+
+Conversely, seven clubs show significant discounts. Sevilla faces the steepest penalty: players are valued 28% below league average (β₀ⱼ = -0.33, 95% CI \[-0.42, -0.23\]). Porto (-27%), Benfica (-22%), Roma (-21%), Napoli (-17%), Villarreal (-16%), and Tottenham (-14%) also show significant negative effects.
+
+### Diverging Temporal Trajectories
+
+The random slopes reveal that club fortunes diverged over the study period. Three clubs showed significantly faster appreciation than league average: Arsenal (+2.9%/year, 95% CI \[0.8%, 5.0%\]), Liverpool (+2.7%/year, 95% CI \[0.7%, 4.8%\]), and Tottenham (+2.8%/year, 95% CI \[0.8%, 4.8%\]). These trajectories coincide with improved sporting performance and, for Liverpool, a Champions League victory in 2019.
+
+Four clubs experienced significantly slower growth (or faster decline): Manchester United (-2.8%/year, 95% CI \[-4.5%, -1.0%\]), Borussia Dortmund (-2.3%/year, 95% CI \[-4.1%, -0.4%\]), Juventus (-2.3%/year, 95% CI \[-4.1%, -0.5%\]), and Barcelona (-1.8%/year, 95% CI \[-3.5%, -0.1%\]). Despite high baseline premiums, these clubs saw their market advantages erode over time.
+
+### The Manchester United Paradox
+
+Manchester United presents a striking case: the highest baseline premium (+68%) combined with the steepest decline (-2.8%/year). This pattern reflects United's transition from dominant force (multiple Premier League titles pre-2013) to relative underperformance (no league title since 2013). The brand premium persists—players still benefit from the "Theatre of Dreams" cachet—but this advantage is actively shrinking.
+
+```{r}
+#| echo: false
+#| fig-width: 8
+#| fig-height: 10
+#| 
+# extract random effects from the final model
+player_ranef <- ranef(final_model, condVar = TRUE)$player_id 
+
+player_random_results <- player_ranef |> 
+  as.data.frame() |>
+  rownames_to_column() |> 
+  rename(player_id=1, Intercept=2) |> 
+  # add club names from the dataframe
+  left_join(
+    clean_player_df |> 
+      distinct(player_id, name)) |> 
+  relocate(name) |> 
+  select(-player_id) |> 
+  tibble()
+
+# Extract posterior variances (stored as an attribute)
+post_var <- attr(player_ranef, "postVar")
+se_intercept <- sqrt(post_var[1, 1, ])
+
+# post_var is a 3D array: [effect, effect, club]
+# post_var[1,1,] = variance of intercept for each club
+# post_var[2,2,] = variance of slope for each club
+# post_var[1,2,] = covariance between intercept and slope
+
+# add standard errors to club_random_results
+player_random_results <- player_random_results |> 
+  mutate(se_intercept = se_intercept,
+         # calculate 95% CI
+         lower = Intercept - 1.96 * se_intercept,
+         upper = Intercept + 1.96 * se_intercept
+         ) |> 
+  # convert to %
+  mutate(across(where(is.double), ~ exp(.x)),
+         name = fct_reorder(name, Intercept, max)) |> 
+  select(-starts_with("se_")) 
+  
+
+# build catapiler visual of random effects
+player_random_results |> 
+  arrange(desc(Intercept)) |> 
+  slice(1:50) |> 
+  ggplot(aes(x = name, y = Intercept)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray40", size = 0.5) +
+  geom_point(show.legend = FALSE) +
+  geom_errorbar(aes(ymin=lower, ymax=upper), show.legend = FALSE) +
+  coord_flip() +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Player-Level Market Value Premium, Top 50",
+    x = NULL,
+    y = "Random Intercept (log market value deviation)",
+    caption = 
+      "Error bars show 95% confidence intervals. Dashed line = Player average.") +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    axis.text.y = element_text(size = 10),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank()) 
+```
+
+## The "Prodigy Premium": Pricing Future Potential
+
+The largest positive random effects belong overwhelmingly to teenage phenoms. Lamine Yamal exhibits the most extreme effect: at age 16-17, his market value was approximately **18.8 times higher** (95% CI: \[8.3, 42.7\]) than predicted by his current age, position, goals, assists, and playing time. Similar premiums characterize Gavi (16.0x), Florian Wirtz (15.3x), Warren Zaïre-Emery (12.1x), and Jude Bellingham (11.4x).
+
+These extreme values highlight a fundamental limitation of our model: we measure **realized performance**, but the transfer market prices **expected future performance**. Young players with limited statistical output but perceived "generational" potential attract valuations that dwarf their current contributions. The random intercept absorbs this unmeasured "star quality"—a combination of physical attributes, technical ceiling, mentality, and marketability that scouts and sporting directors perceive but our metrics cannot capture.
+
+**The Barcelona Effect:** Five of the top ten premiums belong to Barcelona players or academy graduates (Yamal, Gavi, Pedri, Ansu Fati, plus Bellingham's La Liga move). This concentration suggests either (a) La Masia produces uniquely valuable talent, (b) Barcelona's global brand amplifies player valuations, or (c) Barcelona systematically overpays for young stars—a hypothesis consistent with the club's recent financial difficulties.
+
+**The Buffon Anomaly:** Gianluigi Buffon (10.6x) appears as the sole veteran among teenage prodigies. This reflects both goalkeeper-specific model limitations (goals and assists are zero for keepers) and the market's valuation of legendary status. Just as prodigies are priced on future potential, icons are priced on legacy value—neither captured by our performance metrics.
+
+### Implications
+
+These findings suggest that transfer market valuations incorporate substantial **option value**—the right to a player's future output. Clubs pay premiums for young players not because of current production, but because they are purchasing a call option on potential superstar performance. This option value decays with age (as uncertainty resolves) but can transform into legacy value for players who achieve iconic status.
+
+Future research could incorporate prospect-level data (youth tournament performance, physical metrics, contract length) to explain more of this variance. For now, the random intercept serves as a useful proxy for "market-perceived quality beyond observable statistics."
 
 \
 
