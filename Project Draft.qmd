@@ -682,6 +682,153 @@ Figure 3 here displays predicted market values by position for players with posi
 
 \newpage
 
+```{r fig4, fig.width=10, fig.height=6, fig.cap="Performance Effects Vary by Position: Goals and Assists"}
+library(patchwork)
+
+# Create expanded prediction grid for performance by position
+perf_grid <- expand.grid(
+  season_year = 2024,
+  position = c("Attack", "Midfield", "Defender", "Goalkeeper"),
+  goals = seq(0, 20, by = 2),
+  age_cen = 0,
+  height_cen = 0,
+  yellow_cards = 2,
+  assists = 5,
+  Region = "Europe & Central Asia",
+  citizen_of_club_country = "Yes",
+  uefa_coef_cen = 0
+) %>%
+  mutate(
+    position = factor(position, levels = pos_levels),
+    Region = factor(Region, levels = region_levels),
+    citizen_of_club_country = factor(citizen_of_club_country, levels = citizen_levels)
+  )
+
+perf_grid$log_pred <- predict(m_final_reml, newdata = perf_grid, re.form = NA)
+perf_grid$market_value <- exp(perf_grid$log_pred)
+
+p1 <- ggplot(perf_grid, aes(x = goals, y = market_value, color = position, linetype = position)) +
+  geom_line(linewidth = 1.1) +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  scale_color_manual(values = c("#F18F01", "#2E86AB", "#A23B72", "#06A77D")) +
+  labs(
+    x = "Goals Scored per Season",
+    y = "Predicted Market Value (2024 USD)",
+    color = "Position",
+    linetype = "Position"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    axis.title = element_text(face = "bold"),
+    legend.position = "bottom",
+    panel.grid.minor = element_blank()
+  )
+
+# Assists effect by position
+assist_grid <- expand.grid(
+  season_year = 2024,
+  position = c("Attack", "Midfield", "Defender", "Goalkeeper"),
+  assists = seq(0, 15, by = 1),
+  age_cen = 0,
+  height_cen = 0,
+  yellow_cards = 2,
+  goals = 5,
+  Region = "Europe & Central Asia",
+  citizen_of_club_country = "Yes",
+  uefa_coef_cen = 0
+) %>%
+  mutate(
+    position = factor(position, levels = pos_levels),
+    Region = factor(Region, levels = region_levels),
+    citizen_of_club_country = factor(citizen_of_club_country, levels = citizen_levels)
+  )
+
+assist_grid$log_pred <- predict(m_final_reml, newdata = assist_grid, re.form = NA)
+assist_grid$market_value <- exp(assist_grid$log_pred)
+
+p2 <- ggplot(assist_grid, aes(x = assists, y = market_value, color = position, linetype = position)) +
+  geom_line(linewidth = 1.1) +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  scale_color_manual(values = c("#F18F01", "#2E86AB", "#A23B72", "#06A77D")) +
+  labs(
+    x = "Assists per Season",
+    y = "Predicted Market Value (2024 USD)",
+    color = "Position",
+    linetype = "Position"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    axis.title = element_text(face = "bold"),
+    legend.position = "bottom",
+    panel.grid.minor = element_blank()
+  )
+
+p1 + p2 + plot_layout(guides = "collect") & theme(legend.position = "bottom")
+```
+
+Figure 4 illustrates how goal-scoring and assist contributions translate to market value across different positions. The parallel slopes confirm that the marginal effect of goals and assists is relatively consistent across positions, though the baseline valuations differ substantially. Attackers start from higher baselines but show similar returns to performance increments as other positions.
+
+```{r fig5, fig.width=8, fig.height=6, fig.cap="Age-Performance Interaction: Career Trajectories by Position"}
+# Age trajectory by position  
+age_positions <- c("Attack", "Midfield", "Defender", "Goalkeeper")
+age_traj <- data.frame()
+
+for(pos in age_positions) {
+  pos_goals <- ifelse(pos == "Attack", 10, ifelse(pos %in% c("Midfield", "Defender"), 2, 0))
+  pos_assists <- ifelse(pos == "Attack", 5, ifelse(pos == "Midfield", 5, 2))
+  
+  temp <- data.frame(
+    season_year = 2024,
+    position = pos,
+    Age = seq(18, 38, by = 1),
+    height_cen = 0,
+    yellow_cards = 2,
+    goals = pos_goals,
+    assists = pos_assists,
+    Region = "Europe & Central Asia",
+    citizen_of_club_country = "Yes",
+    uefa_coef_cen = 0
+  )
+  age_traj <- bind_rows(age_traj, temp)
+}
+
+age_traj <- age_traj %>%
+  mutate(
+    position = factor(position, levels = pos_levels),
+    Region = factor(Region, levels = region_levels),
+    citizen_of_club_country = factor(citizen_of_club_country, levels = citizen_levels),
+    age_cen = Age - mean(clean_player_df$Age, na.rm = TRUE)
+  )
+
+age_traj$log_pred <- predict(m_final_reml, newdata = age_traj, re.form = NA)
+age_traj$market_value <- exp(age_traj$log_pred)
+
+ggplot(age_traj, aes(x = Age, y = market_value, color = position, fill = position)) +
+  geom_line(linewidth = 1.2) +
+  geom_vline(xintercept = 26.5, linetype = "dashed", color = "gray40", alpha = 0.6) +
+  annotate("text", x = 27.5, y = max(age_traj$market_value) * 0.95, 
+           label = "Mean Age (26.5)", hjust = 0, size = 3.5, color = "gray40") +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  scale_color_manual(values = c("#F18F01", "#2E86AB", "#A23B72", "#06A77D")) +
+  scale_fill_manual(values = c("#F18F01", "#2E86AB", "#A23B72", "#06A77D")) +
+  labs(
+    x = "Player Age (years)",
+    y = "Predicted Market Value (2024 USD)",
+    color = "Position",
+    fill = "Position"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    axis.title = element_text(face = "bold"),
+    legend.position = "bottom",
+    panel.grid.minor = element_blank()
+  )
+```
+
+Figure 5 depicts career value trajectories across positions, revealing that while all positions follow the inverted-U lifecycle, attackers maintain higher valuations throughout their careers. The dashed line marks the sample mean age of 26.5 years, near the peak valuation period for most positions.
+
+\newpage
+
 # Discussion
 
 So to summarize, this study investigated the multilevel determinants of player market values in elite European football, with particular emphasis on quantifying the "halo effect" of club prestige. Our findings provide strong evidence that both individual performance and club-level context jointly shape player valuations, with club prestige explaining a substantial proportion of variance independent of individual characteristics.
@@ -768,3 +915,6 @@ As football clubs increasingly adopt data-driven decision-making, understanding 
 
 ::: {#refs}
 :::
+
+\appendix
+
