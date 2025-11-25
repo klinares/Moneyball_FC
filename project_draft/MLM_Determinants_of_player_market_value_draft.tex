@@ -96,20 +96,6 @@
 \addtolength{\textwidth}{1in}%
 \addtolength{\textheight}{1.7in}%
 \addtolength{\topmargin}{-1in}%
-\usepackage{booktabs}
-\usepackage{longtable}
-\usepackage{array}
-\usepackage{multirow}
-\usepackage{wrapfig}
-\usepackage{float}
-\usepackage{colortbl}
-\usepackage{pdflscape}
-\usepackage{tabu}
-\usepackage{threeparttable}
-\usepackage{threeparttablex}
-\usepackage[normalem]{ulem}
-\usepackage{makecell}
-\usepackage{xcolor}
 \makeatletter
 \@ifpackageloaded{caption}{}{\usepackage{caption}}
 \AtBeginDocument{%
@@ -184,7 +170,7 @@ valuation, club prestige, UEFA coefficient, sports analytics},
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\date{November 19, 2025}
+\date{November 24, 2025}
 \title{\bf Multilevel Determinants of Player Market Value in Elite
 European Football: The Role of Performance, Club Prestige, and Player
 Characteristics}
@@ -200,22 +186,17 @@ University of Maryland\\
 \bigskip
 \bigskip
 \begin{abstract}
-This study investigates the determinants of player market values in
-elite European football using a three-level cross-classified
-mixed-effects model. We analyzed 7,023 season-year observations of 2,215
-players across 21 elite clubs from 2013 to 2024. The primary research
-question examines how individual performance metrics, player
-characteristics, and club-level prestige jointly predict market
-valuations. Results demonstrate that club prestige, measured by the UEFA
-10-year coefficient, explains 47.9\% of between-club variance in player
-values (p\textless0.001), independent of individual performance.
-Additionally, each goal scored increases market value by 3.75\%
-(p\textless0.001), while each assist adds 4.95\% (p\textless0.001).
-Positional effects reveal that attackers command approximately 71.1\%
-premiums over goalkeepers (p\textless0.001). The full model achieves a
-conditional R2 of 0.793. These findings provide evidence for a
-substantial ``halo effect,'' whereby players at elite clubs command
-valuation premiums independent of individual performance.
+This study investigates the determinants of player market value in elite
+European football using a cross-classified multilevel model applied to
+7,023 observations between 2013 and 2024. By disentangling individual
+reputation from club context, we identify distinct non-linear trends in
+market evolution and biological aging. Our results reveal a ``Boom and
+Bust'' market cycle, a strict ``Inverted-U'' career arc peaking at age
+27, and a significant 42\% valuation premium for key starters (``Squad
+Status''). Furthermore, we find evidence of a ``Diversity Premium,''
+where clubs with higher international representation garner higher
+player valuations, contrasting with a ``Domestic Discount'' for local
+players.
 \end{abstract}
 
 \noindent%
@@ -228,115 +209,515 @@ valuation, club prestige, UEFA coefficient, sports analytics
 
 
 \setstretch{2}
-\section{Introduction}\label{sec-intro}
+\section{Introduction and Research
+Motivation}\label{introduction-and-research-motivation}
 
-The global football transfer market has grown exponentially, with annual
-expenditures exceeding €7 billion. Consequently, understanding the
-determinants of player market values is critical for clubs seeking
-competitive advantages. While traditional scouting emphasized subjective
-assessments, the ``Moneyball'' revolution demonstrated that data-driven
-approaches could identify undervalued players by focusing on objective
-metrics (Herm et al., 2014). Crowd-sourced platforms like Transfermarkt
-provide real-time valuations that correlate strongly (r\textgreater0.90)
-with actual transfer fees (Herm et al., 2014).
+The valuation of elite athletes in the European soccer transfer market
+has evolved from a subjective scouting exercise into a global financial
+industry exceeding €7 billion annually. In this high-stakes environment,
+accurate valuation is critical for club solvency and competitive
+balance. In this study, we operationalize Market Value using
+crowd-sourced estimates from Transfermarkt, a metric widely validated in
+sports economics literature as a robust proxy for actual transfer fees
+and a leading indicator of player market valuation based on demand.
 
-However, player market values likely reflect contextual factors such as
-club reputation and competitive success, in addition to individual
-performance. Previous research suggests that 15-20\% of salary variation
-is attributable to team-level factors (Franck \& Nüesch, 2012). This
-raises a critical question: to what extent do club-level characteristics
-create a ``halo effect'' on player valuations? This study addresses
-three objectives:
+Foundational research in sports economics has long sought to isolate the
+determinants of this value. Frick (2007) established that while ``hard''
+performance metrics like goals and assists are primary drivers,
+valuation follows a strict ``Inverted-U'' biological trajectory,
+typically peaking between ages 27 and 28 before depreciating rapidly.
+Beyond on-pitch performance, Franck and Nüesch (2012) empirically
+demonstrated the ``Superstar Effect,'' finding that non-performance
+factors---such as media popularity and brand visibility---can magnify a
+player's value significantly, especially at the top end of the wage
+distribution. However, these existing studies often model players as
+static units nested within a single club. This approach fails to account
+for the dynamic reality of modern football, where players transfer
+between teams, accumulating value from both their portable human capital
+(e.g., experience, age) and the institutional prestige of their current
+employer.
+
+Neglecting this cross-classified structure---where player and club
+effects intersect rather than nest---likely misestimates the true
+drivers of market value. This research addresses this methodological
+limitation by applying a cross-classified multilevel model to a decade
+of transfer data (2013--2024). By disentangling individual reputation
+from club context, this study aims to answer four critical questions
+that remain under-explored in nested models:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
-\tightlist
 \item
-  \textbf{Quantify individual performance effects:} Determine the
-  marginal impact of measurable metrics (goals, assists) on market
-  values.
+  \textbf{Market Evolution (RQ1):} \emph{How has the transfer market
+  evolved annually compared to the 2013 baseline?} Understanding the
+  non-linear trajectory of market inflation (the ``Boom and Bust''
+  cycles) is essential for distinguishing real player value growth from
+  sector-wide inflation.
 \item
-  \textbf{Assess club prestige effects:} Estimate the influence of
-  club-level prestige (UEFA coefficients) on valuations beyond
-  individual characteristics.
+  \textbf{Biological Career Arc (RQ2):} \emph{How does market value
+  change as a player moves through their career?} By modeling the
+  non-linear effect of age, we aim to validate Frick's (2007) ``peak
+  age'' hypothesis, identifying the precise window where physical peak
+  and experience intersect.
 \item
-  \textbf{Model multilevel structure:} Account for the cross-classified
-  nature of football data, where repeated measurements are nested within
-  players, and players transfer between clubs.
+  \textbf{Squad Status (RQ3):} \emph{Does playing more minutes than the
+  average teammate serve as a primary driver of valuation?} While goals
+  capture output, they bias towards attackers. We propose that ``Squad
+  Status'' (relative minutes played) is a more universal signal of
+  manager trust and player utility across all positions.
+\item
+  \textbf{Contextual Premiums (RQ4):} \emph{Is there a premium for club
+  diversity and a discount for domestic players?} As the labor market
+  globalizes, we investigate whether clubs with broader international
+  recruitment (Diversity Premium) generate higher valuations, and if
+  domestic players face a valuation discount compared to imported
+  talent.
 \end{enumerate}
 
-\section{\texorpdfstring{\textbf{Theoretical
-Framework}}{Theoretical Framework}}\label{theoretical-framework}
+\section{Method}\label{method}
 
-We integrate human capital theory with signaling theory. Human capital
-theory posits that market value reflects an individual's productivity
-potential (goals, assists). Signaling theory suggests that club
-affiliation serves as a quality signal; playing for elite clubs
-indicates higher quality because these clubs maintain higher selection
-standards.
+\emph{Data Source.} We obtained data from
+\href{https://www.transfermarkt.com/}{Transfermarkt}and
+\href{https://www.uefa.com/}{Union of European Football Associattion}
+(UEFA) official rankings, which are both public available websites. At
+the time of this study Transfermarket does not have free API access to
+ndefinedtheir data repository, but instead the r package
+\href{https://jaseziv.github.io/worldfootballR/articles/load-scraped-data.html}{worldfootballR}
+allows us to scrap data from their website. However, there are several
+limitations to this package such as time out requests and failure to
+capture dynamic java tables on webpages. Fortunately, we found the
+necessary data through kaggle
+\href{https://www.kaggle.com/datasets/davidcariboo/player-scores?resource=download}{\textbf{Football
+Data from Transfermarkt}} \textbf{,} which allowed us to focus on the
+modeling aspect of this project following data restructuring and
+predictor variable engineering.
 
-Herm et al.~(2014) established the validity of crowd-sourced market
-valuations, identifying performance, age, and club prestige as key
-attributes. While performance metrics consistently emerge as significant
-predictors, the relative importance of different dimensions remains
-contested. Furthermore, prior research rarely employs multilevel models
-capable of attributing variance to individual versus team-level factors.
+\emph{Sample Characteristics.} We use the 10 year averaged UEFA
+coefficient rankings\footnote{UEFA coefficient rankings are a
+  points-based system used by European football's governing body to rank
+  national associations and clubs based on their performance in European
+  competitions, which determines qualification spots and seeding for
+  tournaments like the Champions League and Europa League.} to select
+the top 21 European soccer teams as our first stage sampling. In our
+second stage non-random sampling, we select soccer players that played
+for a full season in one of the 21 clubs from 2013-2024. This resulted
+in 2,215 male players representing 7,168 seasons. However, after
+examining missing data, which mostly came from missing information on
+citizenship status, we were left with 2,159 players representing 7,023
+seasons, a 2.5\% loss of player data (e.g., 2\% loss in season data).
+The majority of players across clubs and years were in their mid 20s
+(\emph{M}=26.5, \emph{SD=}4.6). In this sample, players on average
+played 3.2 (\emph{SD}=2.9) seasons, and if we were to droped players
+that had less than two seasons to examine player trajectories we would
+loose 62\% of our sample. Figure 1 contains the number of players in
+each of the 21 clubs across the years.
 
-Franck and Nüesch (2012) demonstrated that team-level factors like brand
-value significantly influence compensation. However, most research
-treats club affiliation as a fixed effect or omits it, potentially
-biasing estimates. Additionally, few studies account for player
-mobility, which violates strict nesting assumptions. To address this, we
-utilize the UEFA coefficient as an objective measure of club prestige
-based on historical performance. We propose the following hypotheses:
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-3-1.pdf}
+
+\emph{Variable selection and Normalization}. Our outcome of interest is
+a player's yearly market valuation which we convert from euros to US
+dollars. Market valuation in Euro varies by month and we first took the
+yearly average for each player prior to transforming to USD. We log
+transform market value to 2024 USD because financial data follows a
+pareto distribution rather than a normal distribution. Keeping the
+outcome on the raw scale would result in extremely large residuals for
+high value players, and small for low value players violating the
+assumption of homoscedasticity. Log transforming the outcome compresses
+the extreme outliers by pulling the long right tail to try and make the
+distribution normal. Therefore, this adjustment allows us to compare
+real economic power of a player in 2013 versus 2014 without the noise of
+currency fluctuation.\footnote{We handle exchange rate fluctuation by
+  using historical exchange rates to convert our values to USD. We also
+  adjust market value to 2024 USD because 10 million in 2013 is not the
+  same as in 2024 due to inflation, and by keeping the raw values we
+  would lose real economic value.} Figure 2 shows that market value has
+a lot of variability across years, yet most values are at the lower end
+which is common for salary data. When we log transform our outcome, we
+bring the lower values up and the higher values down.
+
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-4-1.pdf}
+
+A list of variables we used for modeling players' market values are
+shown in Table 1 alongside how and why they were centered. THIS TABLE
+MIGHT NEED TO GO IN The Appendix.
+
+To ensure meaningful model intercepts and convergence, we applied the
+following centering strategies:
 
 \begin{itemize}
 \item
-  \textbf{H1:} Player performance metrics will exhibit significant
-  positive associations with market value.
+  \textbf{Outcome:} \texttt{usd\_revenue\_2024\_log} (Natural log of
+  inflation-adjusted market value).
 \item
-  \textbf{H2:} Club-level UEFA coefficients will predict player market
-  values beyond individual characteristics.
+  \textbf{Time:} \texttt{season\_year\_c} (Min-centered, 2013=0).
 \item
-  \textbf{H3:} Player age will demonstrate a negative relationship with
-  market value.
+  \textbf{Player Traits:} \texttt{age\_c} (Grand-mean centered) and
+  \texttt{height\_c} (Grand-mean centered).
 \item
-  \textbf{H4:} Attacking players will command significant premiums over
-  defensive players.
+  \textbf{Squad Status:} \texttt{minutes\_played} was
+  \textbf{standardized (Z-score)} relative to the specific club-year.
+  This isolates a player's status as a ``Starter'' or ``Bench Player''
+  relative to their current teammates, removing the noise of team-level
+  rotation policies.
+\item
+  \textbf{Club Context:} \texttt{foreign\_players} (Proportion of
+  foreign players, grand-mean centered).
+\item
+  \textbf{Categorical Controls:} Region, Position, and Citizenship
+  (Binary: 1 = Citizen of Club Country).
 \end{itemize}
 
-\section{Methods}\label{methods}
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2466}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2466}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2466}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2603}}@{}}
+\caption{Table 1. Data Structure for fixed effects, except year as it is
+a random slope}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Variable Type}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Variable}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Centering Strategy/ Form Factor
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Justification
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Variable Type}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Variable}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Centering Strategy/ Form Factor
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Justification
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Time} & Season Year & Min-Centering (+ Quadratic) & Establishes
+a meaningful starting intercept (2013 =0) \\
+\textbf{Contextual, Club} & UEFA Coefficient & Year-Mean Centering &
+Isolates relative prestige; removes historical inflation \\
+& Foreign Players Proportion & Grand-Mean Centering & Moves baseline to
+``Average Club'' (since 0\% is unlikely) \\
+\textbf{Player Characteristics} & Age & Grand-Mean (+ Quadratic) &
+Captures absolute career stage (Prospect \(\to\) Prime \(\to\)
+Veteran) \\
+& Height (in cm) & Grand-Mean & Captures premium for absolute physical
+size \\
+& Position & Reference group, attacker & Attackers tend to be valued
+more on average \\
+\textbf{Player Demographic} & Citizen of Club Country & None (Raw binary
+0/1) & Keeps ``Non-Citizen'' as clear reference group. Separates
+individual status from club composition (\texttt{foreign\_players}) \\
+& Region of origin & Reference group, Europe & Control variable for
+where player is from \\
+\textbf{Player Performance} & Goals & Position-Centering & Preserves
+natural 0 and marginal value of 1 goal interpretation \\
+& Assists & Position-Centering & Preserves natural 0 and marginal value
+of 1 assist interpretation \\
+& Red Card & raw season count & Meaningful 0 interpretation \\
+& Yellow Card & raw season count & Meaningful 0 interpretation \\
+& Average minutes played in season & Year-Mean Centering, z-score &
+Isolates whether player is a starter or bench player \\
+\end{longtable}
 
-\textbf{Data Source and Sample} Data were obtained from Transfermarkt
-and UEFA official rankings. The sample consists of 7,023 season-year
-observations representing 2,215 unique players across 21 elite European
-football clubs from 2013 to 2024. Clubs were selected based on
-consistent presence in top UEFA rankings.
+\emph{Data Assumptions:} We assume that variables such as height and
+positions are time invariant for the duration of this study. At the club
+level, we assume mutually exclusiveness in that players can only belong
+to one club in a given year. Although a player could have switched clubs
+mid-season, we keep this constant for model simplicity. We also assume
+that the relationship between age and log-market value is non-linear and
+parabolic so we introduce a quadratic term on age. Because we excluded
+observations with missing data (listwise deletion), we assume the data
+are Missing Completely at Random (MCAR) or that the proportion of
+missing cases (\textasciitilde2\%) is negligible and does not introduce
+systematic bias.
 
-\textbf{Variables}
+\hfill\break
 
-\begin{itemize}
-\item
-  \textbf{Outcome:} \emph{Market Value} (2024 USD), log-transformed to
-  address right skewness.
-\item
-  \textbf{Level 1 Predictors (Time-Varying):} \emph{Season Year}
-  (2013-2024), \emph{Goals}, \emph{Assists}, and \emph{Yellow Cards}.
-\item
-  \textbf{Level 2 Predictors (Player-Invariant):} \emph{Position}
-  (Goalkeeper, Defender, Midfield, Attack), \emph{Age} (grand-mean
-  centered at 26.5), \emph{Height} (grand-mean centered at 182.4 cm),
-  \emph{Birth Region}, and \emph{Citizenship of Club Country}.
-\item
-  \textbf{Level 3 Predictor (Club-Level):} \emph{UEFA Coefficient}
-  (grand-mean centered at 194.36).
-\end{itemize}
+\section{Modeling Approach}\label{modeling-approach}
 
-\textbf{Data Structure} The data exhibit a cross-classified structure.
-Measurements (Level 1) are nested within players (Level 2). However,
-players are not strictly nested within clubs because 456 players
-(20.6\%) transferred clubs during the observation window. We model
-player and club as crossed random effects: (1∣player\_id)+(1∣club\_id).
+We employ a cross-classified multilevel linear model to partition
+variance across observations (Level 1), players (Level 2a), and clubs
+(Level 2b). This structure explicitily accounts for players transferring
+between clubs and thus treating player and club as cross random factors
+rather than a strict three level hierarchy. We found that in this
+sample, almost 20\% of players had been in two to seven (17\% in two
+clubs) clubs which was the basis for fitting a cross-classified model to
+these data. Figure 3 is a visual of a cross-classified model example of
+three players that either move through clubs or remain in the same club
+throughout their career. Players can change teams over their span of
+their careers meaning that the player context can change. They may be a
+star player in one team and a bench player on a different team that they
+switch to. In a cross-classified model, the player is the constant unit
+(i), but the club (j) changes over time (t). If player (I) plays for
+club (j1) in year (t0) but switches to club (j2) in year (t1) the fixed
+effect in the model, such as minutes played, updates the players status,
+as opposed to having static or average predictors. Club attributes, such
+as foreign players and UEFA scores, ensures that when player move clubs,
+the model swaps the values of \(X_j1\), for \(X_j2\). Player's
+characteristics, for instance age and height, move with the player
+across time.
+
+\begin{figure}
+
+\centering{
+
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/fig-cross-class-1.pdf}
+
+}
+
+\caption{\label{fig-cross-class}Figure 3. Cross-Classified Data
+Structure: Players move between clubs over time.}
+
+\end{figure}%
+
+\textbf{Jianing}, can you write this result? This section should be for
+the slope, but remember that the slope is on the club not player.
+
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-5-1.pdf}
+
+We plot age by yearly market value in 2024 USD (on the log scale) in
+Figure 5. for each team and observe almost an upside down u shape. As
+players get older you are valued less in the market, same for younger
+players.
+
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-6-1.pdf}
+
+\hfill\break
+
+\subsection{Model Specification}\label{model-specification}
+
+To formally describe our analysis, we utilize a hierarchical notation
+system that decomposes the model into observation, player, and club
+levels. This analysis clarifies how the cross-classified structure
+(\(i\) players crossed with \(j\) clubs) contributes to the variance in
+market value.
+
+Level 1: Observation Model (Time-Varying Effects)
+
+At the observation level (time \(t\), player \(i\), club \(j\)), the
+log-transformed market value is a function of a player-club specific
+intercept (\(\pi_{0ij}\)), temporal trends, biological aging, and
+dynamic performance metrics:
+
+\[
+\begin{aligned}
+\log(\text{Revenue})_{tij} &= \pi_{0ij} \\
+&+ \pi_{1j}(\text{Year}_{t}) + \pi_{2}(\text{Year}^2_{t}) + \pi_{3}(\text{Year}^3_{t}) \\
+&+ \pi_{4}(\text{Age}_{it}) + \pi_{5}(\text{Age}_{it})^2 \\
+&+ \pi_{6}(\text{Mins}_{Z,it}) + \pi_{7}(\text{Goals}^*_{it}) + \pi_{8}(\text{Assists}^*_{it}) \\
+&+ \pi_{9}(\text{Red}_{it}) + \pi_{10}(\text{Yellow}_{it}) \\
+&+ \epsilon_{tij}
+\end{aligned}
+\]
+
+where \(\epsilon_{tij} \sim N(0, \sigma^2_{\epsilon})\).
+
+Level 2a: Player Model (Time-Invariant Traits)
+
+The player-club intercept (\(\pi_{0ij}\)) is determined by static
+physical and demographic characteristics, citizenship status relative to
+the club, and a player-specific random effect:
+
+\[
+\pi_{0ij} = \beta_{0j} + \gamma_{1}(\text{Height}_{i}) + \gamma_{2}(\text{Citizen}_{ij}) + \sum_{p} \gamma_{p} \mathbb{1}_{\text{Position}_i=p} + \sum_{r} \gamma_{r} \mathbb{1}_{\text{Region}_i=r} + u_{0i}
+\]
+
+where \(u_{0i} \sim N(0, \sigma^2_{u})\).
+
+Level 2b: Club Model (Contextual Effects)
+
+The club-level baseline (\(\beta_{0j}\)) and the linear time slope
+(\(\pi_{1j}\)) are modeled as functions of club internationalization and
+club-specific random effects:
+
+\[
+\begin{aligned}
+\beta_{0j} &= \delta_{00} + \delta_{01}(\text{Foreign}_{tj}) + v_{0j} \\
+\pi_{1j} &= \delta_{10} + v_{1j} \\
+\pi_{2} &= \delta_{20} \quad \text{(fixed across clubs)} \\
+\pi_{3} &= \delta_{30} \quad \text{(fixed across clubs)}
+\end{aligned}
+\]
+
+where
+\(\begin{pmatrix} v_{0j} \\ v_{1j} \end{pmatrix} \sim N \left( \mathbf{0}, \boldsymbol{\Sigma}_{club} \right)\),
+with
+\(\boldsymbol{\Sigma}_{club} = \begin{pmatrix} \sigma^2_{v_0} & \sigma_{v_0v_1} \\ \sigma_{v_0v_1} & \sigma^2_{v_1} \end{pmatrix}\).
+
+Interpretation of Cross-Classification:
+
+Player effects (\(u_{0i}\)): Capture persistent individual heterogeneity
+(e.g., reputation, marketability) that follows a player across clubs.
+
+Club effects (\(v_{0j}, v_{1j}\)): Capture the baseline prestige and
+temporal trajectory of the club itself, which affects all players on the
+roster.
+
+Cross-classified structure: A player's market value at time \(t\)
+depends on both their intrinsic ``brand'' (\(u_{0i}\)) and the club they
+are currently with (\(v_{0j} + v_{1j} \cdot \text{Year}_t\)).
+
+\hfill\break
+
+\section{Results}\label{results}
+
+\textbf{Discuss things like REML, LRT test, and mention the models we
+fit and how we compared them to arrive at our final model.}
+
+\textbf{Expand on the results a bit more, and double check the
+estimates.}
+
+Market Evolution (Q1)
+
+The model reveals a significant cubic trend (p\textless.001) in market
+evolution. As shown in Figure 6A, the market followed an ``S-shaped''
+trajectory: stagnation (2013--2014), a rapid inflationary ``boom''
+(2015--2019), and a post-2020 plateau. This confirms that football
+market inflation is cyclical rather than constant.
+
+Biological Career Arc (Q2)
+
+We observe a strong quadratic effect for Age (p\textless.001). Figure 6B
+illustrates the ``Inverted-U'' shape, where value peaks during a
+player's prime (approx. age 27) and declines significantly in the
+veteran stage.
+
+Squad Status Premium (Q3)
+
+Squad status is a massive driver of valuation. Because minutes\_played
+was standardized, the coefficient (\(\pi_6 \approx = .35\)) indicates
+that a one standard deviation increase in playing time is associated
+with a 42\% increase in market value (\(e^{.35} - 1 \approx .42\)). This
+confirms that being a ``Starter'' is financially distinct from being a
+Rotation Player.
+
+Contextual Effects (Q4-Q5)
+
+We find a ``Diversity Premium'' (\(\delta_{01} = .20\). A 10 percentage
+point increase in a club's foreign player proportion increases average
+player value by 2\%. Conversely, we find a ``Domestic Discount'' where
+homegrown citizens are valued 17\% lower than foreign imports
+(\(e^{-.19} - 1 \approx -.17\)).
+
+\begin{figure}
+
+\centering{
+
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/fig-results-1.pdf}
+
+}
+
+\caption{\label{fig-results}Key Drivers of Market Value. (A) Cubic
+Market Trend. (B) Quadratic Career Arc. (C) Squad Status Premium. (D)
+Diversity Premium.}
+
+\end{figure}%
+
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-7-1.pdf}
+
+\section{Club-Level Heterogeneity}\label{club-level-heterogeneity}
+
+Figure X displays the estimated club random effects from our
+cross-classified model. Substantial heterogeneity exists in both
+baseline valuations and temporal trajectories.
+
+\subsection{Baseline Premiums and
+Discounts}\label{baseline-premiums-and-discounts}
+
+Manchester United exhibits the largest effect: controlling for age,
+position, and performance, United players are valued 68\% higher than
+league average (\(\beta_{0j}\) = 0.52, 95\% CI {[}0.31, 0.76{]}).
+Barcelona (+56\%, 95\% CI {[}29\%, 93\%{]}), Paris Saint-Germain (+26\%,
+95\% CI {[}6\%, 53\%{]}), Chelsea (+25\%, 95\% CI {[}7\%, 50\%{]}),
+Manchester City (+24\%, 95\% CI {[}5\%, 49\%{]}), and Bayern Munich
+(+22\%, 95\% CI {[}4\%, 48\%{]}) also show significant premiums.
+
+Conversely, seven clubs show significant discounts. Sevilla faces the
+steepest penalty: players are valued 28\% below league average
+(\(\beta_{0j}\) = -0.33, 95\% CI {[}-0.42, -0.23{]}). Porto (-27\%),
+Benfica (-22\%), Roma (-21\%), Napoli (-17\%), Villarreal (-16\%), and
+Tottenham (-14\%) also show significant negative effects.
+
+\subsection{Diverging Temporal
+Trajectories}\label{diverging-temporal-trajectories}
+
+The random slopes reveal that club fortunes diverged over the study
+period. Three clubs showed significantly faster appreciation than league
+average: Arsenal (+2.9\%/year, 95\% CI {[}0.8\%, 5.0\%{]}), Liverpool
+(+2.7\%/year, 95\% CI {[}0.7\%, 4.8\%{]}), and Tottenham (+2.8\%/year,
+95\% CI {[}0.8\%, 4.8\%{]}). These trajectories coincide with improved
+sporting performance and, for Liverpool, a Champions League victory in
+2019.
+
+Four clubs experienced significantly slower growth (or faster decline):
+Manchester United (-2.8\%/year, 95\% CI {[}-4.5\%, -1.0\%{]}), Borussia
+Dortmund (-2.3\%/year, 95\% CI {[}-4.1\%, -0.4\%{]}), Juventus
+(-2.3\%/year, 95\% CI {[}-4.1\%, -0.5\%{]}), and Barcelona (-1.8\%/year,
+95\% CI {[}-3.5\%, -0.1\%{]}). Despite high baseline premiums, these
+clubs saw their market advantages erode over time.
+
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-8-1.pdf}
+
+\hfill\break
+
+\section{Findings}\label{findings}
+
+This study demonstrates that player market value is driven primarily by
+individual reputation and squad status, but is significantly moderated
+by club context and market cycles. Our cross-classified approach reveals
+that while ``Incubator Clubs'' can accelerate value growth, the market
+overall has entered a deceleration phase post-2020. Future research
+should address the potential endogeneity of playing time using
+instrumental variable approaches.
+
+While our cross-classified model demonstrates strong predictive power
+(\(R^2 \approx .89\)) , several limitations warrant consideration.
+First, although the Likelihood Ratio Test supported the inclusion of
+random slopes for club trajectories, the variance estimates should be
+interpreted with caution given the relatively small number of unique
+clubs (N=21). Second, diagnostic plots indicated deviations from
+normality in the extreme tails of the residual distribution; while our
+large sample size (N=7,023) ensures robust estimation of fixed effects,
+future iterations could employ robust standard errors or a Gamma GLMM to
+better address these extremes. Finally, predictors such as
+\texttt{minutes\_played} are likely endogenous---since better players
+naturally accrue more playing time---and thus should be interpreted as
+associations reflecting ``Squad Status'' rather than purely causal
+effects.
+
+Ultimately, this research highlights the necessity of moving beyond
+static, single-level analyses to capture the true complexity of the
+football transfer market. By rigorously modeling the cross-classified
+intersection of individual player trajectories and dynamic club
+contexts, we provide a more accurate lens for valuing talent in a
+hyper-inflated economy. As the industry continues to professionalize,
+such multidimensional frameworks---which account for the interplay of
+human capital, institutional prestige, and market cycles---will remain
+indispensable for clubs seeking to distinguish genuine value from market
+noise.
+
+\newpage
+
+\section{References}\label{references}
+
+Frick, B. (2007). The Football Players' Labor Market: Empirical Evidence
+from the Major European Leagues. Scottish Journal of Political Economy,
+54(3), 422--446.
+
+Franck, E., \& Nüesch, S. (2012). Talent and/or Popularity: What Does It
+Take to Be a Superstar? Economic Inquiry, 50(1), 202--216.
+
+Rosen, S. (1981). The Economics of Superstars. The American Economic
+Review, 71(5), 845--858.
 
 
 
