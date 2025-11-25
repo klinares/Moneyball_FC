@@ -1,27 +1,26 @@
 % Options for packages loaded elsewhere
-% Options for packages loaded elsewhere
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
 \PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
 %
 \documentclass[
   12pt]{article}
-\usepackage{xcolor}
+
 \usepackage{amsmath,amssymb}
-\setcounter{secnumdepth}{5}
+\usepackage{setspace}
 \usepackage{iftex}
 \ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
 \else % if luatex or xetex
-  \usepackage{unicode-math} % this also loads fontspec
+  \usepackage{unicode-math}
   \defaultfontfeatures{Scale=MatchLowercase}
   \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
 \fi
 \usepackage{lmodern}
-\ifPDFTeX\else
-  % xetex/luatex font selection
+\ifPDFTeX\else  
+    % xetex/luatex font selection
 \fi
 % Use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
@@ -29,7 +28,6 @@
   \usepackage[]{microtype}
   \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
 }{}
-\usepackage{setspace}
 \makeatletter
 \@ifundefined{KOMAClassName}{% if non-KOMA class
   \IfFileExists{parskip.sty}{%
@@ -40,6 +38,9 @@
 }{% if KOMA class
   \KOMAoptions{parskip=half}}
 \makeatother
+\usepackage{xcolor}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\setcounter{secnumdepth}{5}
 % Make \paragraph and \subparagraph free-standing
 \makeatletter
 \ifx\paragraph\undefined\else
@@ -65,7 +66,8 @@
 \makeatother
 
 
-\usepackage{longtable,booktabs,array}
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}\usepackage{longtable,booktabs,array}
 \usepackage{calc} % for calculating minipage widths
 % Correct order of tables after \paragraph or \subparagraph
 \usepackage{etoolbox}
@@ -77,41 +79,39 @@
 \makesavenoteenv{longtable}
 \usepackage{graphicx}
 \makeatletter
-\newsavebox\pandoc@box
-\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
-  \sbox\pandoc@box{#1}%
-  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
-  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
-  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
-  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
-  \else\usebox{\pandoc@box}%
-  \fi%
-}
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
 % Set default figure placement to htbp
+\makeatletter
 \def\fps@figure{htbp}
 \makeatother
-
-
-
-
-
-\setlength{\emergencystretch}{3em} % prevent overfull lines
-
-\providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-
-
-
- 
-\usepackage[]{natbib}
-\bibliographystyle{agsm}
-
 
 \addtolength{\oddsidemargin}{-.5in}%
 \addtolength{\evensidemargin}{-1in}%
 \addtolength{\textwidth}{1in}%
 \addtolength{\textheight}{1.7in}%
 \addtolength{\topmargin}{-1in}%
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{longtable}
+\usepackage{colortbl}
+\usepackage{array}
+\usepackage{anyfontsize}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
 \makeatletter
 \@ifpackageloaded{caption}{}{\usepackage{caption}}
 \AtBeginDocument{%
@@ -153,14 +153,21 @@
 \@ifpackageloaded{caption}{}{\usepackage{caption}}
 \@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
 \makeatother
+
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage[]{natbib}
+\bibliographystyle{agsm}
 \usepackage{bookmark}
+
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\urlstyle{same}
+\urlstyle{same} % disable monospaced font for URLs
 \hypersetup{
-  pdftitle={Multilevel Determinants of Player Market Value in Elite European Football: The Role of Performance, Club Prestige, and Player Characteristics},
-  pdfauthor={Sagnik Chakrava; Jianing Zou; Kevin Linares; Namit Shrivastava},
-  pdfkeywords={football economics, multilevel modeling, player
-valuation, club prestige, UEFA coefficient, sports analytics},
+  pdftitle={Multilevel Determinants of Player Market Value in Elite European Succer},
+  pdfauthor={Kevin Linares; Jianing Zou; Namit Shrivastava; Sagnik Chakrava},
+  pdfkeywords={soccer economics, multilevel modeling, player valuation,
+club prestige, UEFA coefficient, sports analytics},
   colorlinks=true,
   linkcolor={blue},
   filecolor={Maroon},
@@ -179,15 +186,14 @@ valuation, club prestige, UEFA coefficient, sports analytics},
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\date{November 24, 2025}
+\date{November 25, 2025}
 \title{\bf Multilevel Determinants of Player Market Value in Elite
-European Football: The Role of Performance, Club Prestige, and Player
-Characteristics}
+European Succer}
 \author{
-Sagnik Chakrava\\
+Kevin Linares\\
 and\\Jianing Zou\\
-and\\Kevin Linares\\
 and\\Namit Shrivastava\\
+and\\Sagnik Chakrava\\
 University of Maryland\\
 }
 \maketitle
@@ -195,22 +201,23 @@ University of Maryland\\
 \bigskip
 \bigskip
 \begin{abstract}
-This study investigates the determinants of player market value in elite
-European football using a cross-classified multilevel model applied to
-7,023 observations between 2013 and 2024. By disentangling individual
-reputation from club context, we identify distinct non-linear trends in
-market evolution and biological aging. Our results reveal a ``Boom and
-Bust'' market cycle, a strict ``Inverted-U'' career arc peaking at age
-27, and a significant 42\% valuation premium for key starters (``Squad
-Status''). Furthermore, we find evidence of a ``Diversity Premium,''
-where clubs with higher international representation garner higher
-player valuations, contrasting with a ``Domestic Discount'' for local
-players.
+The valuation of elite succer players has evolved into a global
+financial industry exceeding €7 billion annually, yet traditional models
+often fail to capture the dynamic movement of players between clubs.
+Using a cross-classified multilevel model on 7,023 observations
+(2013--2024), we partition market value variance into individual
+reputation and club context. We identify a distinct market cycle and a
+strict career arc peaking at age 27. Notably, club status drives
+valuation more than previously understood, with key starters commanding
+a 42\% premium over rotation players. We also identify a diversity
+premium, where clubs with higher international representation generate
+higher player valuations, contrasting with a systematic 17\% discount
+for domestic talent.
 \end{abstract}
 
 \noindent%
-{\it Keywords:} football economics, multilevel modeling, player
-valuation, club prestige, UEFA coefficient, sports analytics
+{\it Keywords:} soccer economics, multilevel modeling, player valuation,
+club prestige, UEFA coefficient, sports analytics
 \vfill
 
 \newpage
@@ -231,78 +238,61 @@ validated in sports economics literature as a robust proxy for actual
 transfer fees and serves as a leading indicator of player market
 valuation based on demand.
 
-Foundational research in sports economics has long sought to isolate the
-determinants of this value. Frick (2007) established that while hard
-performance metrics like goals and assists are primary drivers,
-valuation follows a strict inverted-U biological trajectory, typically
-peaking between ages 27 and 28 before depreciating rapidly. Beyond
-on-pitch performance, Franck and Nüesch (2012) empirically demonstrated
-the superstar effect. They found that non-performance factors such as
-media popularity and brand visibility can magnify a player's value
-significantly, especially at the top end of the wage distribution.
-However, these existing studies often model players as static units
-nested within a single club. This approach fails to account for the
-dynamic reality of modern football, where players transfer between teams
-and accumulate value from both their portable human capital (such as
-experience and age) and the institutional prestige of their current
-employer.
-
-Neglecting this cross-classified structure, where player and club
-effects intersect rather than nest, likely misestimates the true drivers
-of market value. We address this methodological limitation by applying a
-cross-classified multilevel model to a decade of transfer data (2013 to
-2024). By disentangling individual reputation from club context, we aim
-to answer four critical questions that remain under-explored in nested
-models:
+Research in sports economics has long sought to isolate the determinants
+of transfer value. While Frick (2007) established that performance
+metrics like goals and assists are primary drivers, valuation follows a
+strict ``Inverted-U'' biological trajectory, typically peaking between
+ages 27 and 28. Beyond on-pitch output, Franck and Nüesch (2012)
+demonstrated a ``Superstar Effect (Rosen, 1981),'' where brand
+visibility magnifies value at the top of the wage distribution. However,
+existing models frequently treat players as static units nested within a
+single club. This approach ignores the reality of modern soccer in which
+players are mobile assets who accumulate value from both their portable
+human capital (i.e., experience, skils, reputation) and the
+institutional prestige of their current club. Neglecting this
+cross-classified structure---where player and club effects intersect
+rather than nest---misestimates the true drivers of market value. When
+we apply a cross-classified multilevel model to a decade of transfer
+data, we disentangle individual reputation from club context to address
+four critical questions:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  \textbf{Market Evolution (RQ1):} How has the transfer market evolved
-  annually compared to the 2013 baseline? We believe that understanding
-  the nonlinear trajectory of market inflation is essential for
-  distinguishing real player value growth from sector-wide inflation.
+  \textbf{Market valuation evolution:} Distinguishing real value growth
+  from inflation.
 \item
-  \textbf{Biological Career Arc (RQ2):} How does market value change as
-  a player moves through their career? By modeling the nonlinear effect
-  of age, we aim to validate Frick's (2007) peak age hypothesis and
-  identify the precise window where physical peak and experience
-  intersect.
+  \textbf{Career arc:} Identifying the precise biological window where
+  physical peak and experience intersect.
 \item
-  \textbf{Squad Status (RQ3):} Does playing more minutes than the
-  average teammate serve as a primary driver of valuation? While goals
-  capture output, they bias towards attackers. We propose that squad
-  status (measured by relative minutes played) is a more universal
-  signal of manager trust and player utility across all positions.
+  \textbf{Club status:} Testing whether relative playing time signals
+  value more reliably than raw counting stats.
 \item
-  \textbf{Contextual Premiums (RQ4):} Is there a premium for club
-  diversity and a discount for domestic players? As the labor market
-  globalizes, we investigate whether clubs with broader international
-  recruitment generate higher valuations and whether domestic players
-  face a valuation discount compared to imported talent.
+  \textbf{Contextual premiums:} Quantifying the valuation impact of club
+  diversity and domestic status in a globalized labor market.
 \end{enumerate}
 
 \section{Method}\label{method}
 
 \emph{Data Source.} We obtained data from
 \href{https://www.transfermarkt.com/}{Transfermarkt} and
-\href{https://www.uefa.com/}{Union of European Football Association}
+\href{https://www.uefa.com/}{Union of European soccer Association}
 (UEFA) official rankings, which are both publicly available websites. At
 the time of this study, Transfermarkt does not have free API access to
 their data repository. Instead, the R package
-\href{https://jaseziv.github.io/worldfootballR/articles/load-scraped-data.html}{worldfootballR}
+\href{https://jaseziv.github.io/worldfootballR/articles/load-scraped-data.html}{worldsoccerR}
 allows us to scrape data from their website. However, there are several
 limitations to this package such as timeout requests and failure to
-capture dynamic JavaScript tables on webpages. Fortunately, we found the
-necessary data through Kaggle
-\href{https://www.kaggle.com/datasets/davidcariboo/player-scores?resource=download}{\textbf{Football
+capture dynamic JavaScript tables on webpages. We found the necessary
+data through Kaggle
+\href{https://www.kaggle.com/datasets/davidcariboo/player-scores?resource=download}{\textbf{soccer
 Data from Transfermarkt}}, which allowed us to focus on the modeling
 aspect of this project following data restructuring and predictor
 variable engineering.
 
 \emph{Sample Characteristics.} We used the 10-year averaged UEFA
 coefficient rankings\footnote{UEFA coefficient rankings are a
-  points-based system used by European football's governing body to rank
+  points-based system used by European soccer's governing body to rank
   national associations and clubs based on their performance in European
   competitions, which determines qualification spots and seeding for
   tournaments like the Champions League and Europa League.} to select
@@ -320,7 +310,7 @@ drop players that had less than two seasons to examine player
 trajectories, we would lose 62\% of our sample. Figure 1 shows the
 number of players in each of the 21 clubs across the years.
 
-\pandocbounded{\includegraphics[keepaspectratio]{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-3-1.pdf}}
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-3-1.pdf}
 
 \emph{Variable Selection and Normalization.} Our outcome of interest is
 a player's yearly market valuation, which we convert from euros to US
@@ -344,118 +334,45 @@ variability across years, yet most values are at the lower end, which is
 common for salary data. When we log-transform our outcome, we bring the
 lower values up and the higher values down.
 
-\pandocbounded{\includegraphics[keepaspectratio]{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-4-1.pdf}}
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-4-1.pdf}
 
 A list of variables we used for modeling players' market values are
-shown in Table 1 alongside how and why they were centered. THIS TABLE
-MIGHT NEED TO GO IN The Appendix.
-
-To ensure meaningful model intercepts and convergence, we applied the
-following centering strategies:
-
-\begin{itemize}
-\item
-  \textbf{Outcome:} We used the natural log of inflation-adjusted market
-  value (\texttt{usd\_revenue\_2024\_log}).
-\item
-  \textbf{Time:} We centered season year at the minimum value, making
-  2013 equal to 0 (\texttt{season\_year\_c}).
-\item
-  \textbf{Player Traits:} We applied grand-mean centering to age
-  (\texttt{age\_c}) and height (\texttt{height\_c}).
-\item
-  \textbf{Squad Status:} We standardized minutes played (Z-score)
-  relative to each specific club-year. This isolates a player's status
-  as a starter or bench player relative to their current teammates and
-  removes the noise of team-level rotation policies.
-\item
-  \textbf{Club Context:} We grand-mean centered the proportion of
-  foreign players (\texttt{foreign\_players}).
-\item
-  \textbf{Categorical Controls:} We included region, position, and
-  citizenship status (coded as 1 for citizens of the club country).
-\end{itemize}
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2466}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2466}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2466}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2603}}@{}}
-\caption{Table 1. Data Structure for fixed effects, except year as it is
-a random slope}\tabularnewline
-\toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
-\textbf{Variable Type}
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-\textbf{Variable}
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Centering Strategy/ Form Factor
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Justification
-\end{minipage} \\
-\midrule\noalign{}
-\endfirsthead
-\toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
-\textbf{Variable Type}
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-\textbf{Variable}
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Centering Strategy/ Form Factor
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Justification
-\end{minipage} \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\textbf{Time} & Season Year & Min-Centering (+ Quadratic) & Establishes
-a meaningful starting intercept (2013 =0) \\
-\textbf{Contextual, Club} & UEFA Coefficient & Year-Mean Centering &
-Isolates relative prestige; removes historical inflation \\
-& Foreign Players Proportion & Grand-Mean Centering & Moves baseline to
-``Average Club'' (since 0\% is unlikely) \\
-\textbf{Player Characteristics} & Age & Grand-Mean (+ Quadratic) &
-Captures absolute career stage (Prospect \(\to\) Prime \(\to\)
-Veteran) \\
-& Height (in cm) & Grand-Mean & Captures premium for absolute physical
-size \\
-& Position & Reference group, attacker & Attackers tend to be valued
-more on average \\
-\textbf{Player Demographic} & Citizen of Club Country & None (Raw binary
-0/1) & Keeps ``Non-Citizen'' as clear reference group. Separates
-individual status from club composition (\texttt{foreign\_players}) \\
-& Region of origin & Reference group, Europe & Control variable for
-where player is from \\
-\textbf{Player Performance} & Goals & Position-Centering & Preserves
-natural 0 and marginal value of 1 goal interpretation \\
-& Assists & Position-Centering & Preserves natural 0 and marginal value
-of 1 assist interpretation \\
-& Red Card & raw season count & Meaningful 0 interpretation \\
-& Yellow Card & raw season count & Meaningful 0 interpretation \\
-& Average minutes played in season & Year-Mean Centering, z-score &
-Isolates whether player is a starter or bench player \\
-\end{longtable}
-
-\emph{Data Assumptions:} We assume that variables such as height and
-positions are time invariant for the duration of this study. At the club
-level, we assume mutually exclusiveness in that players can only belong
-to one club in a given year. Although a player could have switched clubs
-mid-season, we keep this constant for model simplicity. We also assume
-that the relationship between age and log-market value is non-linear and
-parabolic so we introduce a quadratic term on age. Because we excluded
-observations with missing data (listwise deletion), we assume the data
-are Missing Completely at Random (MCAR) or that the proportion of
-missing cases (\textasciitilde2\%) is negligible and does not introduce
-systematic bias.
-
-\hfill\break
+shown in Appendix 1 alongside our justification for how and why we
+centered each fixed effect, such as ensuring meaninfulful model
+intercepts and solving convergence (e.g., degenerate Hessian). We
+applied the following centering and normalization/transformation
+strategies:\footnote{\emph{Data Assumptions:} We assume that variables
+  such as height and positions are time invariant for the duration of
+  this study. At the club level, we assume mutually exclusiveness in
+  that players can only belong to one club in a given year. Although a
+  player could have switched clubs mid-season, we keep this constant for
+  model simplicity. We also assume that the relationship between age and
+  log-market value is non-linear and parabolic so we introduce a
+  quadratic term on age. Because we excluded observations with missing
+  data (listwise deletion), we assume the data are Missing Completely at
+  Random (MCAR) or that the proportion of missing cases
+  (\textasciitilde2\%) is negligible and does not introduce systematic
+  bias.} We used the natural log of inflation-adjusted market value
+(\texttt{usd\_revenue\_2024\_log}). We centered season year at the
+minimum value, making 2013 equal to 0 (\texttt{season\_year\_c}). We
+applied grand-mean centering to age (\texttt{age\_c}) and height
+(\texttt{height\_c}). We standardized minutes played (Z-score) relative
+to each specific club-year. This isolates a player's status as a starter
+or bench player relative to their current teammates and removes the
+noise of team level rotation policies. We also grand-mean centered the
+proportion of foreign players (\texttt{foreign\_players}). We included
+region, position, and citizenship status (coded as 1 for citizens of the
+club country). We centered the number of goals and assist by the four
+positions of players (e.g., defender, midfielder, goalkeeper, attacker).
+This ensured that a goal from a defender is weighted differently than a
+goal from an attacker since they are more likely to strike a goal (i.e.,
+goalies are classified as defenders in these data).
 
 \section{Modeling Approach}\label{modeling-approach}
 
 We employ a cross-classified multilevel linear model to partition
 variance across observations (Level 1), players (Level 2a), and clubs
-(Level 2b). This structure explicitily accounts for players transferring
+(Level 2b). This structure explicitly accounts for players transferring
 between clubs and thus treating player and club as cross random factors
 rather than a strict three level hierarchy. We found that in this
 sample, almost 20\% of players had been in two to seven (17\% in two
@@ -471,36 +388,30 @@ club (j1) in year (t0) but switches to club (j2) in year (t1) the fixed
 effect in the model, such as minutes played, updates the players status,
 as opposed to having static or average predictors. Club attributes, such
 as foreign players and UEFA scores, ensures that when player move clubs,
-the model swaps the values of \(X_j1\), for \(X_j2\). Player's
+the model swaps the values of \(X_{j1}\), for \(X_{j2}\). Player's
 characteristics, for instance age and height, move with the player
 across time.
 
-\begin{figure}
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-5-1.pdf}
 
-\centering{
+In the overall spaghetti plot in Figure 4.a, grouped by club, they
+consistently show differences and are not constant across years .This
+means between-club differences in market values exist, and their
+trajectory change over time as well, indicating slopes might vary across
+clubs. We also plot in Figure 4.b and 4.a. what appears to be a
+quadratic and cubic relationship between market value and time. This
+provides us with enough justification to include test these terms in our
+models.
 
-\pandocbounded{\includegraphics[keepaspectratio]{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/fig-cross-class-1.pdf}}
-
-}
-
-\caption{\label{fig-cross-class}Figure 3. Cross-Classified Data
-Structure: Players move between clubs over time.}
-
-\end{figure}%
-
-\textbf{Jianing}, can you write this result? This section should be for
-the slope, but remember that the slope is on the club not player.
-
-\pandocbounded{\includegraphics[keepaspectratio]{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-5-1.pdf}}
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-6-1.pdf}
 
 We plot age by yearly market value in 2024 USD (on the log scale) in
 Figure 5. for each team and observe almost an upside down u shape. As
 players get older you are valued less in the market, same for younger
-players.
+players. Again, this indicates to us that testing a quadratic term on
+age should be included in our modeling plan.
 
-\pandocbounded{\includegraphics[keepaspectratio]{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-6-1.pdf}}
-
-\hfill\break
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-7-1.pdf}
 
 \subsection{Model Specification}\label{model-specification}
 
@@ -508,7 +419,7 @@ To formally describe our analysis, we utilize a hierarchical notation
 system that decomposes the model into observation, player, and club
 levels. This analysis clarifies how the cross-classified structure
 (\(i\) players crossed with \(j\) clubs) contributes to the variance in
-market value.
+market value. Here we express our final model.
 
 Level 1: Observation Model (Time-Varying Effects)
 
@@ -575,38 +486,56 @@ Cross-classified structure: A player's market value at time \(t\)
 depends on both their intrinsic ``brand'' (\(u_{0i}\)) and the club they
 are currently with (\(v_{0j} + v_{1j} \cdot \text{Year}_t\)).
 
-\hfill\break
-
 \section{Results}\label{results}
-
-\textbf{Model Building and Comparison}
 
 We fitted a series of nested multilevel models to identify the optimal
 specification. We started with a null model containing only random
 intercepts for players and clubs to establish baseline variance
 partitioning. We then systematically added temporal trends (linear,
 quadratic, and cubic), random slopes for club trajectories, player-level
-predictors, and finally club-level contextual factors. We compared
-models using likelihood ratio tests (LRT) with REML estimation and
-assessed fit using AIC and BIC criteria.
+predictors, and finally club-level contextual factors. Model selection
+and comparison was guided by Likelihood Ratio Tests (LRT) to evaluate
+the statistical significance of nested model improvements. To balance
+goodness-of-fit against model complexity, we also consulted the Akaike
+Information Criterion (AIC) and Bayesian Information Criterion (BIC).
+Models yielding significant LRT results (p\textless.05) and lower values
+on both information criteria were retained for subsequent analysis. We
+describe each model in Appendix 2, Table 2 alongside ICC, AIC, and BIC
+values.
 
-\textbf{Market Evolution (RQ1)}
+Appendix 3 contains all of our modeling results. Our random intercept
+only model reveals that player\_id accounts for about 75\% of market
+value while club\_id accounts for 3\%. We test whether a random slope on
+year is needed the LRT test\footnote{The alternative hypothesis,
+  \(H_A=\tau_{11} > 0\) since variance should be larger than 0. To test
+  this hypothesis we use the likelihood ratio test (LRT) simply by
+  \(-2[\text{log likelihood}_{reduced} - \text{log likelihood}_{full}]\)
+  to examine the difference. We use a mixture of \(\chi^2\) 1 and 2
+  distributions to compare the full model with two random effects
+  against a reduced model with one random effect.} reveals that the
+random slope provides a significantly better fit than the reduce model,
+the quadratic term is needed for this data. We also tested a random
+slope of year within club which did not converge, probably due to a
+large proportion of players only play 1-2 seasons in our our data.
+Overall, our final model included player characteristics, performance
+metrics, and club characteristics, and we select Model 4 because we
+found a non significant LRT test different between when we include club
+characteristics versus only player characteristics(Model\_3.2) despite
+Model 4 having a slightly larger AIC and BIC than Model 3.2.
+
+IN DRAFT
 
 Our model reveals a significant cubic trend (p \textless{} .001) in
 market evolution. As shown in Figure 6A, the market followed an S-shaped
 trajectory. We observed stagnation from 2013 to 2014, followed by a
 rapid inflationary boom from 2015 to 2019, and then a post-2020 plateau.
-This confirms that football market inflation is cyclical rather than
+This confirms that soccer market inflation is cyclical rather than
 constant.
-
-\textbf{Biological Career Arc (RQ2)}
 
 We observe a strong quadratic effect for age (p \textless{} .001).
 Figure 6B illustrates the inverted-U shape, where value peaks during a
 player's prime (approximately age 27) and declines significantly in the
 veteran stage.
-
-\textbf{Squad Status Premium (RQ3)}
 
 Our results show that squad status is a massive driver of valuation.
 Because we standardized minutes played, the coefficient (approximately
@@ -614,18 +543,38 @@ Because we standardized minutes played, the coefficient (approximately
 is associated with a 42\% increase in market value. This confirms that
 being a starter is financially distinct from being a rotation player.
 
-\textbf{Contextual Effects (RQ4)}
-
 We find evidence of a diversity premium. A 10 percentage point increase
 in a club's foreign player proportion increases average player value by
 2\%. Conversely, we find a domestic discount where homegrown citizens
 are valued 17\% lower than foreign imports.
 
+\begin{verbatim}
+LRT Statistic: 66.6861 
+Parameter Diff: 2 
+Distribution:   Mixture of ChiSq(1) and ChiSq(2) 
+P-Value:        < 0.0001 
+\end{verbatim}
+
+\begin{table}
+\fontsize{12.0pt}{14.0pt}\selectfont
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}rrrrrrrr}
+\toprule
+npar & AIC & BIC & logLik & -2*log(L) & Chisq & Df & Pr(>Chisq) \\ 
+\midrule\addlinespace[2.5pt]
+26 & 14362.95 & 14541.23 & -7155.476 & 14310.95 & NA & NA & NA \\ 
+28 & 14361.89 & 14553.88 & -7152.944 & 14305.89 & 5.064713 & 2 & 0.07947152 \\ 
+\bottomrule
+\end{tabular*}
+\end{table}
+
+Below are marginal effects cour our categorical variables that we need
+to unpack.
+
 \begin{figure}
 
 \centering{
 
-\pandocbounded{\includegraphics[keepaspectratio]{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/fig-results-1.pdf}}
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/fig-results-1.pdf}
 
 }
 
@@ -637,7 +586,7 @@ international rosters.}
 
 \end{figure}%
 
-\pandocbounded{\includegraphics[keepaspectratio]{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-7-1.pdf}}
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-10-1.pdf}
 
 \section{Club-Level Heterogeneity}\label{club-level-heterogeneity}
 
@@ -681,7 +630,7 @@ to -0.4\%), Juventus declined 2.3\% per year (95\% CI from -4.1\% to
 -0.1\%). Despite high baseline premiums, these clubs saw their market
 advantages erode over time.
 
-\pandocbounded{\includegraphics[keepaspectratio]{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-8-1.pdf}}
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-11-1.pdf}
 
 \hfill\break
 
@@ -709,7 +658,7 @@ associations reflecting squad status rather than purely causal effects.
 
 Ultimately, our research highlights the necessity of moving beyond
 static, single-level analyses to capture the true complexity of the
-football transfer market. By rigorously modeling the cross-classified
+soccer transfer market. By rigorously modeling the cross-classified
 intersection of individual player trajectories and dynamic club
 contexts, we provide a more accurate lens for valuing talent in a
 hyper-inflated economy. As the industry continues to professionalize,
@@ -722,7 +671,7 @@ noise.
 
 \section{References}\label{references}
 
-Frick, B. (2007). The Football Players' Labor Market: Empirical Evidence
+Frick, B. (2007). The soccer Players' Labor Market: Empirical Evidence
 from the Major European Leagues. Scottish Journal of Political Economy,
 54(3), 422--446.
 
@@ -731,6 +680,809 @@ Take to Be a Superstar? Economic Inquiry, 50(1), 202--216.
 
 Rosen, S. (1981). The Economics of Superstars. The American Economic
 Review, 71(5), 845--858.
+
+\newpage
+
+\section{Appendix 1. Modeling Predictors and Centering
+Strategies}\label{appendix-1.-modeling-predictors-and-centering-strategies}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2192}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2192}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2192}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3425}}@{}}
+\caption{Table 1. Data Structure for fixed effects, except year as it is
+a random slope}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Variable Type}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Variable}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Centering Strategy/ Form Factor
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Justification
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Variable Type}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Variable}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Centering Strategy/ Form Factor
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Justification
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Time} & Season Year & Min-Centering (+ Quadratic) & Establishes
+a meaningful starting intercept (2013 =0) \\
+\textbf{Contextual, Club} & UEFA Coefficient & Year-Mean Centering &
+Isolates relative prestige; removes historical inflation \\
+& Foreign Players Proportion & Grand-Mean Centering & Moves baseline to
+``Average Club'' (since 0\% is unlikely) \\
+\textbf{Player Characteristics} & Age & Grand-Mean (+ Quadratic) &
+Captures absolute career stages (Prospect \(\to\) Prime \(\to\)
+Veteran) \\
+& Height (in cm) & Grand-Mean & Captures premium for absolute physical
+size \\
+& Position & Reference group, attacker & Attackers tend to be valued
+more on average \\
+\textbf{Player Demographic} & Citizen of Club Country & None (Raw binary
+0/1) & Keeps ``Non-Citizen'' as clear reference group. Separates
+individual status from club composition (\texttt{foreign\_players}) \\
+& Region of origin & Reference group, Europe & Control variable for
+where player is from \\
+\textbf{Player Performance} & Goals & Position-Centering & Preserves
+natural 0 and marginal value of 1 goal interpretation \\
+& Assists & Position-Centering & Preserves natural 0 and marginal value
+of 1 assist interpretation \\
+& Red Card & raw season count & Meaningful 0 interpretation \\
+& Yellow Card & raw season count & Meaningful 0 interpretation \\
+& Average minutes played in season & Year-Mean Centering, z-score &
+Isolates whether player is a starter or bench player \\
+\end{longtable}
+
+\newpage
+
+\section{Appendix 2. Modeling Plan}\label{appendix-2.-modeling-plan}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1622}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1892}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.2297}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1216}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1351}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1622}}@{}}
+\toprule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Models} & \textbf{Specification / Additions} & \textbf{Purpose
+\& Research Justification} & ICCplayer/club & AIC & BIC \\
+\textbf{Model 1} & Unconditional Means Model (Random Intercepts only) &
+Calculate ICC and partition variance between players and clubs before
+adding predictors & .746/.034 & 20105.1893 & 20132.6171 \\
+\textbf{Model 2.1} & + Fixed Effect: \texttt{season\_year\_c} & Test for
+a general linear trend in market value growth & .756/.033 & 20052.802 &
+20087.087 \\
+\textbf{Model 2.2} & + Fixed Effect: \texttt{season\_year\_c\_sq}
+(\(Year^2\)) & Test for non-linear market dynamics (e.g., acceleration
+or deceleration/plateaus) & .757/.033 & 20046.978 & 20088.119 \\
+\textbf{Model 2.3} & + Fixed Effect: \texttt{season\_year\_c\_cub}
+(\(Year^3\)) & Test for complex ``S-shaped'' market trajectories (e.g.,
+booms) & .758/.033 & 20037.404 & 20085.402 \\
+\textbf{Model 2.4} & + Random Slope: \texttt{season\_year\_c} (at Club
+Level) & Test if market value growth rates vary significantly between
+clubs & .749/.051 & 19974.718 & 20036.430 \\
+\textbf{Model 2.5} & + Random Slope: \texttt{season\_year\_c\_sq} & Test
+if the growth curvature varies by club & & & No Convergence \\
+\textbf{Model 3.1} & + Player Fixed Effects: Performance (Goals,
+Assists, etc.), Status (Minutes), Demographics (Region, Citizen), Traits
+(Height, Linear Age) & Estimate the marginal value of performance
+metrics and player characteristics controlling for time & .636/.096 &
+17469.242 & 17640.666 \\
+\textbf{Model 3.2} & + Fixed Effect: \texttt{age\_c\_sq} (\(Age^2\)) &
+Test the the inverted-U career arc (Prospect \(\to\) Prime \(\to\)
+Veteran) & .775/.047 & 14507.097 & 14685.378 \\
+\textbf{Model 4} & + Club Fixed Effects: \texttt{foreign\_players},
+\texttt{uefa\_coefficients} & Test for contextual club effects &
+.773/.050 & 14520.484 & 14712.479 \\
+\textbf{Final Model Selection} & Diagnostics \& Comparison & Compare
+models using LRT, AIC/BIC, and residual diagnostics (QQ plots) to select
+the most parsimonious and robust fit & & & \\
+\end{longtable}
+
+\newpage
+
+\section{Appendix 3. R code for models and
+outputs:}\label{appendix-3.-r-code-for-models-and-outputs}
+
+\subsection{We print model output here for
+review.}\label{we-print-model-output-here-for-review.}
+
+Printing fit results for Model 1
+
+\begin{table}[!h]
+\centering
+\begin{tabular}{lr}
+\toprule
+\cellcolor{gray!10}{Observations} & \cellcolor{gray!10}{7023}\\
+Dependent variable & usd\_revenue\_2024\_log\\
+\cellcolor{gray!10}{Type} & \cellcolor{gray!10}{Mixed effects linear regression}\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lr}
+\toprule
+\cellcolor{gray!10}{AIC} & \cellcolor{gray!10}{20105.189}\\
+BIC & 20132.617\\
+\cellcolor{gray!10}{Pseudo-R² (fixed effects)} & \cellcolor{gray!10}{0.000}\\
+Pseudo-R² (total) & 0.780\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{threeparttable}
+\begin{tabular}{lrrrrr}
+\toprule
+\multicolumn{6}{c}{Fixed Effects} \\
+\cmidrule(l{3pt}r{3pt}){1-6}
+  & Est. & S.E. & t val. & d.f. & p\\
+\midrule
+\cellcolor{gray!10}{(Intercept)} & \cellcolor{gray!10}{15.821} & \cellcolor{gray!10}{0.069} & \cellcolor{gray!10}{228.895} & \cellcolor{gray!10}{26.989} & \cellcolor{gray!10}{0.000}\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item  p values calculated using Satterthwaite d.f. 
+\end{tablenotes}
+\end{threeparttable}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lll}
+\toprule
+\multicolumn{3}{c}{Random Effects} \\
+\cmidrule(l{3pt}r{3pt}){1-3}
+Group & Parameter & Std. Dev.\\
+\midrule
+\cellcolor{gray!10}{player\_id} & \cellcolor{gray!10}{(Intercept)} & \cellcolor{gray!10}{1.321}\\
+club\_id & (Intercept) & 0.284\\
+\cellcolor{gray!10}{Residual} & \cellcolor{gray!10}{} & \cellcolor{gray!10}{0.718}\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lrl}
+\toprule
+\multicolumn{3}{c}{Grouping Variables} \\
+\cmidrule(l{3pt}r{3pt}){1-3}
+Group & \# groups & ICC\\
+\midrule
+\cellcolor{gray!10}{player\_id} & \cellcolor{gray!10}{2159} & \cellcolor{gray!10}{0.746}\\
+club\_id & 21 & 0.034\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+Printing fit results for Model 2.1
+
+\begin{table}[!h]
+\centering
+\begin{tabular}{lr}
+\toprule
+\cellcolor{gray!10}{Observations} & \cellcolor{gray!10}{7023}\\
+Dependent variable & usd\_revenue\_2024\_log\\
+\cellcolor{gray!10}{Type} & \cellcolor{gray!10}{Mixed effects linear regression}\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lr}
+\toprule
+\cellcolor{gray!10}{AIC} & \cellcolor{gray!10}{20052.802}\\
+BIC & 20087.087\\
+\cellcolor{gray!10}{Pseudo-R² (fixed effects)} & \cellcolor{gray!10}{0.005}\\
+Pseudo-R² (total) & 0.791\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{threeparttable}
+\begin{tabular}{lrrrrr}
+\toprule
+\multicolumn{6}{c}{Fixed Effects} \\
+\cmidrule(l{3pt}r{3pt}){1-6}
+  & Est. & S.E. & t val. & d.f. & p\\
+\midrule
+\cellcolor{gray!10}{(Intercept)} & \cellcolor{gray!10}{15.991} & \cellcolor{gray!10}{0.072} & \cellcolor{gray!10}{221.312} & \cellcolor{gray!10}{32.906} & \cellcolor{gray!10}{0.000}\\
+season\_year\_c & -0.031 & 0.004 & -8.113 & 6524.033 & 0.000\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item  p values calculated using Satterthwaite d.f. 
+\end{tablenotes}
+\end{threeparttable}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lll}
+\toprule
+\multicolumn{3}{c}{Random Effects} \\
+\cmidrule(l{3pt}r{3pt}){1-3}
+Group & Parameter & Std. Dev.\\
+\midrule
+\cellcolor{gray!10}{player\_id} & \cellcolor{gray!10}{(Intercept)} & \cellcolor{gray!10}{1.344}\\
+club\_id & (Intercept) & 0.282\\
+\cellcolor{gray!10}{Residual} & \cellcolor{gray!10}{} & \cellcolor{gray!10}{0.709}\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lrl}
+\toprule
+\multicolumn{3}{c}{Grouping Variables} \\
+\cmidrule(l{3pt}r{3pt}){1-3}
+Group & \# groups & ICC\\
+\midrule
+\cellcolor{gray!10}{player\_id} & \cellcolor{gray!10}{2159} & \cellcolor{gray!10}{0.756}\\
+club\_id & 21 & 0.033\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+Printing fit results for Model 2.2
+
+\begin{table}[!h]
+\centering
+\begin{tabular}{lr}
+\toprule
+\cellcolor{gray!10}{Observations} & \cellcolor{gray!10}{7023}\\
+Dependent variable & usd\_revenue\_2024\_log\\
+\cellcolor{gray!10}{Type} & \cellcolor{gray!10}{Mixed effects linear regression}\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lr}
+\toprule
+\cellcolor{gray!10}{AIC} & \cellcolor{gray!10}{20046.978}\\
+BIC & 20088.119\\
+\cellcolor{gray!10}{Pseudo-R² (fixed effects)} & \cellcolor{gray!10}{0.006}\\
+Pseudo-R² (total) & 0.791\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{threeparttable}
+\begin{tabular}{lrrrrr}
+\toprule
+\multicolumn{6}{c}{Fixed Effects} \\
+\cmidrule(l{3pt}r{3pt}){1-6}
+  & Est. & S.E. & t val. & d.f. & p\\
+\midrule
+\cellcolor{gray!10}{(Intercept)} & \cellcolor{gray!10}{15.916} & \cellcolor{gray!10}{0.074} & \cellcolor{gray!10}{214.884} & \cellcolor{gray!10}{36.552} & \cellcolor{gray!10}{0.000}\\
+poly(season\_year\_c, 2, raw = TRUE)1 & 0.019 & 0.012 & 1.584 & 5756.860 & 0.113\\
+\cellcolor{gray!10}{poly(season\_year\_c, 2, raw = TRUE)2} & \cellcolor{gray!10}{-0.004} & \cellcolor{gray!10}{0.001} & \cellcolor{gray!10}{-4.451} & \cellcolor{gray!10}{5650.505} & \cellcolor{gray!10}{0.000}\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item  p values calculated using Satterthwaite d.f. 
+\end{tablenotes}
+\end{threeparttable}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lll}
+\toprule
+\multicolumn{3}{c}{Random Effects} \\
+\cmidrule(l{3pt}r{3pt}){1-3}
+Group & Parameter & Std. Dev.\\
+\midrule
+\cellcolor{gray!10}{player\_id} & \cellcolor{gray!10}{(Intercept)} & \cellcolor{gray!10}{1.343}\\
+club\_id & (Intercept) & 0.282\\
+\cellcolor{gray!10}{Residual} & \cellcolor{gray!10}{} & \cellcolor{gray!10}{0.708}\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lrl}
+\toprule
+\multicolumn{3}{c}{Grouping Variables} \\
+\cmidrule(l{3pt}r{3pt}){1-3}
+Group & \# groups & ICC\\
+\midrule
+\cellcolor{gray!10}{player\_id} & \cellcolor{gray!10}{2159} & \cellcolor{gray!10}{0.757}\\
+club\_id & 21 & 0.033\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+Printing fit results for Model 2.3
+
+\begin{table}[!h]
+\centering
+\begin{tabular}{lr}
+\toprule
+\cellcolor{gray!10}{Observations} & \cellcolor{gray!10}{7023}\\
+Dependent variable & usd\_revenue\_2024\_log\\
+\cellcolor{gray!10}{Type} & \cellcolor{gray!10}{Mixed effects linear regression}\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lr}
+\toprule
+\cellcolor{gray!10}{AIC} & \cellcolor{gray!10}{20037.404}\\
+BIC & 20085.402\\
+\cellcolor{gray!10}{Pseudo-R² (fixed effects)} & \cellcolor{gray!10}{0.007}\\
+Pseudo-R² (total) & 0.793\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{threeparttable}
+\begin{tabular}{lrrrrr}
+\toprule
+\multicolumn{6}{c}{Fixed Effects} \\
+\cmidrule(l{3pt}r{3pt}){1-6}
+  & Est. & S.E. & t val. & d.f. & p\\
+\midrule
+\cellcolor{gray!10}{(Intercept)} & \cellcolor{gray!10}{15.993} & \cellcolor{gray!10}{0.076} & \cellcolor{gray!10}{211.563} & \cellcolor{gray!10}{39.594} & \cellcolor{gray!10}{0.000}\\
+poly(season\_year\_c, 3, raw = TRUE)1 & -0.093 & 0.025 & -3.733 & 5460.096 & 0.000\\
+\cellcolor{gray!10}{poly(season\_year\_c, 3, raw = TRUE)2} & \cellcolor{gray!10}{0.022} & \cellcolor{gray!10}{0.005} & \cellcolor{gray!10}{4.153} & \cellcolor{gray!10}{5343.577} & \cellcolor{gray!10}{0.000}\\
+poly(season\_year\_c, 3, raw = TRUE)3 & -0.002 & 0.000 & -5.095 & 5343.972 & 0.000\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item  p values calculated using Satterthwaite d.f. 
+\end{tablenotes}
+\end{threeparttable}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lll}
+\toprule
+\multicolumn{3}{c}{Random Effects} \\
+\cmidrule(l{3pt}r{3pt}){1-3}
+Group & Parameter & Std. Dev.\\
+\midrule
+\cellcolor{gray!10}{player\_id} & \cellcolor{gray!10}{(Intercept)} & \cellcolor{gray!10}{1.346}\\
+club\_id & (Intercept) & 0.282\\
+\cellcolor{gray!10}{Residual} & \cellcolor{gray!10}{} & \cellcolor{gray!10}{0.705}\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lrl}
+\toprule
+\multicolumn{3}{c}{Grouping Variables} \\
+\cmidrule(l{3pt}r{3pt}){1-3}
+Group & \# groups & ICC\\
+\midrule
+\cellcolor{gray!10}{player\_id} & \cellcolor{gray!10}{2159} & \cellcolor{gray!10}{0.758}\\
+club\_id & 21 & 0.033\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+Printing fit results for Model 2.4
+
+\begin{table}[!h]
+\centering
+\begin{tabular}{lr}
+\toprule
+\cellcolor{gray!10}{Observations} & \cellcolor{gray!10}{7023}\\
+Dependent variable & usd\_revenue\_2024\_log\\
+\cellcolor{gray!10}{Type} & \cellcolor{gray!10}{Mixed effects linear regression}\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lr}
+\toprule
+\cellcolor{gray!10}{AIC} & \cellcolor{gray!10}{19974.718}\\
+BIC & 20036.430\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{threeparttable}
+\begin{tabular}{lrrrrr}
+\toprule
+\multicolumn{6}{c}{Fixed Effects} \\
+\cmidrule(l{3pt}r{3pt}){1-6}
+  & Est. & S.E. & t val. & d.f. & p\\
+\midrule
+\cellcolor{gray!10}{(Intercept)} & \cellcolor{gray!10}{15.982} & \cellcolor{gray!10}{0.089} & \cellcolor{gray!10}{180.211} & \cellcolor{gray!10}{28.024} & \cellcolor{gray!10}{0.000}\\
+poly(season\_year\_c, 3, raw = TRUE)1 & -0.092 & 0.026 & -3.533 & 1018.972 & 0.000\\
+\cellcolor{gray!10}{poly(season\_year\_c, 3, raw = TRUE)2} & \cellcolor{gray!10}{0.023} & \cellcolor{gray!10}{0.005} & \cellcolor{gray!10}{4.304} & \cellcolor{gray!10}{5311.323} & \cellcolor{gray!10}{0.000}\\
+poly(season\_year\_c, 3, raw = TRUE)3 & -0.002 & 0.000 & -5.290 & 5311.733 & 0.000\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item  p values calculated using Satterthwaite d.f. 
+\end{tablenotes}
+\end{threeparttable}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lll}
+\toprule
+\multicolumn{3}{c}{Random Effects} \\
+\cmidrule(l{3pt}r{3pt}){1-3}
+Group & Parameter & Std. Dev.\\
+\midrule
+\cellcolor{gray!10}{player\_id} & \cellcolor{gray!10}{(Intercept)} & \cellcolor{gray!10}{1.351}\\
+club\_id & (Intercept) & 0.353\\
+\cellcolor{gray!10}{club\_id} & \cellcolor{gray!10}{season\_year\_c} & \cellcolor{gray!10}{0.039}\\
+Residual &  & 0.697\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lrl}
+\toprule
+\multicolumn{3}{c}{Grouping Variables} \\
+\cmidrule(l{3pt}r{3pt}){1-3}
+Group & \# groups & ICC\\
+\midrule
+\cellcolor{gray!10}{player\_id} & \cellcolor{gray!10}{2159} & \cellcolor{gray!10}{0.749}\\
+club\_id & 21 & 0.051\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+Printing fit results for Model 3.1
+
+\begin{table}[!h]
+\centering
+\begin{tabular}{lr}
+\toprule
+\cellcolor{gray!10}{Observations} & \cellcolor{gray!10}{7023}\\
+Dependent variable & usd\_revenue\_2024\_log\\
+\cellcolor{gray!10}{Type} & \cellcolor{gray!10}{Mixed effects linear regression}\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lr}
+\toprule
+\cellcolor{gray!10}{AIC} & \cellcolor{gray!10}{17469.242}\\
+BIC & 17640.666\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{threeparttable}
+\begin{tabular}{lrrrrr}
+\toprule
+\multicolumn{6}{c}{Fixed Effects} \\
+\cmidrule(l{3pt}r{3pt}){1-6}
+  & Est. & S.E. & t val. & d.f. & p\\
+\midrule
+\cellcolor{gray!10}{(Intercept)} & \cellcolor{gray!10}{16.512} & \cellcolor{gray!10}{0.102} & \cellcolor{gray!10}{161.900} & \cellcolor{gray!10}{44.473} & \cellcolor{gray!10}{0.000}\\
+poly(season\_year\_c, 3, raw = TRUE)1 & -0.054 & 0.023 & -2.381 & 1148.438 & 0.017\\
+\cellcolor{gray!10}{poly(season\_year\_c, 3, raw = TRUE)2} & \cellcolor{gray!10}{0.022} & \cellcolor{gray!10}{0.005} & \cellcolor{gray!10}{4.848} & \cellcolor{gray!10}{5237.468} & \cellcolor{gray!10}{0.000}\\
+poly(season\_year\_c, 3, raw = TRUE)3 & -0.002 & 0.000 & -6.689 & 5239.087 & 0.000\\
+\cellcolor{gray!10}{height\_c} & \cellcolor{gray!10}{0.014} & \cellcolor{gray!10}{0.004} & \cellcolor{gray!10}{3.722} & \cellcolor{gray!10}{1669.492} & \cellcolor{gray!10}{0.000}\\
+\addlinespace
+positionDefender & -0.431 & 0.060 & -7.231 & 1650.123 & 0.000\\
+\cellcolor{gray!10}{positionGoalkeeper} & \cellcolor{gray!10}{-1.240} & \cellcolor{gray!10}{0.098} & \cellcolor{gray!10}{-12.704} & \cellcolor{gray!10}{1666.856} & \cellcolor{gray!10}{0.000}\\
+positionMidfield & -0.228 & 0.060 & -3.823 & 1677.849 & 0.000\\
+\cellcolor{gray!10}{citizen\_of\_club\_countryYes} & \cellcolor{gray!10}{-0.399} & \cellcolor{gray!10}{0.038} & \cellcolor{gray!10}{-10.630} & \cellcolor{gray!10}{5729.204} & \cellcolor{gray!10}{0.000}\\
+RegionEast Asia \& Pacific & -0.182 & 0.211 & -0.861 & 1734.428 & 0.390\\
+\addlinespace
+\cellcolor{gray!10}{RegionLatin America \& Caribbean} & \cellcolor{gray!10}{0.248} & \cellcolor{gray!10}{0.063} & \cellcolor{gray!10}{3.913} & \cellcolor{gray!10}{1796.512} & \cellcolor{gray!10}{0.000}\\
+RegionMiddle East \& North Africa & 0.083 & 0.245 & 0.340 & 1697.415 & 0.734\\
+\cellcolor{gray!10}{RegionNorth America} & \cellcolor{gray!10}{-0.005} & \cellcolor{gray!10}{0.225} & \cellcolor{gray!10}{-0.023} & \cellcolor{gray!10}{1778.504} & \cellcolor{gray!10}{0.981}\\
+RegionSub-Saharan Africa & 0.018 & 0.104 & 0.176 & 1732.487 & 0.860\\
+\cellcolor{gray!10}{age\_c} & \cellcolor{gray!10}{-0.001} & \cellcolor{gray!10}{0.004} & \cellcolor{gray!10}{-0.252} & \cellcolor{gray!10}{2354.791} & \cellcolor{gray!10}{0.801}\\
+\addlinespace
+goals & 0.014 & 0.003 & 5.317 & 5538.686 & 0.000\\
+\cellcolor{gray!10}{assists} & \cellcolor{gray!10}{0.013} & \cellcolor{gray!10}{0.004} & \cellcolor{gray!10}{3.445} & \cellcolor{gray!10}{5075.156} & \cellcolor{gray!10}{0.001}\\
+red\_cards & -0.019 & 0.030 & -0.634 & 4696.827 & 0.526\\
+\cellcolor{gray!10}{yellow\_cards} & \cellcolor{gray!10}{0.006} & \cellcolor{gray!10}{0.004} & \cellcolor{gray!10}{1.420} & \cellcolor{gray!10}{5406.162} & \cellcolor{gray!10}{0.156}\\
+minutes\_played & 0.511 & 0.017 & 29.411 & 5605.944 & 0.000\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item  p values calculated using Satterthwaite d.f. 
+\end{tablenotes}
+\end{threeparttable}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lll}
+\toprule
+\multicolumn{3}{c}{Random Effects} \\
+\cmidrule(l{3pt}r{3pt}){1-3}
+Group & Parameter & Std. Dev.\\
+\midrule
+\cellcolor{gray!10}{player\_id} & \cellcolor{gray!10}{(Intercept)} & \cellcolor{gray!10}{0.946}\\
+club\_id & (Intercept) & 0.369\\
+\cellcolor{gray!10}{club\_id} & \cellcolor{gray!10}{season\_year\_c} & \cellcolor{gray!10}{0.033}\\
+Residual &  & 0.614\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lrl}
+\toprule
+\multicolumn{3}{c}{Grouping Variables} \\
+\cmidrule(l{3pt}r{3pt}){1-3}
+Group & \# groups & ICC\\
+\midrule
+\cellcolor{gray!10}{player\_id} & \cellcolor{gray!10}{2159} & \cellcolor{gray!10}{0.636}\\
+club\_id & 21 & 0.096\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\clearpage
+
+\newpage
+
+Printing fit results for Model 3.2
+
+\begin{table}[!h]
+\centering
+\begin{tabular}{lr}
+\toprule
+\cellcolor{gray!10}{Observations} & \cellcolor{gray!10}{7023}\\
+Dependent variable & usd\_revenue\_2024\_log\\
+\cellcolor{gray!10}{Type} & \cellcolor{gray!10}{Mixed effects linear regression}\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lr}
+\toprule
+\cellcolor{gray!10}{AIC} & \cellcolor{gray!10}{14507.097}\\
+BIC & 14685.378\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{threeparttable}
+\begin{tabular}{lrrrrr}
+\toprule
+\multicolumn{6}{c}{Fixed Effects} \\
+\cmidrule(l{3pt}r{3pt}){1-6}
+  & Est. & S.E. & t val. & d.f. & p\\
+\midrule
+\cellcolor{gray!10}{(Intercept)} & \cellcolor{gray!10}{16.850} & \cellcolor{gray!10}{0.078} & \cellcolor{gray!10}{215.307} & \cellcolor{gray!10}{82.332} & \cellcolor{gray!10}{0.000}\\
+poly(season\_year\_c, 3, raw = TRUE)1 & -0.056 & 0.017 & -3.291 & 2124.850 & 0.001\\
+\cellcolor{gray!10}{poly(season\_year\_c, 3, raw = TRUE)2} & \cellcolor{gray!10}{0.028} & \cellcolor{gray!10}{0.003} & \cellcolor{gray!10}{7.947} & \cellcolor{gray!10}{5036.126} & \cellcolor{gray!10}{0.000}\\
+poly(season\_year\_c, 3, raw = TRUE)3 & -0.002 & 0.000 & -10.894 & 5037.446 & 0.000\\
+\cellcolor{gray!10}{height\_c} & \cellcolor{gray!10}{0.010} & \cellcolor{gray!10}{0.004} & \cellcolor{gray!10}{2.695} & \cellcolor{gray!10}{1799.848} & \cellcolor{gray!10}{0.007}\\
+\addlinespace
+positionDefender & -0.404 & 0.058 & -6.979 & 1786.194 & 0.000\\
+\cellcolor{gray!10}{positionGoalkeeper} & \cellcolor{gray!10}{-1.057} & \cellcolor{gray!10}{0.095} & \cellcolor{gray!10}{-11.159} & \cellcolor{gray!10}{1797.710} & \cellcolor{gray!10}{0.000}\\
+positionMidfield & -0.190 & 0.058 & -3.301 & 1802.041 & 0.001\\
+\cellcolor{gray!10}{citizen\_of\_club\_countryYes} & \cellcolor{gray!10}{-0.190} & \cellcolor{gray!10}{0.031} & \cellcolor{gray!10}{-6.039} & \cellcolor{gray!10}{6875.765} & \cellcolor{gray!10}{0.000}\\
+RegionEast Asia \& Pacific & -0.431 & 0.204 & -2.110 & 1836.234 & 0.035\\
+\addlinespace
+\cellcolor{gray!10}{RegionLatin America \& Caribbean} & \cellcolor{gray!10}{0.191} & \cellcolor{gray!10}{0.061} & \cellcolor{gray!10}{3.133} & \cellcolor{gray!10}{1954.213} & \cellcolor{gray!10}{0.002}\\
+RegionMiddle East \& North Africa & -0.092 & 0.237 & -0.386 & 1814.616 & 0.699\\
+\cellcolor{gray!10}{RegionNorth America} & \cellcolor{gray!10}{-0.063} & \cellcolor{gray!10}{0.217} & \cellcolor{gray!10}{-0.292} & \cellcolor{gray!10}{1856.805} & \cellcolor{gray!10}{0.770}\\
+RegionSub-Saharan Africa & 0.066 & 0.100 & 0.657 & 1848.911 & 0.511\\
+\cellcolor{gray!10}{poly(age\_c, 2, raw = TRUE)1} & \cellcolor{gray!10}{0.019} & \cellcolor{gray!10}{0.004} & \cellcolor{gray!10}{4.988} & \cellcolor{gray!10}{2295.002} & \cellcolor{gray!10}{0.000}\\
+\addlinespace
+poly(age\_c, 2, raw = TRUE)2 & -0.024 & 0.000 & -62.796 & 6152.216 & 0.000\\
+\cellcolor{gray!10}{goals} & \cellcolor{gray!10}{0.005} & \cellcolor{gray!10}{0.002} & \cellcolor{gray!10}{2.363} & \cellcolor{gray!10}{5169.192} & \cellcolor{gray!10}{0.018}\\
+assists & 0.010 & 0.003 & 3.450 & 4882.603 & 0.001\\
+\cellcolor{gray!10}{red\_cards} & \cellcolor{gray!10}{0.010} & \cellcolor{gray!10}{0.022} & \cellcolor{gray!10}{0.428} & \cellcolor{gray!10}{4678.452} & \cellcolor{gray!10}{0.669}\\
+yellow\_cards & -0.002 & 0.003 & -0.583 & 5089.437 & 0.560\\
+\addlinespace
+\cellcolor{gray!10}{minutes\_played} & \cellcolor{gray!10}{0.353} & \cellcolor{gray!10}{0.013} & \cellcolor{gray!10}{26.260} & \cellcolor{gray!10}{5243.836} & \cellcolor{gray!10}{0.000}\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item  p values calculated using Satterthwaite d.f. 
+\end{tablenotes}
+\end{threeparttable}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lll}
+\toprule
+\multicolumn{3}{c}{Random Effects} \\
+\cmidrule(l{3pt}r{3pt}){1-3}
+Group & Parameter & Std. Dev.\\
+\midrule
+\cellcolor{gray!10}{player\_id} & \cellcolor{gray!10}{(Intercept)} & \cellcolor{gray!10}{0.960}\\
+club\_id & (Intercept) & 0.237\\
+\cellcolor{gray!10}{club\_id} & \cellcolor{gray!10}{season\_year\_c} & \cellcolor{gray!10}{0.019}\\
+Residual &  & 0.459\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lrl}
+\toprule
+\multicolumn{3}{c}{Grouping Variables} \\
+\cmidrule(l{3pt}r{3pt}){1-3}
+Group & \# groups & ICC\\
+\midrule
+\cellcolor{gray!10}{player\_id} & \cellcolor{gray!10}{2159} & \cellcolor{gray!10}{0.775}\\
+club\_id & 21 & 0.047\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\clearpage
+
+\newpage
+
+Printing fit results for Model 4
+
+\begin{table}[!h]
+\centering
+\begin{tabular}{lr}
+\toprule
+\cellcolor{gray!10}{Observations} & \cellcolor{gray!10}{7023}\\
+Dependent variable & usd\_revenue\_2024\_log\\
+\cellcolor{gray!10}{Type} & \cellcolor{gray!10}{Mixed effects linear regression}\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lr}
+\toprule
+\cellcolor{gray!10}{AIC} & \cellcolor{gray!10}{14520.484}\\
+BIC & 14712.479\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{threeparttable}
+\begin{tabular}{lrrrrr}
+\toprule
+\multicolumn{6}{c}{Fixed Effects} \\
+\cmidrule(l{3pt}r{3pt}){1-6}
+  & Est. & S.E. & t val. & d.f. & p\\
+\midrule
+\cellcolor{gray!10}{(Intercept)} & \cellcolor{gray!10}{16.857} & \cellcolor{gray!10}{0.079} & \cellcolor{gray!10}{212.455} & \cellcolor{gray!10}{77.432} & \cellcolor{gray!10}{0.000}\\
+poly(season\_year\_c, 3, raw = TRUE)1 & -0.061 & 0.017 & -3.550 & 1979.243 & 0.000\\
+\cellcolor{gray!10}{poly(season\_year\_c, 3, raw = TRUE)2} & \cellcolor{gray!10}{0.028} & \cellcolor{gray!10}{0.003} & \cellcolor{gray!10}{8.097} & \cellcolor{gray!10}{5037.191} & \cellcolor{gray!10}{0.000}\\
+poly(season\_year\_c, 3, raw = TRUE)3 & -0.002 & 0.000 & -10.969 & 5035.695 & 0.000\\
+\cellcolor{gray!10}{height\_c} & \cellcolor{gray!10}{0.010} & \cellcolor{gray!10}{0.004} & \cellcolor{gray!10}{2.704} & \cellcolor{gray!10}{1797.210} & \cellcolor{gray!10}{0.007}\\
+\addlinespace
+positionDefender & -0.404 & 0.058 & -6.991 & 1783.353 & 0.000\\
+\cellcolor{gray!10}{positionGoalkeeper} & \cellcolor{gray!10}{-1.057} & \cellcolor{gray!10}{0.095} & \cellcolor{gray!10}{-11.166} & \cellcolor{gray!10}{1795.098} & \cellcolor{gray!10}{0.000}\\
+positionMidfield & -0.190 & 0.058 & -3.302 & 1799.253 & 0.001\\
+\cellcolor{gray!10}{citizen\_of\_club\_countryYes} & \cellcolor{gray!10}{-0.186} & \cellcolor{gray!10}{0.031} & \cellcolor{gray!10}{-5.905} & \cellcolor{gray!10}{6884.155} & \cellcolor{gray!10}{0.000}\\
+RegionEast Asia \& Pacific & -0.431 & 0.204 & -2.113 & 1833.721 & 0.035\\
+\addlinespace
+\cellcolor{gray!10}{RegionLatin America \& Caribbean} & \cellcolor{gray!10}{0.189} & \cellcolor{gray!10}{0.061} & \cellcolor{gray!10}{3.106} & \cellcolor{gray!10}{1951.968} & \cellcolor{gray!10}{0.002}\\
+RegionMiddle East \& North Africa & -0.094 & 0.237 & -0.395 & 1811.883 & 0.693\\
+\cellcolor{gray!10}{RegionNorth America} & \cellcolor{gray!10}{-0.066} & \cellcolor{gray!10}{0.217} & \cellcolor{gray!10}{-0.304} & \cellcolor{gray!10}{1854.349} & \cellcolor{gray!10}{0.761}\\
+RegionSub-Saharan Africa & 0.064 & 0.100 & 0.637 & 1846.571 & 0.524\\
+\cellcolor{gray!10}{poly(age\_c, 2, raw = TRUE)1} & \cellcolor{gray!10}{0.018} & \cellcolor{gray!10}{0.004} & \cellcolor{gray!10}{4.955} & \cellcolor{gray!10}{2294.634} & \cellcolor{gray!10}{0.000}\\
+\addlinespace
+poly(age\_c, 2, raw = TRUE)2 & -0.024 & 0.000 & -62.790 & 6163.057 & 0.000\\
+\cellcolor{gray!10}{goals} & \cellcolor{gray!10}{0.005} & \cellcolor{gray!10}{0.002} & \cellcolor{gray!10}{2.386} & \cellcolor{gray!10}{5164.585} & \cellcolor{gray!10}{0.017}\\
+assists & 0.010 & 0.003 & 3.473 & 4878.216 & 0.001\\
+\cellcolor{gray!10}{red\_cards} & \cellcolor{gray!10}{0.009} & \cellcolor{gray!10}{0.022} & \cellcolor{gray!10}{0.391} & \cellcolor{gray!10}{4673.660} & \cellcolor{gray!10}{0.696}\\
+yellow\_cards & -0.002 & 0.003 & -0.572 & 5084.816 & 0.567\\
+\addlinespace
+\cellcolor{gray!10}{minutes\_played} & \cellcolor{gray!10}{0.353} & \cellcolor{gray!10}{0.013} & \cellcolor{gray!10}{26.270} & \cellcolor{gray!10}{5239.334} & \cellcolor{gray!10}{0.000}\\
+uefa\_coefficient & -0.001 & 0.001 & -0.981 & 4466.845 & 0.327\\
+\cellcolor{gray!10}{foreign\_players} & \cellcolor{gray!10}{0.199} & \cellcolor{gray!10}{0.097} & \cellcolor{gray!10}{2.053} & \cellcolor{gray!10}{1972.890} & \cellcolor{gray!10}{0.040}\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item  p values calculated using Satterthwaite d.f. 
+\end{tablenotes}
+\end{threeparttable}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lll}
+\toprule
+\multicolumn{3}{c}{Random Effects} \\
+\cmidrule(l{3pt}r{3pt}){1-3}
+Group & Parameter & Std. Dev.\\
+\midrule
+\cellcolor{gray!10}{player\_id} & \cellcolor{gray!10}{(Intercept)} & \cellcolor{gray!10}{0.959}\\
+club\_id & (Intercept) & 0.244\\
+\cellcolor{gray!10}{club\_id} & \cellcolor{gray!10}{season\_year\_c} & \cellcolor{gray!10}{0.019}\\
+Residual &  & 0.459\\
+\bottomrule
+\end{tabular}
+\end{table} \begin{table}[!h]
+\centering
+\begin{tabular}{lrl}
+\toprule
+\multicolumn{3}{c}{Grouping Variables} \\
+\cmidrule(l{3pt}r{3pt}){1-3}
+Group & \# groups & ICC\\
+\midrule
+\cellcolor{gray!10}{player\_id} & \cellcolor{gray!10}{2159} & \cellcolor{gray!10}{0.773}\\
+club\_id & 21 & 0.050\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\clearpage
+
+\newpage
+
+\begin{verbatim}
+LRT Statistic: 66.6861 
+Parameter Diff: 2 
+Distribution:   Mixture of ChiSq(1) and ChiSq(2) 
+P-Value:        < 0.0001 
+\end{verbatim}
+
+\newpage
+
+\section{Appendix 4: Final Model
+Diagnostics}\label{appendix-4-final-model-diagnostics}
+
+\begin{itemize}
+\item
+  By comparing the QQ-line and QQ-plot (both residuals and random
+  effects) we can find that both model plots look good on normality,
+  except some outliers. By comparing the residual-fitted value plot, we
+  can find that both model show the same spread pattern, the dots are
+  evenly spread across zero-mean line up and down.
+\item
+  By comparing EBLUPs plots, we can see that most of the points lie
+  deviate from the diagonal at both tails, and the lower side is more
+  downward, suggesting moderate departures from normality in the random
+  slopes and random intercepts, which indicates possible skewness and
+  outliers.Thus, we cannot say the normal random effects assumption in
+  the multilevel model are met.
+\end{itemize}
+
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-22-1.pdf}
+
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-22-2.pdf}
+
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-22-3.pdf}
+
+\begin{itemize}
+\item
+  The red regression line slopes slightly downward, but only gently.
+  That is, clubs with higher baseline log market value tend to have
+  slightly more negative or flatter slopes. Clubs with lower baseline
+  market value tend to have slightly steeper slopes.
+\item
+  Most residuals lie between about −1 and +1, and fitted log revenues
+  between 14 and 18. There is no strong curved pattern or obvious
+  systematic relationship between residual and fitted values. So the
+  residual reasonably consistent with the linearity assumption. Besides,
+  there is no funnel shape, so the residuals are homogeneous. However,
+  we can still see some outliers exist.
+\end{itemize}
+
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-23-1.pdf}
+
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-23-2.pdf}
+
+\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-24-1.pdf}
+
+\newpage
+
+\section{Appendix 5. AI Acknowledgement
+Statement}\label{appendix-5.-ai-acknowledgement-statement}
+
+We relied on AI, specifically Claude, to assist us with the latex for
+our equation since at we had difficulty rendering the quarto file.
+Additionally, we sometimes used the assistance of AI to help us with our
+visualization, such as how removing specific grid lines in the
+background, or specific bold font. Finally, we had convergence issues
+specifically when attempting to introduce a random slope of year within
+players and we sought the wisdom of AI to come up with a solution below.
 
 
 
