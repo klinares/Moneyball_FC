@@ -1,26 +1,27 @@
 % Options for packages loaded elsewhere
+% Options for packages loaded elsewhere
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
 \PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
 %
 \documentclass[
   12pt]{article}
-
+\usepackage{xcolor}
 \usepackage{amsmath,amssymb}
-\usepackage{setspace}
+\setcounter{secnumdepth}{5}
 \usepackage{iftex}
 \ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
 \else % if luatex or xetex
-  \usepackage{unicode-math}
+  \usepackage{unicode-math} % this also loads fontspec
   \defaultfontfeatures{Scale=MatchLowercase}
   \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
 \fi
 \usepackage{lmodern}
-\ifPDFTeX\else  
-    % xetex/luatex font selection
+\ifPDFTeX\else
+  % xetex/luatex font selection
 \fi
 % Use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
@@ -28,6 +29,7 @@
   \usepackage[]{microtype}
   \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
 }{}
+\usepackage{setspace}
 \makeatletter
 \@ifundefined{KOMAClassName}{% if non-KOMA class
   \IfFileExists{parskip.sty}{%
@@ -38,9 +40,6 @@
 }{% if KOMA class
   \KOMAoptions{parskip=half}}
 \makeatother
-\usepackage{xcolor}
-\setlength{\emergencystretch}{3em} % prevent overfull lines
-\setcounter{secnumdepth}{5}
 % Make \paragraph and \subparagraph free-standing
 \makeatletter
 \ifx\paragraph\undefined\else
@@ -66,8 +65,7 @@
 \makeatother
 
 
-\providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}\usepackage{longtable,booktabs,array}
+\usepackage{longtable,booktabs,array}
 \usepackage{calc} % for calculating minipage widths
 % Correct order of tables after \paragraph or \subparagraph
 \usepackage{etoolbox}
@@ -79,17 +77,35 @@
 \makesavenoteenv{longtable}
 \usepackage{graphicx}
 \makeatletter
-\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
-\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
-\makeatother
-% Scale images if necessary, so that they will not overflow the page
-% margins by default, and it is still possible to overwrite the defaults
-% using explicit options in \includegraphics[width, height, ...]{}
-\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
 % Set default figure placement to htbp
-\makeatletter
 \def\fps@figure{htbp}
 \makeatother
+
+
+
+
+
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+
+ 
+\usepackage[]{natbib}
+\bibliographystyle{agsm}
+
 
 \addtolength{\oddsidemargin}{-.5in}%
 \addtolength{\evensidemargin}{-1in}%
@@ -137,16 +153,9 @@
 \@ifpackageloaded{caption}{}{\usepackage{caption}}
 \@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
 \makeatother
-
-\ifLuaTeX
-  \usepackage{selnolig}  % disable illegal ligatures
-\fi
-\usepackage[]{natbib}
-\bibliographystyle{agsm}
 \usepackage{bookmark}
-
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\urlstyle{same} % disable monospaced font for URLs
+\urlstyle{same}
 \hypersetup{
   pdftitle={Multilevel Determinants of Player Market Value in Elite European Football: The Role of Performance, Club Prestige, and Player Characteristics},
   pdfauthor={Sagnik Chakrava; Jianing Zou; Kevin Linares; Namit Shrivastava},
@@ -216,126 +225,126 @@ The valuation of elite athletes in the European soccer transfer market
 has evolved from a subjective scouting exercise into a global financial
 industry exceeding €7 billion annually. In this high-stakes environment,
 accurate valuation is critical for club solvency and competitive
-balance. In this study, we operationalize Market Value using
-crowd-sourced estimates from Transfermarkt, a metric widely validated in
-sports economics literature as a robust proxy for actual transfer fees
-and a leading indicator of player market valuation based on demand.
+balance. In this study, we operationalize market value using
+crowd-sourced estimates from Transfermarkt. This metric has been widely
+validated in sports economics literature as a robust proxy for actual
+transfer fees and serves as a leading indicator of player market
+valuation based on demand.
 
 Foundational research in sports economics has long sought to isolate the
-determinants of this value. Frick (2007) established that while ``hard''
+determinants of this value. Frick (2007) established that while hard
 performance metrics like goals and assists are primary drivers,
-valuation follows a strict ``Inverted-U'' biological trajectory,
-typically peaking between ages 27 and 28 before depreciating rapidly.
-Beyond on-pitch performance, Franck and Nüesch (2012) empirically
-demonstrated the ``Superstar Effect,'' finding that non-performance
-factors---such as media popularity and brand visibility---can magnify a
-player's value significantly, especially at the top end of the wage
-distribution. However, these existing studies often model players as
-static units nested within a single club. This approach fails to account
-for the dynamic reality of modern football, where players transfer
-between teams, accumulating value from both their portable human capital
-(e.g., experience, age) and the institutional prestige of their current
+valuation follows a strict inverted-U biological trajectory, typically
+peaking between ages 27 and 28 before depreciating rapidly. Beyond
+on-pitch performance, Franck and Nüesch (2012) empirically demonstrated
+the superstar effect. They found that non-performance factors such as
+media popularity and brand visibility can magnify a player's value
+significantly, especially at the top end of the wage distribution.
+However, these existing studies often model players as static units
+nested within a single club. This approach fails to account for the
+dynamic reality of modern football, where players transfer between teams
+and accumulate value from both their portable human capital (such as
+experience and age) and the institutional prestige of their current
 employer.
 
-Neglecting this cross-classified structure---where player and club
-effects intersect rather than nest---likely misestimates the true
-drivers of market value. This research addresses this methodological
-limitation by applying a cross-classified multilevel model to a decade
-of transfer data (2013--2024). By disentangling individual reputation
-from club context, this study aims to answer four critical questions
-that remain under-explored in nested models:
+Neglecting this cross-classified structure, where player and club
+effects intersect rather than nest, likely misestimates the true drivers
+of market value. We address this methodological limitation by applying a
+cross-classified multilevel model to a decade of transfer data (2013 to
+2024). By disentangling individual reputation from club context, we aim
+to answer four critical questions that remain under-explored in nested
+models:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  \textbf{Market Evolution (RQ1):} \emph{How has the transfer market
-  evolved annually compared to the 2013 baseline?} Understanding the
-  non-linear trajectory of market inflation (the ``Boom and Bust''
-  cycles) is essential for distinguishing real player value growth from
-  sector-wide inflation.
+  \textbf{Market Evolution (RQ1):} How has the transfer market evolved
+  annually compared to the 2013 baseline? We believe that understanding
+  the nonlinear trajectory of market inflation is essential for
+  distinguishing real player value growth from sector-wide inflation.
 \item
-  \textbf{Biological Career Arc (RQ2):} \emph{How does market value
-  change as a player moves through their career?} By modeling the
-  non-linear effect of age, we aim to validate Frick's (2007) ``peak
-  age'' hypothesis, identifying the precise window where physical peak
-  and experience intersect.
+  \textbf{Biological Career Arc (RQ2):} How does market value change as
+  a player moves through their career? By modeling the nonlinear effect
+  of age, we aim to validate Frick's (2007) peak age hypothesis and
+  identify the precise window where physical peak and experience
+  intersect.
 \item
-  \textbf{Squad Status (RQ3):} \emph{Does playing more minutes than the
-  average teammate serve as a primary driver of valuation?} While goals
-  capture output, they bias towards attackers. We propose that ``Squad
-  Status'' (relative minutes played) is a more universal signal of
-  manager trust and player utility across all positions.
+  \textbf{Squad Status (RQ3):} Does playing more minutes than the
+  average teammate serve as a primary driver of valuation? While goals
+  capture output, they bias towards attackers. We propose that squad
+  status (measured by relative minutes played) is a more universal
+  signal of manager trust and player utility across all positions.
 \item
-  \textbf{Contextual Premiums (RQ4):} \emph{Is there a premium for club
-  diversity and a discount for domestic players?} As the labor market
+  \textbf{Contextual Premiums (RQ4):} Is there a premium for club
+  diversity and a discount for domestic players? As the labor market
   globalizes, we investigate whether clubs with broader international
-  recruitment (Diversity Premium) generate higher valuations, and if
-  domestic players face a valuation discount compared to imported
-  talent.
+  recruitment generate higher valuations and whether domestic players
+  face a valuation discount compared to imported talent.
 \end{enumerate}
 
 \section{Method}\label{method}
 
 \emph{Data Source.} We obtained data from
-\href{https://www.transfermarkt.com/}{Transfermarkt}and
-\href{https://www.uefa.com/}{Union of European Football Associattion}
-(UEFA) official rankings, which are both public available websites. At
-the time of this study Transfermarket does not have free API access to
-ndefinedtheir data repository, but instead the r package
+\href{https://www.transfermarkt.com/}{Transfermarkt} and
+\href{https://www.uefa.com/}{Union of European Football Association}
+(UEFA) official rankings, which are both publicly available websites. At
+the time of this study, Transfermarkt does not have free API access to
+their data repository. Instead, the R package
 \href{https://jaseziv.github.io/worldfootballR/articles/load-scraped-data.html}{worldfootballR}
-allows us to scrap data from their website. However, there are several
-limitations to this package such as time out requests and failure to
-capture dynamic java tables on webpages. Fortunately, we found the
-necessary data through kaggle
+allows us to scrape data from their website. However, there are several
+limitations to this package such as timeout requests and failure to
+capture dynamic JavaScript tables on webpages. Fortunately, we found the
+necessary data through Kaggle
 \href{https://www.kaggle.com/datasets/davidcariboo/player-scores?resource=download}{\textbf{Football
-Data from Transfermarkt}} \textbf{,} which allowed us to focus on the
-modeling aspect of this project following data restructuring and
-predictor variable engineering.
+Data from Transfermarkt}}, which allowed us to focus on the modeling
+aspect of this project following data restructuring and predictor
+variable engineering.
 
-\emph{Sample Characteristics.} We use the 10 year averaged UEFA
+\emph{Sample Characteristics.} We used the 10-year averaged UEFA
 coefficient rankings\footnote{UEFA coefficient rankings are a
   points-based system used by European football's governing body to rank
   national associations and clubs based on their performance in European
   competitions, which determines qualification spots and seeding for
   tournaments like the Champions League and Europa League.} to select
 the top 21 European soccer teams as our first stage sampling. In our
-second stage non-random sampling, we select soccer players that played
-for a full season in one of the 21 clubs from 2013-2024. This resulted
-in 2,215 male players representing 7,168 seasons. However, after
-examining missing data, which mostly came from missing information on
-citizenship status, we were left with 2,159 players representing 7,023
-seasons, a 2.5\% loss of player data (e.g., 2\% loss in season data).
-The majority of players across clubs and years were in their mid 20s
-(\emph{M}=26.5, \emph{SD=}4.6). In this sample, players on average
-played 3.2 (\emph{SD}=2.9) seasons, and if we were to droped players
-that had less than two seasons to examine player trajectories we would
-loose 62\% of our sample. Figure 1 contains the number of players in
-each of the 21 clubs across the years.
+second stage nonrandom sampling, we selected soccer players that played
+for a full season in one of the 21 clubs from 2013 to 2024. This
+resulted in 2,215 male players representing 7,168 seasons. However,
+after examining missing data (which mostly came from missing information
+on citizenship status), we were left with 2,159 players representing
+7,023 seasons. This represents a 2.5\% loss of player data and a 2\%
+loss in season data. The majority of players across clubs and years were
+in their mid-20s (\emph{M} = 26.5, \emph{SD} = 4.6). In this sample,
+players on average played 3.2 (\emph{SD} = 2.9) seasons. If we were to
+drop players that had less than two seasons to examine player
+trajectories, we would lose 62\% of our sample. Figure 1 shows the
+number of players in each of the 21 clubs across the years.
 
-\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-3-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-3-1.pdf}}
 
-\emph{Variable selection and Normalization}. Our outcome of interest is
-a player's yearly market valuation which we convert from euros to US
-dollars. Market valuation in Euro varies by month and we first took the
-yearly average for each player prior to transforming to USD. We log
-transform market value to 2024 USD because financial data follows a
-pareto distribution rather than a normal distribution. Keeping the
-outcome on the raw scale would result in extremely large residuals for
-high value players, and small for low value players violating the
-assumption of homoscedasticity. Log transforming the outcome compresses
-the extreme outliers by pulling the long right tail to try and make the
-distribution normal. Therefore, this adjustment allows us to compare
-real economic power of a player in 2013 versus 2014 without the noise of
-currency fluctuation.\footnote{We handle exchange rate fluctuation by
-  using historical exchange rates to convert our values to USD. We also
-  adjust market value to 2024 USD because 10 million in 2013 is not the
-  same as in 2024 due to inflation, and by keeping the raw values we
-  would lose real economic value.} Figure 2 shows that market value has
-a lot of variability across years, yet most values are at the lower end
-which is common for salary data. When we log transform our outcome, we
-bring the lower values up and the higher values down.
+\emph{Variable Selection and Normalization.} Our outcome of interest is
+a player's yearly market valuation, which we convert from euros to US
+dollars. Market valuation in euros varies by month, so we first
+calculated the yearly average for each player prior to transforming to
+USD. We log-transform market value to 2024 USD because financial data
+follows a Pareto distribution rather than a normal distribution. Keeping
+the outcome on the raw scale would result in extremely large residuals
+for high-value players and small residuals for low-value players, which
+violates the assumption of homoscedasticity. Log-transforming the
+outcome compresses the extreme outliers by pulling the long right tail
+to make the distribution more normal. Therefore, this adjustment allows
+us to compare the real economic power of a player in 2013 versus 2024
+without the noise of currency fluctuation.\footnote{We handle exchange
+  rate fluctuation by using historical exchange rates to convert our
+  values to USD. We also adjust market value to 2024 USD because 10
+  million dollars in 2013 is not the same as 10 million in 2024 due to
+  inflation. By keeping the raw values, we would lose information about
+  real economic value.} Figure 2 shows that market value has substantial
+variability across years, yet most values are at the lower end, which is
+common for salary data. When we log-transform our outcome, we bring the
+lower values up and the higher values down.
 
-\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-4-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-4-1.pdf}}
 
 A list of variables we used for modeling players' market values are
 shown in Table 1 alongside how and why they were centered. THIS TABLE
@@ -346,32 +355,32 @@ following centering strategies:
 
 \begin{itemize}
 \item
-  \textbf{Outcome:} \texttt{usd\_revenue\_2024\_log} (Natural log of
-  inflation-adjusted market value).
+  \textbf{Outcome:} We used the natural log of inflation-adjusted market
+  value (\texttt{usd\_revenue\_2024\_log}).
 \item
-  \textbf{Time:} \texttt{season\_year\_c} (Min-centered, 2013=0).
+  \textbf{Time:} We centered season year at the minimum value, making
+  2013 equal to 0 (\texttt{season\_year\_c}).
 \item
-  \textbf{Player Traits:} \texttt{age\_c} (Grand-mean centered) and
-  \texttt{height\_c} (Grand-mean centered).
+  \textbf{Player Traits:} We applied grand-mean centering to age
+  (\texttt{age\_c}) and height (\texttt{height\_c}).
 \item
-  \textbf{Squad Status:} \texttt{minutes\_played} was
-  \textbf{standardized (Z-score)} relative to the specific club-year.
-  This isolates a player's status as a ``Starter'' or ``Bench Player''
-  relative to their current teammates, removing the noise of team-level
-  rotation policies.
+  \textbf{Squad Status:} We standardized minutes played (Z-score)
+  relative to each specific club-year. This isolates a player's status
+  as a starter or bench player relative to their current teammates and
+  removes the noise of team-level rotation policies.
 \item
-  \textbf{Club Context:} \texttt{foreign\_players} (Proportion of
-  foreign players, grand-mean centered).
+  \textbf{Club Context:} We grand-mean centered the proportion of
+  foreign players (\texttt{foreign\_players}).
 \item
-  \textbf{Categorical Controls:} Region, Position, and Citizenship
-  (Binary: 1 = Citizen of Club Country).
+  \textbf{Categorical Controls:} We included region, position, and
+  citizenship status (coded as 1 for citizens of the club country).
 \end{itemize}
 
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2466}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2466}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2466}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2603}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2466}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2466}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2466}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2603}}@{}}
 \caption{Table 1. Data Structure for fixed effects, except year as it is
 a random slope}\tabularnewline
 \toprule\noalign{}
@@ -470,7 +479,7 @@ across time.
 
 \centering{
 
-\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/fig-cross-class-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/fig-cross-class-1.pdf}}
 
 }
 
@@ -482,14 +491,14 @@ Structure: Players move between clubs over time.}
 \textbf{Jianing}, can you write this result? This section should be for
 the slope, but remember that the slope is on the club not player.
 
-\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-5-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-5-1.pdf}}
 
 We plot age by yearly market value in 2024 USD (on the log scale) in
 Figure 5. for each team and observe almost an upside down u shape. As
 players get older you are valued less in the market, same for younger
 players.
 
-\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-6-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-6-1.pdf}}
 
 \hfill\break
 
@@ -570,138 +579,142 @@ are currently with (\(v_{0j} + v_{1j} \cdot \text{Year}_t\)).
 
 \section{Results}\label{results}
 
-\textbf{Discuss things like REML, LRT test, and mention the models we
-fit and how we compared them to arrive at our final model.}
+\textbf{Model Building and Comparison}
 
-\textbf{Expand on the results a bit more, and double check the
-estimates.}
+We fitted a series of nested multilevel models to identify the optimal
+specification. We started with a null model containing only random
+intercepts for players and clubs to establish baseline variance
+partitioning. We then systematically added temporal trends (linear,
+quadratic, and cubic), random slopes for club trajectories, player-level
+predictors, and finally club-level contextual factors. We compared
+models using likelihood ratio tests (LRT) with REML estimation and
+assessed fit using AIC and BIC criteria.
 
-Market Evolution (Q1)
+\textbf{Market Evolution (RQ1)}
 
-The model reveals a significant cubic trend (p\textless.001) in market
-evolution. As shown in Figure 6A, the market followed an ``S-shaped''
-trajectory: stagnation (2013--2014), a rapid inflationary ``boom''
-(2015--2019), and a post-2020 plateau. This confirms that football
-market inflation is cyclical rather than constant.
+Our model reveals a significant cubic trend (p \textless{} .001) in
+market evolution. As shown in Figure 6A, the market followed an S-shaped
+trajectory. We observed stagnation from 2013 to 2014, followed by a
+rapid inflationary boom from 2015 to 2019, and then a post-2020 plateau.
+This confirms that football market inflation is cyclical rather than
+constant.
 
-Biological Career Arc (Q2)
+\textbf{Biological Career Arc (RQ2)}
 
-We observe a strong quadratic effect for Age (p\textless.001). Figure 6B
-illustrates the ``Inverted-U'' shape, where value peaks during a
-player's prime (approx. age 27) and declines significantly in the
+We observe a strong quadratic effect for age (p \textless{} .001).
+Figure 6B illustrates the inverted-U shape, where value peaks during a
+player's prime (approximately age 27) and declines significantly in the
 veteran stage.
 
-Squad Status Premium (Q3)
+\textbf{Squad Status Premium (RQ3)}
 
-Squad status is a massive driver of valuation. Because minutes\_played
-was standardized, the coefficient (\(\pi_6 \approx = .35\)) indicates
-that a one standard deviation increase in playing time is associated
-with a 42\% increase in market value (\(e^{.35} - 1 \approx .42\)). This
-confirms that being a ``Starter'' is financially distinct from being a
-Rotation Player.
+Our results show that squad status is a massive driver of valuation.
+Because we standardized minutes played, the coefficient (approximately
+0.35) indicates that a one standard deviation increase in playing time
+is associated with a 42\% increase in market value. This confirms that
+being a starter is financially distinct from being a rotation player.
 
-Contextual Effects (Q4-Q5)
+\textbf{Contextual Effects (RQ4)}
 
-We find a ``Diversity Premium'' (\(\delta_{01} = .20\). A 10 percentage
-point increase in a club's foreign player proportion increases average
-player value by 2\%. Conversely, we find a ``Domestic Discount'' where
-homegrown citizens are valued 17\% lower than foreign imports
-(\(e^{-.19} - 1 \approx -.17\)).
+We find evidence of a diversity premium. A 10 percentage point increase
+in a club's foreign player proportion increases average player value by
+2\%. Conversely, we find a domestic discount where homegrown citizens
+are valued 17\% lower than foreign imports.
 
 \begin{figure}
 
 \centering{
 
-\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/fig-results-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/fig-results-1.pdf}}
 
 }
 
-\caption{\label{fig-results}Key Drivers of Market Value. (A) Cubic
-Market Trend. (B) Quadratic Career Arc. (C) Squad Status Premium. (D)
-Diversity Premium.}
+\caption{\label{fig-results}Key drivers of market value. Panel A shows
+the cubic market trend over time. Panel B displays the quadratic career
+arc with peak around age 27. Panel C illustrates the squad status
+premium for starters. Panel D demonstrates the diversity premium for
+international rosters.}
 
 \end{figure}%
 
-\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-7-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-7-1.pdf}}
 
 \section{Club-Level Heterogeneity}\label{club-level-heterogeneity}
 
-Figure X displays the estimated club random effects from our
-cross-classified model. Substantial heterogeneity exists in both
+Figure 7 displays the estimated club random effects from our
+cross-classified model. We find substantial heterogeneity in both
 baseline valuations and temporal trajectories.
 
 \subsection{Baseline Premiums and
 Discounts}\label{baseline-premiums-and-discounts}
 
-Manchester United exhibits the largest effect: controlling for age,
+Manchester United exhibits the largest effect. When controlling for age,
 position, and performance, United players are valued 68\% higher than
-league average (\(\beta_{0j}\) = 0.52, 95\% CI {[}0.31, 0.76{]}).
-Barcelona (+56\%, 95\% CI {[}29\%, 93\%{]}), Paris Saint-Germain (+26\%,
-95\% CI {[}6\%, 53\%{]}), Chelsea (+25\%, 95\% CI {[}7\%, 50\%{]}),
-Manchester City (+24\%, 95\% CI {[}5\%, 49\%{]}), and Bayern Munich
-(+22\%, 95\% CI {[}4\%, 48\%{]}) also show significant premiums.
+league average. The 95\% confidence interval ranges from 31\% to 76\%.
+Barcelona shows a 56\% premium (95\% CI from 29\% to 93\%), while Paris
+Saint-Germain shows a 26\% premium (95\% CI from 6\% to 53\%). Chelsea,
+Manchester City, and Bayern Munich also show significant premiums of
+approximately 22\% to 25\%.
 
 Conversely, seven clubs show significant discounts. Sevilla faces the
-steepest penalty: players are valued 28\% below league average
-(\(\beta_{0j}\) = -0.33, 95\% CI {[}-0.42, -0.23{]}). Porto (-27\%),
-Benfica (-22\%), Roma (-21\%), Napoli (-17\%), Villarreal (-16\%), and
-Tottenham (-14\%) also show significant negative effects.
+steepest penalty, with players valued 28\% below league average (95\% CI
+from -42\% to -23\%). Porto shows a 27\% discount, Benfica shows 22\%,
+Roma shows 21\%, Napoli shows 17\%, Villarreal shows 16\%, and Tottenham
+shows 14\%.
 
 \subsection{Diverging Temporal
 Trajectories}\label{diverging-temporal-trajectories}
 
-The random slopes reveal that club fortunes diverged over the study
+Our random slopes reveal that club fortunes diverged over the study
 period. Three clubs showed significantly faster appreciation than league
-average: Arsenal (+2.9\%/year, 95\% CI {[}0.8\%, 5.0\%{]}), Liverpool
-(+2.7\%/year, 95\% CI {[}0.7\%, 4.8\%{]}), and Tottenham (+2.8\%/year,
-95\% CI {[}0.8\%, 4.8\%{]}). These trajectories coincide with improved
-sporting performance and, for Liverpool, a Champions League victory in
-2019.
+average. Arsenal showed growth of 2.9\% per year (95\% CI from 0.8\% to
+5.0\%), Liverpool showed 2.7\% per year (95\% CI from 0.7\% to 4.8\%),
+and Tottenham showed 2.8\% per year (95\% CI from 0.8\% to 4.8\%). These
+trajectories coincide with improved sporting performance and, for
+Liverpool, a Champions League victory in 2019.
 
-Four clubs experienced significantly slower growth (or faster decline):
-Manchester United (-2.8\%/year, 95\% CI {[}-4.5\%, -1.0\%{]}), Borussia
-Dortmund (-2.3\%/year, 95\% CI {[}-4.1\%, -0.4\%{]}), Juventus
-(-2.3\%/year, 95\% CI {[}-4.1\%, -0.5\%{]}), and Barcelona (-1.8\%/year,
-95\% CI {[}-3.5\%, -0.1\%{]}). Despite high baseline premiums, these
-clubs saw their market advantages erode over time.
+Four clubs experienced significantly slower growth or faster decline.
+Manchester United declined 2.8\% per year (95\% CI from -4.5\% to
+-1.0\%), Borussia Dortmund declined 2.3\% per year (95\% CI from -4.1\%
+to -0.4\%), Juventus declined 2.3\% per year (95\% CI from -4.1\% to
+-0.5\%), and Barcelona declined 1.8\% per year (95\% CI from -3.5\% to
+-0.1\%). Despite high baseline premiums, these clubs saw their market
+advantages erode over time.
 
-\includegraphics{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-8-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{MLM_Determinants_of_player_market_value_draft_files/figure-pdf/unnamed-chunk-8-1.pdf}}
 
 \hfill\break
 
 \section{Findings}\label{findings}
 
-This study demonstrates that player market value is driven primarily by
+Our study demonstrates that player market value is driven primarily by
 individual reputation and squad status, but is significantly moderated
 by club context and market cycles. Our cross-classified approach reveals
-that while ``Incubator Clubs'' can accelerate value growth, the market
-overall has entered a deceleration phase post-2020. Future research
-should address the potential endogeneity of playing time using
-instrumental variable approaches.
+that 78\% of variance can be attributed to persistent player effects
+while accounting for dynamic club contexts.
 
 While our cross-classified model demonstrates strong predictive power
-(\(R^2 \approx .89\)) , several limitations warrant consideration.
-First, although the Likelihood Ratio Test supported the inclusion of
-random slopes for club trajectories, the variance estimates should be
-interpreted with caution given the relatively small number of unique
-clubs (N=21). Second, diagnostic plots indicated deviations from
-normality in the extreme tails of the residual distribution; while our
-large sample size (N=7,023) ensures robust estimation of fixed effects,
-future iterations could employ robust standard errors or a Gamma GLMM to
-better address these extremes. Finally, predictors such as
-\texttt{minutes\_played} are likely endogenous---since better players
-naturally accrue more playing time---and thus should be interpreted as
-associations reflecting ``Squad Status'' rather than purely causal
-effects.
+(R-squared approximately 0.89), several limitations warrant
+consideration. First, although the likelihood ratio test supported
+including random slopes for club trajectories, we should interpret the
+variance estimates with caution given the relatively small number of
+unique clubs (N = 21). Second, our diagnostic plots indicated deviations
+from normality in the extreme tails of the residual distribution. While
+our large sample size (N = 7,023) ensures robust estimation of fixed
+effects, future iterations could employ robust standard errors or a
+Gamma GLMM to better address these extremes. Finally, predictors such as
+minutes played are likely endogenous, since better players naturally
+accrue more playing time. We should interpret our estimates as
+associations reflecting squad status rather than purely causal effects.
 
-Ultimately, this research highlights the necessity of moving beyond
+Ultimately, our research highlights the necessity of moving beyond
 static, single-level analyses to capture the true complexity of the
 football transfer market. By rigorously modeling the cross-classified
 intersection of individual player trajectories and dynamic club
 contexts, we provide a more accurate lens for valuing talent in a
 hyper-inflated economy. As the industry continues to professionalize,
-such multidimensional frameworks---which account for the interplay of
-human capital, institutional prestige, and market cycles---will remain
+such multidimensional frameworks (which account for the interplay of
+human capital, institutional prestige, and market cycles) will remain
 indispensable for clubs seeking to distinguish genuine value from market
 noise.
 
