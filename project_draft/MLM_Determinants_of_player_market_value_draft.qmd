@@ -34,8 +34,20 @@ keywords:
 ```{r}
 
 # Loading required packages
-pacman::p_load(arrow, lme4, lmertest, broom.mixed, performance, jtools,
-              knitr, gt, MuMin, patchwork, arm, viridis, ggeffects, tidyverse)
+library(arrow)
+library(lme4)
+library(lmerTest)
+library(broom.mixed)
+library(performance)
+library(jtools)
+library(knitr)
+library(gt)
+library(MuMIn)
+library(patchwork)
+library(arm)
+library(viridis)
+library(ggeffects)
+library(tidyverse)
 
 # Setting scientific notation off
 options(scipen=999)
