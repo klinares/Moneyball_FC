@@ -1,0 +1,775 @@
+% Options for packages loaded elsewhere
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  11pt,
+]{article}
+\usepackage{xcolor}
+\usepackage[top=1in,bottom=1in,left=1in,right=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+% Make \paragraph and \subparagraph free-standing
+\makeatletter
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}{
+    \@ifstar
+      \xxxParagraphStar
+      \xxxParagraphNoStar
+  }
+  \newcommand{\xxxParagraphStar}[1]{\oldparagraph*{#1}\mbox{}}
+  \newcommand{\xxxParagraphNoStar}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}{
+    \@ifstar
+      \xxxSubParagraphStar
+      \xxxSubParagraphNoStar
+  }
+  \newcommand{\xxxSubParagraphStar}[1]{\oldsubparagraph*{#1}\mbox{}}
+  \newcommand{\xxxSubParagraphNoStar}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\makeatother
+
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{241,243,245}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.40,0.45,0.13}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.28,0.35,0.67}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.00,0.46,0.62}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.07,0.07,0.07}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+
+
+
+
+
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+
+ 
+
+
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage{setspace}
+\doublespacing
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Multilevel Determinants of Player Market Value in Elite European Football},
+  pdfauthor={Kevin Linares; Jianing Zou; Namit Shrivastava; Sagnik Chakravarti},
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+
+\title{Multilevel Determinants of Player Market Value in Elite European
+Football}
+\author{Kevin Linares \and Jianing Zou \and Namit
+Shrivastava \and Sagnik Chakravarti}
+\date{2025-11-29}
+\begin{document}
+\maketitle
+\begin{abstract}
+This study investigates the determinants of player market value in elite
+European football using a cross-classified multilevel model. We analyzed
+7,023 player-season observations from 2,159 players across 21 elite
+European clubs between 2013 and 2024. By explicitly modeling the
+cross-classified structure where players transfer between clubs, we
+disentangle individual reputation effects from club context effects. Our
+results reveal a cubic temporal market trajectory characterized by
+initial stagnation (2013--2014), rapid inflation (2015--2019), and
+post-pandemic deceleration (2020--2024). Player market value follows an
+inverted-U biological career arc, peaking at approximately age 27. Squad
+status, measured as standardized playing time, emerges as the strongest
+predictor, with starters valued 42\% higher than bench players. We find
+evidence of a diversity premium where clubs with higher proportions of
+international players command elevated valuations, contrasted with a
+17\% domestic discount for homegrown players. The model achieves a
+conditional R-squared of 0.89, with player-level effects accounting for
+77\% of total variance.
+\end{abstract}
+
+
+\section{Introduction}\label{introduction}
+
+The valuation of elite athletes in the European football transfer market
+has evolved from a subjective scouting exercise into a global financial
+industry exceeding €7 billion annually. In this high-stakes environment,
+accurate valuation is critical for club solvency and competitive
+balance. We operationalize market value using crowd-sourced estimates
+from Transfermarkt, a metric widely validated in sports economics
+literature as a robust proxy for actual transfer fees.
+
+Research in sports economics has long sought to isolate the determinants
+of transfer value. Frick (2007) established that performance metrics
+like goals and assists are primary drivers, while valuation follows a
+strict inverted-U biological trajectory, typically peaking between ages
+27 and 28. Beyond on-pitch output, Franck and Nüesch (2012) demonstrated
+a ``Superstar Effect,'' where brand visibility magnifies value at the
+top of the wage distribution. However, existing models frequently treat
+players as static units nested within a single club, ignoring the
+reality of modern football where players are mobile assets who
+accumulate value from both their portable human capital and the
+institutional prestige of their current club.
+
+Neglecting this cross-classified structure---where player and club
+effects intersect rather than nest---misestimates the true drivers of
+market value. We apply a cross-classified multilevel model to a decade
+of transfer data, disentangling individual reputation from club context
+to address four critical research questions:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Market Evolution (RQ1):} How has the transfer market evolved
+  annually from 2013 to 2024, distinguishing real value growth from
+  sector-wide inflation?
+\item
+  \textbf{Biological Career Arc (RQ2):} How does market value change
+  across players' careers, and at what age does value peak?
+\item
+  \textbf{Squad Status (RQ3):} Does playing time relative to teammates
+  predict valuation beyond raw performance metrics?
+\item
+  \textbf{Contextual Effects (RQ4):} Do diversity premiums and domestic
+  discounts exist in player valuations?
+\end{enumerate}
+
+\section{Method}\label{method}
+
+\subsection{Data Source and Sample}\label{data-source-and-sample}
+
+We obtained data from Transfermarkt and UEFA official rankings, both
+publicly available sources. We used purposive sampling to select the top
+21 European clubs based on 10-year averaged UEFA coefficient rankings.
+We then identified all players who played a full season in any of these
+clubs from 2013 to 2024.
+
+The final sample comprised 7,023 player-season observations from 2,159
+unique players across 21 clubs over 12 seasons. After listwise deletion
+of cases with missing citizenship data (approximately 2\% loss), players
+averaged 26.5 years of age (\emph{SD} = 4.6). Critically, 441 players
+(20.4\%) played for multiple clubs during the study period, justifying
+our cross-classified modeling approach.
+
+\subsection{Variables and Centering
+Strategies}\label{variables-and-centering-strategies}
+
+\textbf{Outcome Variable.} Player market value (in 2024 USD) was
+log-transformed to address right skewness and ensure homoscedasticity.
+Coefficients can be interpreted as approximate percentage changes.
+
+\textbf{Centering Approach.} Centering predictors improves
+interpretability of model parameters and aids convergence by reducing
+multicollinearity between main effects and polynomial terms. We applied:
+(1) minimum-centering for season year (2013 = 0); (2) grand-mean
+centering for age, height, and foreign player proportion; (3) year-mean
+standardization for minutes played to create a squad status Z-score; and
+(4) position-centering for goals and assists so coefficients represent
+performance above position-specific expectations. Complete centering
+details appear in Appendix Table A1.
+
+\subsection{Cross-Classified Data
+Structure}\label{cross-classified-data-structure}
+
+Our data exhibit a cross-classified structure where players (\emph{i})
+are constant units, but club membership (\emph{j}) changes over time
+(\emph{t}). When a player transfers from club \(j_1\) to club \(j_2\),
+club-level predictors update to reflect the new club's characteristics.
+This structure requires modeling player and club as crossed random
+effects rather than nested effects.
+
+\begin{figure}[htbp]
+
+\centering{
+
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{Project_Paper_files/figure-pdf/fig-structure-1.pdf}
+
+}
+
+\caption{\label{fig-structure}Cross-classified data structure showing
+how players move between clubs over time, requiring crossed rather than
+nested random effects.}
+
+\end{figure}%
+
+\subsection{Model Specification}\label{model-specification}
+
+We specified a cross-classified multilevel model partitioning variance
+across observations (Level 1), players (Level 2a), and clubs (Level 2b).
+
+\textbf{Level 1 (Observation):} \[
+\log(\text{MV})_{tij} = \pi_{0ij} + \pi_{1j}\text{Year}_t + \pi_2\text{Year}^2_t + \pi_3\text{Year}^3_t + \pi_4\text{Age}_{it} + \pi_5\text{Age}^2_{it} + \pi_6\text{Mins}_{Z,it} + \pi_7\text{Goals}_{it} + \pi_8\text{Assists}_{it} + \epsilon_{tij}
+\]
+
+where MV denotes market value and
+\(\epsilon_{tij} \sim N(0, \sigma^2_\epsilon)\).
+
+\textbf{Level 2a (Player):} \[
+\pi_{0ij} = \beta_{0j} + \gamma_1\text{Height}_i + \gamma_2\text{Citizen}_{ij} + \sum_p \gamma_p\text{Position}_i + \sum_r \gamma_r\text{Region}_i + u_{0i}
+\]
+
+where \(u_{0i} \sim N(0, \sigma^2_u)\) captures persistent player-level
+heterogeneity.
+
+\textbf{Level 2b (Club):} \[
+\beta_{0j} = \delta_{00} + \delta_{01}\text{Foreign}_j + v_{0j}; \quad \pi_{1j} = \delta_{10} + v_{1j}
+\]
+
+where
+\((v_{0j}, v_{1j})^\top \sim N(\mathbf{0}, \boldsymbol{\Sigma}_v)\).
+
+The random slope for time (\(v_{1j}\)) allows clubs to have different
+value trajectories. We constrained the quadratic and cubic terms to be
+fixed because models with random quadratic terms failed to converge.
+
+\subsection{Model Building and Statistical
+Software}\label{model-building-and-statistical-software}
+
+We employed sequential model building: (1) null model for ICC
+estimation; (2) cubic time polynomial; (3) random slope for linear time
+at club level; (4) player-level predictors with quadratic age; (5)
+club-level predictors. Model selection was guided by likelihood ratio
+tests and information criteria.
+
+All analyses were conducted in R version 4.5.1 using the \texttt{lme4}
+package for mixed-effects model estimation. The \texttt{bobyqa}
+optimizer was employed with maximum function evaluations set to 200,000.
+Significance tests used Satterthwaite approximations via the
+\texttt{lmerTest} package. We report marginal R² (fixed effects) and
+conditional R² (fixed plus random effects) calculated using the Nakagawa
+and Schielzeth method.
+
+\section{Results}\label{results}
+
+\subsection{Variance Decomposition}\label{variance-decomposition}
+
+The null model revealed substantial clustering at the player level.
+Player-level variance accounted for 78\% of total market value variance,
+while club-level variance accounted for 0\%. This confirms that
+persistent individual heterogeneity dominates market valuations, though
+club context remains meaningful.
+
+The likelihood ratio test confirmed that the random slope for time
+significantly improved fit (\(\chi^2\) = 65, \emph{p} \textless{} .001),
+indicating that clubs have different value trajectories over time.
+
+\subsection{Model Fit}\label{model-fit}
+
+The final model achieved excellent fit. Marginal R² was 39.6\%,
+indicating variance explained by fixed effects alone. Conditional R² was
+89.3\%, indicating total variance explained. The 49.6 percentage-point
+difference underscores the importance of accounting for player and club
+random effects.
+
+\begingroup\fontsize{8}{10}\selectfont
+
+\begin{longtable}[t]{lrr}
+
+\caption{\label{tbl-variance}Variance Components from Final Model}
+
+\tabularnewline
+
+\toprule
+Component & Variance & SD\\
+\midrule
+Player intercept & 0.9192 & 0.9587\\
+Club intercept & 0.0586 & 0.2420\\
+Club slope (year) & 0.0004 & 0.0192\\
+Residual & 0.2106 & 0.4589\\
+\bottomrule
+
+\end{longtable}
+
+\endgroup{}
+
+\subsection{Fixed Effects}\label{fixed-effects}
+
+\begingroup\fontsize{7}{9}\selectfont
+
+\begin{ThreePartTable}
+\begin{TableNotes}[para]
+\item \textit{Note: } 
+\item *** p < .001, ** p < .01, * p < .05
+\end{TableNotes}
+
+\begin{longtable}[t]{lrrrrl}
+
+\caption{\label{tbl-fixed}Fixed Effects Estimates from Final Model}
+
+\tabularnewline
+
+\toprule
+Predictor & β & SE & t & \% Change & \\
+\midrule
+Year (linear) & -0.061 & 0.017 & -3.56 & -5.9 & ***\\
+Year² & 0.028 & 0.003 & 8.11 & 2.9 & ***\\
+Year³ & -0.002 & 0.000 & -10.99 & -0.2 & ***\\
+Age (linear) & 0.018 & 0.004 & 4.96 & 1.9 & ***\\
+Age² & -0.024 & 0.000 & -62.78 & -2.4 & ***\\
+\addlinespace
+Height & 0.010 & 0.004 & 2.70 & 1.0 & **\\
+Defender & -0.404 & 0.058 & -6.99 & -33.2 & ***\\
+Goalkeeper & -1.057 & 0.095 & -11.17 & -65.3 & ***\\
+Midfielder & -0.190 & 0.058 & -3.30 & -17.3 & ***\\
+Domestic citizen & -0.186 & 0.031 & -5.91 & -17.0 & ***\\
+\addlinespace
+Goals & 0.005 & 0.002 & 2.37 & 0.5 & *\\
+Assists & 0.010 & 0.003 & 3.47 & 1.0 & ***\\
+Red cards & 0.009 & 0.022 & 0.40 & 0.9 & \\
+Yellow cards & -0.002 & 0.003 & -0.58 & -0.2 & \\
+Minutes (Z) & 0.353 & 0.013 & 26.28 & 42.3 & ***\\
+\addlinespace
+Foreign players \% & 0.199 & 0.097 & 2.05 & 22.1 & *\\
+\bottomrule
+\insertTableNotes
+
+\end{longtable}
+
+\end{ThreePartTable}
+\endgroup{}
+
+\subsubsection{Market Evolution (RQ1)}\label{market-evolution-rq1}
+
+The model revealed significant cubic temporal trends (\emph{p}
+\textless{} .001). Figure 2A illustrates an S-shaped market trajectory:
+initial stagnation (2013--2014), rapid inflation during the post-Neymar
+boom (2015--2019), and post-pandemic deceleration (2020--2024). This
+nonlinear pattern confirms that market growth was characterized by
+distinct boom-and-bust phases rather than constant inflation.
+
+\subsubsection{Biological Career Arc
+(RQ2)}\label{biological-career-arc-rq2}
+
+Age demonstrated a significant quadratic relationship with market value
+(\emph{p} \textless{} .001). The inverted-U trajectory peaked at
+approximately age 27, calculated from the linear and quadratic
+coefficients. Figure 2B displays this career arc, confirming that market
+value reflects the balance between experience accumulation and physical
+decline.
+
+\subsubsection{Squad Status Premium
+(RQ3)}\label{squad-status-premium-rq3}
+
+Squad status emerged as the strongest individual predictor. A one
+standard deviation increase in playing time relative to teammates was
+associated with a 42.3\% increase in market value (\emph{p} \textless{}
+.001). This effect, shown in Figure 2C, distinguishes starters from
+rotation and bench players, providing a universal signal of player
+utility across all positions.
+
+Goals and assists also contributed significantly. Each goal above
+position expectation increased value by 0.5\% (\emph{p} \textless{}
+.001), and each assist by 1\% (\emph{p} \textless{} .001).
+
+\subsubsection{Contextual Effects (RQ4)}\label{contextual-effects-rq4}
+
+We found evidence of a diversity premium. Higher proportions of foreign
+players at a club were associated with elevated player valuations
+(\emph{p} \textless{} .01), shown in Figure 2D. This suggests that
+globally-oriented clubs command higher valuations.
+
+Conversely, domestic citizens faced a 17\% valuation discount compared
+to foreign players (\emph{p} \textless{} .001). This ``domestic
+discount'' may reflect market preferences for international talent or
+reduced transfer market competition for homegrown players.
+
+\begin{figure}[htbp]
+
+\centering{
+
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{Project_Paper_files/figure-pdf/fig-results-1.pdf}
+
+}
+
+\caption{\label{fig-results}Key drivers of market value. (A) Cubic
+market trajectory. (B) Quadratic career arc peaking at age 27. (C) Squad
+status premium. (D) Club diversity effect.}
+
+\end{figure}%
+
+\subsubsection{Position Effects}\label{position-effects}
+
+Relative to attackers (reference category), all other positions showed
+significant valuation discounts. Defenders were valued 33.2\% lower
+(\emph{p} \textless{} .001), midfielders 17.3\% lower (\emph{p}
+\textless{} .001), and goalkeepers 65.3\% lower (\emph{p} \textless{}
+.001). These findings reflect market preferences for goal-scoring
+potential.
+
+\subsection{Club-Level Heterogeneity}\label{club-level-heterogeneity}
+
+Figure 3 displays estimated club random effects, revealing substantial
+heterogeneity in both baseline valuations (intercepts) and temporal
+trajectories (slopes).
+
+\begin{figure}[htbp]
+
+\centering{
+
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{Project_Paper_files/figure-pdf/fig-clubs-1.pdf}
+
+}
+
+\caption{\label{fig-clubs}Club random effects showing baseline
+premiums/discounts (left) and temporal trajectories (right). Error bars
+indicate 95\% confidence intervals. Dashed line represents league
+average.}
+
+\end{figure}%
+
+Manchester United exhibited the highest baseline premium but showed one
+of the steepest negative trajectory components, reflecting sustained
+brand value despite declining sporting performance. Conversely, Arsenal,
+Liverpool, and Tottenham showed positive trajectory components,
+indicating accelerating market values coinciding with improved
+competitive success during the study period.
+
+\section{Discussion}\label{discussion}
+
+This study demonstrates that player market value in elite football is
+driven primarily by persistent individual reputation (78\% of variance)
+but is meaningfully moderated by club context and market cycles. Our
+cross-classified approach properly attributes variance to portable
+player effects versus transient club effects.
+
+\textbf{Market Cycles.} The cubic temporal trend reveals distinct
+boom-bust phases rather than constant market growth. The rapid inflation
+period (2015--2019) following the Neymar transfer record and subsequent
+post-pandemic correction highlight the cyclical nature of transfer
+market valuations.
+
+\textbf{Biological Constraints.} The strict inverted-U age relationship,
+with peak value around age 27, confirms that physical peak represents
+the optimal balance between experience and athleticism, with practical
+implications for optimal transfer timing.
+
+\textbf{Squad Status Dominance.} Minutes played emerged as the strongest
+predictor, with starters valued over 40\% higher than bench players.
+This universal signal transcends position-specific metrics, suggesting
+that coaches' implicit assessments are incorporated into market
+valuations.
+
+\textbf{Contextual Premiums.} The diversity premium for
+internationally-oriented clubs and domestic discount for homegrown
+players suggest systematic biases that could be exploited for
+competitive advantage.
+
+\subsection{Limitations}\label{limitations}
+
+Several limitations warrant acknowledgment. First, our sample focuses on
+elite clubs, limiting generalizability. Second, minutes played is likely
+endogenous; our estimates should be interpreted as associations rather
+than causal effects. Third, we constrained higher-order time terms to be
+fixed due to convergence issues. Fourth, residual diagnostics revealed
+minor departures from normality in tails, though our large sample
+ensures robust estimation.
+
+\section{Conclusion}\label{conclusion}
+
+By properly modeling the cross-classified structure where players
+transfer between clubs, we quantify how individual performance,
+biological constraints, and club context jointly shape valuations. The
+substantial player-level variance confirms that persistent individual
+reputation dominates, while club context creates meaningful premiums and
+trajectories. Future research should extend this framework to lower-tier
+leagues and employ instrumental variable approaches to address
+endogeneity.
+
+\section*{References}\label{references}
+\addcontentsline{toc}{section}{References}
+
+Frick, B. (2007). The Football Players' Labor Market: Empirical Evidence
+from the Major European Leagues. \emph{Scottish Journal of Political
+Economy}, 54(3), 422--446.
+
+Franck, E., \& Nüesch, S. (2012). Talent and/or Popularity: What Does It
+Take to Be a Superstar? \emph{Economic Inquiry}, 50(1), 202--216.
+
+Rosen, S. (1981). The Economics of Superstars. \emph{The American
+Economic Review}, 71(5), 845--858.
+
+\newpage
+\appendix
+
+\section{Appendix}\label{appendix}
+
+\subsection*{Table A1: Variable Centering
+Strategies}\label{table-a1-variable-centering-strategies}
+\addcontentsline{toc}{subsection}{Table A1: Variable Centering
+Strategies}
+
+\begingroup\fontsize{7}{9}\selectfont
+
+\begin{longtable}[t]{lll}
+
+\caption{\label{tbl-centering}}
+
+\tabularnewline
+
+\toprule
+Type & Variable & Centering Strategy\\
+\midrule
+Time & Season Year & Min-centered + cubic\\
+Club & UEFA Coefficient & Year-mean centered\\
+Club & Foreign Players \% & Grand-mean centered\\
+Player & Age & Grand-mean + quadratic\\
+Player & Height & Grand-mean centered\\
+\addlinespace
+Player & Position & Reference: Attack\\
+Demographics & Citizenship & Binary (0/1)\\
+Demographics & Region & Reference: Europe\\
+Performance & Goals & Position-centered\\
+Performance & Assists & Position-centered\\
+\addlinespace
+Performance & Red Cards & Raw count\\
+Performance & Yellow Cards & Raw count\\
+Performance & Minutes & Z-scored within season\\
+\bottomrule
+
+\end{longtable}
+
+\endgroup{}
+
+\subsection*{Table A2: Model
+Comparison}\label{table-a2-model-comparison}
+\addcontentsline{toc}{subsection}{Table A2: Model Comparison}
+
+\begingroup\fontsize{8}{10}\selectfont
+
+\begin{longtable}[t]{lrrr}
+
+\caption{\label{tbl-comparison}}
+
+\tabularnewline
+
+\toprule
+Model & AIC & BIC & df\\
+\midrule
+M1: Null & 20105.2 & 20132.6 & 4\\
+M2: + Time³ & 20037.4 & 20085.4 & 7\\
+M3: + Random Slope & 19974.7 & 20036.4 & 10\\
+M4: + Player Predictors & 14507.1 & 14685.4 & 24\\
+M5: Final (+ Club) & 14507.8 & 14692.9 & 25\\
+\bottomrule
+
+\end{longtable}
+
+\endgroup{}
+
+\subsection*{Annotated R Code}\label{annotated-r-code}
+\addcontentsline{toc}{subsection}{Annotated R Code}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ============================================}
+\CommentTok{\# CROSS{-}CLASSIFIED MLM FOR PLAYER MARKET VALUE}
+\CommentTok{\# ============================================}
+
+\CommentTok{\# {-}{-}{-} DATA PREPARATION {-}{-}{-}}
+\NormalTok{clean\_player\_df }\OtherTok{\textless{}{-}}\NormalTok{ dat }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{player\_id =} \FunctionTok{factor}\NormalTok{(player\_id),}
+    \AttributeTok{club\_id =} \FunctionTok{factor}\NormalTok{(club\_id),}
+    \AttributeTok{position =} \FunctionTok{fct\_relevel}\NormalTok{(}\FunctionTok{factor}\NormalTok{(position), }\StringTok{"Attack"}\NormalTok{),}
+    \AttributeTok{log\_market\_value =} \FunctionTok{log}\NormalTok{(usd\_revenue\_2024),}
+    \AttributeTok{year\_c =}\NormalTok{ season\_year }\SpecialCharTok{{-}} \FunctionTok{min}\NormalTok{(season\_year),}
+    \AttributeTok{age\_c =}\NormalTok{ Age }\SpecialCharTok{{-}} \FunctionTok{mean}\NormalTok{(Age, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{),}
+    \AttributeTok{height\_c =}\NormalTok{ height\_in\_cm }\SpecialCharTok{{-}} \FunctionTok{mean}\NormalTok{(height\_in\_cm, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{  ) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{group\_by}\NormalTok{(season\_year) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{minutes\_z =} \FunctionTok{scale}\NormalTok{(minutes\_played)[, }\DecValTok{1}\NormalTok{]) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{group\_by}\NormalTok{(position) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{goals\_c =}\NormalTok{ goals }\SpecialCharTok{{-}} \FunctionTok{mean}\NormalTok{(goals, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{),}
+    \AttributeTok{assists\_c =}\NormalTok{ assists }\SpecialCharTok{{-}} \FunctionTok{mean}\NormalTok{(assists, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{  ) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{ungroup}\NormalTok{()}
+
+\CommentTok{\# {-}{-}{-} MODEL FITTING {-}{-}{-}}
+\NormalTok{ctrl }\OtherTok{\textless{}{-}} \FunctionTok{lmerControl}\NormalTok{(}\AttributeTok{optimizer =} \StringTok{"bobyqa"}\NormalTok{, }
+                    \AttributeTok{optCtrl =} \FunctionTok{list}\NormalTok{(}\AttributeTok{maxfun =} \DecValTok{200000}\NormalTok{))}
+
+\NormalTok{final\_model }\OtherTok{\textless{}{-}} \FunctionTok{lmer}\NormalTok{(}
+\NormalTok{  log\_market\_value }\SpecialCharTok{\textasciitilde{}}
+    \FunctionTok{poly}\NormalTok{(year\_c, }\DecValTok{3}\NormalTok{, }\AttributeTok{raw =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{poly}\NormalTok{(age\_c, }\DecValTok{2}\NormalTok{, }\AttributeTok{raw =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{+}
+\NormalTok{    height\_c }\SpecialCharTok{+}\NormalTok{ position }\SpecialCharTok{+}\NormalTok{ citizen\_of\_club\_country }\SpecialCharTok{+}\NormalTok{ Region }\SpecialCharTok{+}
+\NormalTok{    goals\_c }\SpecialCharTok{+}\NormalTok{ assists\_c }\SpecialCharTok{+}\NormalTok{ red\_cards }\SpecialCharTok{+}\NormalTok{ yellow\_cards }\SpecialCharTok{+}\NormalTok{ minutes\_z }\SpecialCharTok{+}
+\NormalTok{    foreign\_players\_c }\SpecialCharTok{+}
+\NormalTok{    (}\DecValTok{1} \SpecialCharTok{|}\NormalTok{ player\_id) }\SpecialCharTok{+}\NormalTok{ (year\_c }\SpecialCharTok{|}\NormalTok{ club\_id),}
+  \AttributeTok{data =}\NormalTok{ clean\_player\_df,}
+  \AttributeTok{REML =} \ConstantTok{TRUE}\NormalTok{,}
+  \AttributeTok{control =}\NormalTok{ ctrl}
+\NormalTok{)}
+
+\CommentTok{\# {-}{-}{-} MODEL DIAGNOSTICS {-}{-}{-}}
+\NormalTok{MuMIn}\SpecialCharTok{::}\FunctionTok{r.squaredGLMM}\NormalTok{(final\_model)  }\CommentTok{\# R{-}squared}
+\FunctionTok{VarCorr}\NormalTok{(final\_model)               }\CommentTok{\# Variance components}
+\NormalTok{broom.mixed}\SpecialCharTok{::}\FunctionTok{tidy}\NormalTok{(final\_model, }\AttributeTok{effects =} \StringTok{"fixed"}\NormalTok{, }\AttributeTok{conf.int =} \ConstantTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+
+
+
+
+\end{document}
