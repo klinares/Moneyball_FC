@@ -13,7 +13,8 @@ format: pdf
 
 ```{r}
 pacman::p_load(arrow, lme4, lmerTest, performance, broom, broom.mixed, patchwork,
-               arm, viridis, knitr, jtools, ggeffects, ggdist, gt, tidyverse)
+               arm, viridis, knitr, jtools, ggeffects, ggdist, 
+               gt, tidyverse)
 
 options(scipen = 999)
 
@@ -192,7 +193,7 @@ player_df <- dat |>
     usd_revenue_2024_log = log(usd_revenue_2024),
     # season year
     # scale years with center 2020 for pandomic shock
-    season_year_c = scale(season_year, center = 2020),
+    season_year_c = as.numeric(scale(season_year, center = 2020)),
     # grand mean centering
     foreign_players = foreign_players - mean(foreign_players, na.rm=TRUE),
     age_c = Age - mean(Age, na.rm=TRUE),
@@ -200,8 +201,9 @@ player_df <- dat |>
   ) |> 
   # year mean centering
   group_by(season_year_c) |> 
-  mutate(uefa_coefficient = uefa_coefficient - mean(uefa_coefficient, na.rm=TRUE), 
-         minutes_played = scale(minutes_played)) |> 
+  mutate(uefa_coefficient = 
+           uefa_coefficient - mean(uefa_coefficient, na.rm=TRUE), 
+         minutes_played = as.numeric(scale(minutes_played))) |> 
   # position centering
   group_by(position) |> 
   mutate(goals = goals - mean(goals, na.rm=TRUE),
@@ -216,7 +218,8 @@ player_df <- dat |>
 player_df |> 
   reframe(across(everything(), ~sum(is.na(.)))) |>
   select_if(~ . > 0) |> 
-  pivot_longer(everything(), names_to = "Variable", values_to = "Missing Cases") |> 
+  pivot_longer(everything(), names_to = "Variable", 
+               values_to = "Missing Cases") |> 
   slice(1:5) |> 
   arrange(desc(`Missing Cases`)) |> 
   kable()
@@ -300,11 +303,9 @@ ggplot(clean_player_df, aes(x = season_year_c,
 
     -   Establish whether age quadratic term is needed
 
-        -   Model 3.1: Adding player covariates {Height + Position + Citizen Status + Region + Age + Goals + Assists + Red Cards + Yellow cards + Minutes played}
+        -   Model 3.1: Adding player covariates {Height + Position + Citizen Status + Region + Age + Goals + Assists + Red Cards + Yellow cards + Minutes played + UEFA coefficients + Foreign Players}
 
         -   Model 3.2: Adding the quadratic term for age
-
-    -   Model 4: Adding club covariates {UEFA coefficients + Foreign Players}
 
 -   Compare model fit
 
@@ -360,7 +361,7 @@ Model_2.2 <-  lmer(
   usd_revenue_2024_log ~ 
     # first level fixed effect
     # Use poly() with raw=TRUE 
-    poly(season_year_c, 2) + 
+    poly(season_year_c, 2, raw = TRUE) + 
     # random effects
       (1|player_id) + (1|club_id), 
   data = clean_player_df, REML = TRUE,   control = strict_control)
@@ -390,7 +391,7 @@ Model_2.3 <-  lmer(
   usd_revenue_2024_log ~ 
     # first level fixed effect
     # Use poly() with raw=TRUE 
-    poly(season_year_c, 3) + 
+    poly(season_year_c, 3, raw = TRUE) + 
     # random effects
       (1|player_id) + (1|club_id), 
   data = clean_player_df, REML = TRUE,   control = strict_control)
@@ -419,9 +420,9 @@ Model_2.4 <-  lmer(
   usd_revenue_2024_log ~ 
     ## first level fixed effect
     # Use poly() with raw=TRUE 
-    poly(season_year_c, 3) + 
+    poly(season_year_c, 3, raw = TRUE) + 
     # random effects
-      (1 | player_id) + (poly(season_year_c, 1) | club_id), 
+      (1 | player_id) + (poly(season_year_c, 1, raw = TRUE) | club_id), 
   data = clean_player_df, REML = TRUE,   control = strict_control)
 
 summ(digits = 4,  Model_2.4)
@@ -435,9 +436,9 @@ Model_2.5 <-  lmer(
   usd_revenue_2024_log ~ 
     # first level fixed effect
     # Use poly() with raw=TRUE 
-    poly(season_year_c, 3) +  
+    poly(season_year_c, 3, raw = TRUE) +  
     # random effects
-      (1 | player_id) + (poly(season_year_c, 2) | club_id), 
+      (1 | player_id) + (poly(season_year_c, 2, raw = TRUE) | club_id), 
   data = clean_player_df, REML = TRUE,   control = strict_control)
 
 summ(digits = 4,  Model_2.5)
@@ -456,9 +457,9 @@ Model_2.6 <-  lmer(
   usd_revenue_2024_log ~ 
     # first level fixed effect
     # Use poly() with raw=TRUE 
-    poly(season_year_c, 3) +  
+    poly(season_year_c, 3, raw = TRUE) +  
     # random effects
-      (1 | player_id) + (poly(season_year_c, 3)| club_id), 
+      (1 | player_id) + (poly(season_year_c, 3, raw = TRUE)| club_id), 
   data = clean_player_df, REML = TRUE,   control = strict_control)
 
 summ(digits = 4,  Model_2.6)
@@ -547,13 +548,13 @@ Model_3.1 <-  lmer(
   usd_revenue_2024_log ~ 
     # first level fixed effect
     # Use poly() with raw=TRUE 
-    poly(season_year_c, 3) + 
+    poly(season_year_c, 3, raw = TRUE) + 
     # player fixed effects
     height_c + position + citizen_of_club_country + Region +
     age_c + 
     goals + assists + red_cards + yellow_cards + minutes_played +
     # random effects
-    (1 | player_id) + (poly(season_year_c, 2) | club_id), 
+    (1 | player_id) + (poly(season_year_c, 2, raw = TRUE) | club_id), 
   data = clean_player_df, REML = TRUE,   control = strict_control)
 
 summ(digits = 4,  Model_3.1)
@@ -567,13 +568,15 @@ Model_3.2 <-  lmer(
   usd_revenue_2024_log ~ 
     # first level fixed effect
     # Use poly() with raw=TRUE 
-    poly(season_year_c, 3) + 
+    poly(season_year_c, 3, raw = TRUE) + 
     # player fixed effects
     height_c + position + citizen_of_club_country + Region +
     poly(age_c, 2, raw = TRUE) +
     goals + assists + red_cards + yellow_cards + minutes_played +
+    # club fixed effects
+    uefa_coefficient + foreign_players + 
     # random effects
-    (1 | player_id) + (poly(season_year_c, 2) | club_id), 
+    (1 | player_id) + (poly(season_year_c, 2, raw = TRUE) | club_id), 
   data = clean_player_df, REML = TRUE,   control = strict_control)
 
 summ(digits = 4,  Model_3.2)
@@ -585,38 +588,6 @@ summ(digits = 4,  Model_3.2)
 anova(Model_3.1, Model_3.2) |> gt()
 
 ```
-
-### Model 4: Adding club covariates
-
--   The model with club covariates under performs compared to model 3.2, and both club covariates are not significant which we keep model 3.2
-
-```{r}
-
-Model_4 <-  lmer(
-  usd_revenue_2024_log ~ 
-    # first level fixed effect
-    # Use poly() 
-    poly(season_year_c, 3) + 
-    # player fixed effects
-    height_c + position + citizen_of_club_country + Region +
-    poly(age_c, 2) + 
-    goals + assists + red_cards + yellow_cards + minutes_played +
-    # club fixed effects
-    uefa_coefficient + foreign_players + 
-    # random effects
-    (1 | player_id) + (poly(season_year_c, 2) | club_id), 
-  data = clean_player_df, REML = TRUE,   control = strict_control)
-
-summ(digits = 4,  Model_4)
-
-```
-
-```{r}
-anova(Model_3.2, Model_4) |> gt()
-
-```
-
-\
 
 \
 
@@ -686,39 +657,41 @@ check_model(final_model)
 
 ## Final Model Specification
 
-We specify a **cross-classified multilevel model** (Model 3.2) to partition the variance in market value across observations ($t$), players ($i$), and clubs ($j$).
+We specify a **cross-classified multilevel model** (Model 3.2) to partition the variance in market value across observations ($t$), players ($i$), and clubs ($j$). Crucially, because club attributes like internationalization and UEFA ranking vary year-to-year, they are modeled as **Level 1 (time-varying)** predictors rather than static Level 2 traits.
 
-**Level 1: Observation Model (Time-Varying)**
+**Level 1: Observation Model (Time-Varying Effects)**
 
-At the observation level, the log-transformed market value is modeled as a function of the player-club intercept ($\pi_{0ij}$), orthogonal time trends, biological aging, and performance metrics:
+At the observation level, the log-transformed market value is modeled as a function of the player-club intercept ($\pi_{0ij}$), algebraic time trends, biological aging, and dynamic contextual metrics:
 
 $$
 \begin{aligned}
 \log(\text{Revenue})_{tij} &= \pi_{0ij} \\
-&+ \pi_{1j} \cdot \rho_1(\text{Year}_{t}) + \pi_{2j} \cdot \rho_2(\text{Year}_{t}) + \pi_{3} \cdot \rho_3(\text{Year}_{t}) \\
+&+ \pi_{1j}(\text{Year}_{t}) + \pi_{2j}(\text{Year}^2_{t}) + \pi_{3}(\text{Year}^3_{t}) \\
 &+ \pi_{4}(\text{Age}_{it} - \bar{A}) + \pi_{5}(\text{Age}_{it} - \bar{A})^2 \\
-&+ \pi_{6}(\text{Mins}_{Z,it}) + \mathbf{\Pi}_{perf} + \epsilon_{tij}
+&+ \pi_{6}(\text{Mins}_{Z,it}) \\
+&+ \pi_{7}(\text{Foreign}_{tj}) + \pi_{8}(\text{UEFA}_{tj}) \\
+&+ \mathbf{\Pi}_{perf} + \epsilon_{tij}
 \end{aligned}
 $$
 
-*Note:* $\rho_k(\text{Year})$ denotes the $k$-th order orthogonal polynomial for Season Year. Age is modeled using raw polynomials.
+*Note: The subscripts ${tj}$ for Foreign and UEFA denote that these club attributes vary by time $t$.*
 
-**Level 2a: Player Model (Time-Invariant)**
+**Level 2a: Player Model (Time-Invariant Traits)**
 
-The player-club intercept ($\pi_{0ij}$) is decomposed into a fixed component based on player characteristics and a random player effect ($u_{0i}$):
+The player-club intercept ($\pi_{0ij}$) is decomposed into a fixed component based on static player characteristics and a random player effect ($u_{0i}$):
 
 $$
-\pi_{0ij} = \beta_{0j} + \gamma_{1}(\text{Height}_{i}) + \gamma_{2}(\text{Citizen}_{ij}) + \sum_{p} \gamma_{p}(\text{Pos}) + \sum_{r} \gamma_{r}(\text{Reg}) + u_{0i}
+\pi_{0ij} = \beta_{0j} + \gamma_{1}(\text{Height}_{i}) + \gamma_{2}(\text{Citizen}_{ij}) + \mathbf{\Gamma}_{demog} + u_{0i}
 $$
 
 **Level 2b: Club Model (Contextual Trajectories)**
 
-The club baseline ($\beta_{0j}$) and the time-varying slope parameters ($\pi_{1j}, \pi_{2j}$) are modeled with random effects to allow for heterogeneity in both growth velocity and trajectory curvature:
+The club baseline ($\beta_{0j}$) and the time-varying slope parameters ($\pi_{1j}, \pi_{2j}$) include random effects to allow for heterogeneity in both growth velocity and trajectory curvature:
 
 $$
 \begin{aligned}
 \beta_{0j} &= \delta_{00} + v_{0j} \quad &\text{(Baseline Prestige)} \\
-\pi_{1j} &= \delta_{10} + v_{1j} \quad &\text{(Linear Trend Deviation)} \\
+\pi_{1j} &= \delta_{10} + v_{1j} \quad &\text{(Linear Growth Deviation)} \\
 \pi_{2j} &= \delta_{20} + v_{2j} \quad &\text{(Quadratic Curvature Deviation)} \\
 \pi_{3} &= \delta_{30} \quad &\text{(Fixed Cubic Trend)}
 \end{aligned}
@@ -735,39 +708,24 @@ $$
 
 ## Interpretation of Results
 
-**Model Fit and Structure** The final model (Model 3.2) explains substantial variance in market value ($Pseudo\text{-}R^2_{total} \approx 0.89$). The Intraclass Correlation Coefficient (ICC) for players remains high ($\sigma^2_{player} \approx 0.93$), confirming that individual reputation ("The Superstar Effect") is the dominant driver of valuation.
+**Temporal Dynamics: The "Great Pause"**
+Using raw polynomials centered at 2020 ($t=0$), our model mathematically pinpoints the moment the market froze. The **linear coefficient at the 2020 baseline is effectively zero** ($\pi_1 = 0.00, p = 0.93$), indicating that at the exact onset of the pandemic, the relentless inflation of the previous decade came to a complete halt. The significant negative quadratic ($\pi_2 = -0.27$) and cubic ($\pi_3 = -0.12$) terms confirm the transition from a pre-2019 "Boom" into a structural correction.
 
-**Temporal Dynamics (Orthogonal Trends)** The fixed effects for time utilize orthogonal polynomials to ensure stability. The significant cubic term ($\pi_3 = -5.92, p < .001$) and quadratic term ($\pi_2 = -8.60, p < .001$) confirm the "S-shaped" market evolution: stagnation, rapid inflation ("Boom"), and recent deceleration. Notably, we detected significant variation in these trajectories across clubs; the random quadratic slope ($\sigma^2_{Quad} \approx 31.29$) indicates that clubs differ significantly not just in their baseline value, but in the *shape* of their value growth curves (e.g., volatile vs. stable growth).
+**Club Context and Diversity**
+While we hypothesized a "Diversity Premium" for clubs with higher international representation, the fixed effect for `foreign_players` was positive but **not statistically significant** ($\pi_7 = 0.10, p = 0.32$) in the final model. Similarly, the `uefa_coefficient` showed no significant effect ($p = 0.70$). This suggests that once we account for the massive heterogeneity in **Club Random Effects** (Baseline Prestige and Growth Trajectories) and individual player reputation ($ICC \approx 0.78$), specific club-level metrics add little unique explanatory power.
 
-**Biological Career Arc** We observe a robust "Inverted-U" career trajectory. The raw quadratic age term is significant and negative ($\pi_5 = -0.024, p < .001$), predicting that market value accelerates during a player's development, peaks during their prime years, and depreciates significantly as they age, independent of their on-field performance statistics.
-
-**Squad Status and Performance** Squad status remains a massive driver of valuation. The standardized coefficient for minutes played ($\pi_6 \approx 0.35$) suggests that a one standard deviation increase in playing time is associated with a **42% increase** in market value ($e^{0.35}-1$).
-
-**Contextual Premiums** At the individual level, we observe a "Domestic Discount." Homegrown citizens are valued approximately **17% lower** than comparable foreign imports ($\gamma_2 = -0.19$; $e^{-0.19} - 1 \approx -0.17$).
+**Squad Status and Homegrown Effects**
+Squad status remains the dominant behavioral driver. The standardized coefficient for minutes played ($\pi_6 = 0.35$) indicates a **42% valuation premium** ($e^{0.35}-1$) for key starters (+1 SD) compared to average players. Conversely, we observe a robust **"Domestic Discount,"** where homegrown citizens are valued approximately **17% lower** ($\gamma_2 = -0.19$) than comparable foreign imports.
 
 ```{r}
 
 # average age
 mean_age <- clean_player_df |> reframe(mean(Age, na.rm=TRUE)) |> pull()
 
-# fit the final model but with raw=TRUE he coefficients transform into the format (y=β1x+β2x2) that allows us to use calculus to find the peak
-
-Model_3.2_raw_T <- lmer(
-  usd_revenue_2024_log ~ 
-    # first level fixed effect
-    # Use poly() with raw=TRUE 
-    poly(season_year_c, 3) + 
-    # player fixed effects
-    height_c + position + citizen_of_club_country + Region +
-    poly(age_c, 2, raw = TRUE) +
-    goals + assists + red_cards + yellow_cards + minutes_played +
-    # random effects
-    (1 | player_id) + (poly(season_year_c, 2) | club_id), 
-  data = clean_player_df, REML = TRUE,   control = strict_control)
-
 # Simulate from the estimated sampling distribution
 # "-b1/(2*b2)" Report with confidence interval using delta method
-sims <- sim(Model_3.2_raw_T, n.sims = 1000) 
+
+sims <- sim(final_model, n.sims = 1000) 
 
 peak_sims <- sims@fixef |> 
   as.data.frame() |> 
@@ -783,7 +741,8 @@ peak_sims <- sims@fixef |>
 # Empirical CI
 cat("Peak Age = ", round(mean_age + peak_sims, 2))
 
-# The delta method uses calculus (specifically, Taylor series approximation) to propagate uncertainty through nonlinear transformations.
+# The delta method uses calculus (specifically, Taylor series approximation) 
+## to propagate uncertainty through nonlinear transformations.
 ```
 
 \newpage
@@ -792,25 +751,48 @@ cat("Peak Age = ", round(mean_age + peak_sims, 2))
 
 ### **Q1: Market Evolution**
 
-How does market value change annually compared to the 2013 baseline?
+How does market value change annually compared to the 2020 baseline?
 
--   The visualization answers Q1 by displaying a statistically significant S-shaped trajectory ($\beta_{cubic} \approx -0.002$). Rather than constant inflation, the market shows three distinct phases: an initial period of stability (2013-2014), a rapid "Boom" period of hyper-inflation (2015-2019), and a recent "Plateau" or deceleration in the post-2020 era.
+-   The visualization answers **Q1** by displaying the market's trajectory in calendar time. The curve peaks just prior to the **2020 baseline**, confirming that the rapid inflation of the late 2010s halted abruptly at the onset of the pandemic. Post-2020, the curve flattens and dips, illustrating the lasting structural correction in player valuations.
 
 ```{r}
-# Generate predictions for the full range of years
-# [all] tells it to use a dense grid for a smooth curve
-pred_trend <- ggpredict(final_model, terms = "season_year_c [all]") 
+# 1. Calculate Scaling Parameters from Data
+# We need the exact SD used in the model to reverse the math
+year_sd <- sd(clean_player_df$season_year, na.rm = TRUE)
+year_center <- 2020 # You explicitly set center=2020
 
-plot(pred_trend) +
-  # Custom colors to match your Viridis Purple preference
+# 2. Generate Predictions (on Z-score scale)
+pred_trend <- ggpredict(Model_3.2, terms = "season_year_c [all]") 
+
+# 3. Back-Transform the X-axis
+plot_data <- pred_trend %>%
+  as.data.frame() %>%
+  mutate(
+    # Formula: Real_Year = (Z_Score * SD) + Center
+    year_real = (x * year_sd) + year_center
+  )
+
+# 4. Plot using Real Years
+ggplot(plot_data, aes(x = year_real, y = predicted)) +
+  
+  # Trend Line and Ribbon
   geom_line(color = "#440154", linewidth = 1.5) + 
   geom_ribbon(aes(ymin = conf.low, ymax = conf.high), 
               fill = "#440154", alpha = 0.2) +
-  # Labels and Theme
+  
+  # Reference Line for 2020
+  geom_vline(xintercept = 2020, linetype = "dashed", color = "gray50") +
+  annotate("text", x = 2020.2, y = max(plot_data$predicted), 
+           label = "Pandemic Start", hjust = 0, vjust = -2,
+           size = 4, color = "gray40") +
+  
+  # Scale X-axis to show clean years
+  scale_x_continuous(breaks = seq(2013, 2024, 2)) +
+  
   labs(
-    title = "Q1: Market Trajectory",
-    subtitle = "Cubic fit: Stagnation -> Boom -> Plateau",
-    x = "Season Year (Centered)", 
+    title = "A. Market Evolution (Cubic)",
+    subtitle = "Predicted values back-transformed to calendar years",
+    x = "Season Year", 
     y = "Log Market Value"
   ) +
   theme_minimal() +
@@ -821,74 +803,80 @@ plot(pred_trend) +
 
 \
 
-Below we visualizes the predicted market value evolution for all 21 clubs, confirming a rigid hierarchical stratification where "Super Clubs" like **Manchester City** and **Bayern Munich** maintain a distinct valuation premium over selling clubs throughout the decade. The vertical 2020 baseline highlights divergent responses to the market shock: resilient clubs like **Liverpool** and **Tottenham** exhibit "convex" trajectories that recover momentum post-pandemic, whereas "stagnant giants" like **Manchester United** and **Barcelona** display "concave" paths that plateau or decline. Notably, "Incubator" clubs such as **Arsenal** demonstrate the steepest relative growth rates, mathematically validating a business model predicated on rapid asset appreciation rather than just static prestige.
+Below we visualize the predicted market value evolution for individual players during their active seasons, holding club and global market trends constant. The plot confirms that top-tier players follow a fundamentally different valuation logic than the general population: while the average player (gray lines) exhibits a relatively flat trajectory centered around the league mean, "Superstars" (colored lines) show massive vertical shifts and often steeper acceleration phases that outpace biological maturity. This "fanning out" of curves, particularly post-2020, mathematically illustrates the "Superstar Effect", where the gap between elite outliers and the field widens over time, and suggests that individual brand value can serve as a buffer against sector-wide downturns like the pandemic shock.
 
 ```{r}
 #| fig-width: 8
 #| fig-height: 10
+# 1. CREATE DATA FOR PLOTTING (Simple Centering, NOT Z-score)
+# This ensures -7 = 2013 and +4 = 2024
+plot_data_prep <- clean_player_df %>%
+  mutate(season_year_c = season_year - 2020) %>%
+  # Ensure other variables match what the formula expects
+  mutate(
+    minutes_played = as.numeric(scale(minutes_played)), # Z-score minutes
+    age_c = Age - mean(Age, na.rm=TRUE) # Simple centering age
+  )
 
-# 1. ENSURE DATA IS CORRECT (Simple Centering, NOT Z-score)
-# This prevents the "cutoff" issue by ensuring -7 = 2013
-plot_data_prep <- clean_player_df |>
-  mutate(season_year_c = season_year - 2020) 
-
-# 2. Refit Model for Plotting (Safest method)
-# We refit on this specific dataframe to guarantee the scale matches the plot logic
+# 2. REFIT MODEL ON THIS SPECIFIC DATA
+# We must re-fit so the coefficients align with the -7 to +4 scale
 Plot_Model <- lmer(
   usd_revenue_2024_log ~ 
-    poly(season_year_c, 3, raw = TRUE) + 
-    age_c + I(age_c^2) + minutes_played + foreign_players + 
-    citizen_of_club_country + position + Region +
-    (1 | player_id) + (season_year_c | club_id),
+    poly(season_year_c, 3, raw = TRUE) + # Use raw for plotting model
+    height_c + position + citizen_of_club_country + Region +
+    poly(age_c, 2, raw = TRUE) + 
+    goals + assists + red_cards + yellow_cards + minutes_played +
+    # Note: Model 3.2 structure (No Foreign/UEFA fixed effects)
+    (1 | player_id) + (poly(season_year_c, 2, raw = TRUE) | club_id),
   data = plot_data_prep, 
   control = lmerControl(optimizer = "bobyqa")
 )
 
-# 3. Create Metadata Dictionary (ID -> Name)
-club_meta <- plot_data_prep |>
-  mutate(club_id = as.character(club_id)) |>
-  group_by(club_id) |>
-  summarise(Club = first(Club)) |> 
+# 3. Create Metadata Dictionary
+club_meta <- plot_data_prep %>%
+  mutate(club_id = as.character(club_id)) %>%
+  group_by(club_id) %>%
+  summarise(Club = first(Club)) %>% 
   ungroup()
 
-# 4. Generate Predictions (Random Effects included)
+# 4. Generate Predictions (Full Range)
+# using [all] on the REFITTED model will now span -7 to +4
 club_pred <- ggpredict(Plot_Model, 
                        terms = c("season_year_c [all]", "club_id"), 
                        type = "random") 
 
-# 5. Process Data for Plotting
-final_plot_data <- club_pred |>
-  as.data.frame() |>
-  mutate(group = as.character(group)) |> 
-  left_join(club_meta, by = c("group" = "club_id")) |>
-  # Sort clubs by max value for cleaner layout
-  group_by(Club) |>
-  mutate(max_val = max(predicted)) |>
-  ungroup() |>
+# 5. Process Data
+final_plot_data <- club_pred %>%
+  as.data.frame() %>%
+  mutate(group = as.character(group)) %>% 
+  left_join(club_meta, by = c("group" = "club_id")) %>%
+  group_by(Club) %>%
+  mutate(max_val = max(predicted)) %>%
+  ungroup() %>%
   mutate(Club = reorder(Club, -max_val))
 
-# 6. Plot with EXPLICIT x-axis breaks
+# 6. Plot
 ggplot(final_plot_data, aes(x = x + 2020, y = predicted)) +
   
-  # Pandemic Reference Line
-  geom_vline(xintercept = 2020, linetype = "dashed", color = "red", alpha=0.5) +
+  # Pandemic Line
+  geom_vline(xintercept = 2020, linetype = "dashed", 
+             color = "red", alpha=0.5) +
   
-  # Confidence Interval Ribbon
+  # Trajectories
   geom_ribbon(aes(ymin = conf.low, ymax = conf.high), 
               fill = "#440154", alpha = 0.1) +
-  
-  # Trajectory Line
   geom_line(color = "#440154", linewidth = 1.2) +
   
-  # Facet by Club
+  # Facets
   facet_wrap(~Club, ncol = 5) + 
   
-  # Force X-axis to show 2013-2024
-  scale_x_continuous(breaks = seq(2013, 2024, 2)) +
+  # Ensure axis covers full range
+  scale_x_continuous(breaks = seq(2013, 2024, 2), 
+                     limits = c(2013, 2024)) +
   
   labs(
     title = "Club Trajectories Through the Pandemic (2013-2024)",
-    subtitle = "Predicted Log Market Value (Model 4)",
+    subtitle = "Predicted Log Market Value (Refitted Model)",
     x = "Season Year",
     y = "Log Market Value (2024 USD)"
   ) +
@@ -903,23 +891,44 @@ ggplot(final_plot_data, aes(x = x + 2020, y = predicted)) +
 
 How does market value change as a player moves through their biological career arc (Prospect $\to$ Prime $\to$ Veteran)?
 
--   This plot answers Q2 by visualizing the significant quadratic effect of Age ($\beta_{Age^2} = -0.02$). The Inverted-U shape confirms that market value is biologically constrained: it rises steeply as players develop (Prospects), peaks during their physical prime (ages 26–28), and declines significantly as they become Veterans, reflecting the market's discount on older assets with lower resale potential.
+-   Below we visualize the biological constraints on valuation. The curve rises steeply as players transition from 'Prospects' (Age 17–23), flattens into a 'Prime' plateau between ages 26 and 28, and declines steadily thereafter. The model predicts that a player's value drops by approximately 1.5 log points (from a peak of 17.0 to 15.5) as they age from 27 to 35, reflecting the market's heavy discount on older assets with limited resale potential.
 
 ```{r}
-# Generate predictions for Age
-# [all] ensures a smooth curve rather than just a few points
-pred_age <- ggpredict(final_model, terms = "age_c [all]") 
+# 1. Get Mean Age to reverse the centering
+# We need the exact mean used in the dataset
+mean_age <- mean(clean_player_df$Age, na.rm = TRUE)
 
-plot(pred_age) +
-  # Custom colors (Viridis Blue #3b528b)
-  geom_line(color = "#3b528b", linewidth = 1.5) + 
-  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), fill = "#3b528b", alpha = 0.2) +
+# 2. Generate Predictions
+pred_age <- ggpredict(Model_3.2, terms = "age_c [all]") 
+
+# 3. Back-Transform X-axis
+plot_data_age <- pred_age %>%
+  as.data.frame() %>%
+  mutate(
+    # Formula: Real_Age = Centered_Age + Mean_Age
+    age_real = x + mean_age
+  )
+
+# 4. Plot with Real Ages
+ggplot(plot_data_age, aes(x = age_real, y = predicted)) +
   
-  # Labels and Theme matches your request
+  # Trend Line and Ribbon
+  geom_line(color = "#3b528b", linewidth = 1.5) + 
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), 
+              fill = "#3b528b", alpha = 0.2) +
+  
+  # Add Peak Reference Line (Visual aid)
+  geom_vline(xintercept = 27, linetype = "dashed", color = "gray50") +
+  annotate("text", x = 27.5, y = min(plot_data_age$predicted) + 1, 
+           label = "Peak ~27", hjust = 0, color = "gray40", size = 3.5) +
+  
+  # formatting
+  scale_x_continuous(breaks = seq(16, 40, 4)) + # Show ages 16, 20, 24...
+  
   labs(
-    title = "Q2: The Career Arc",
-    subtitle = "Quadratic fit: Value peaks at approx. 27 years old",
-    x = "Age (Centered)", 
+    title = "B. The Career Arc",
+    subtitle = "Predicted Log Market Value by Biological Age",
+    x = "Player Age (Years)", 
     y = "Log Market Value"
   ) +
   theme_minimal() +
@@ -930,22 +939,17 @@ plot(pred_age) +
 
 Does being a key player (playing more than the average teammate) increase market value?
 
--   This visualization answers Q3 with a steep, positive linear slope ($\beta = 0.35$). Because minutes_played was standardized, the x-axis represents standard deviations. Moving from a "Bench Player" (-1 SD) to a "Key Starter" (+1 SD) results in a massive increase in valuation, confirming that Squad Status is one of the strongest predictors in the model.
+-   Figure 1C visualizes the massive premium placed on utilization. The steep linear slope confirms that 'Squad Status' is a primary driver of valuation. Moving from a rotational role (−1 SD) to a key starter role (+1 SD) is associated with an approximate doubling of market value (+101%), indicating that the market heavily discounts latent talent that cannot crack the starting XI.
 
 ```{r}
 # Generate predictions for Minutes Played
-# [all] ensures the grid covers the full range of Z-scores
-pred_status <- ggpredict(final_model, terms = "minutes_played [all]") 
+pred_status <- ggpredict(Model_3.2, terms = "minutes_played [all]") 
 
 plot(pred_status) +
-  # Custom colors (Viridis Teal #21918c)
   geom_line(color = "#21918c", linewidth = 1.5) + 
   geom_ribbon(aes(ymin = conf.low, ymax = conf.high), fill = "#21918c", alpha = 0.2) +
-  
-  # Labels and Theme
   labs(
-    title = "Q3: Squad Status",
-    subtitle = "Higher utilization (Starter vs Bench) drives value",
+    title = "C. Squad Status",
     x = "Minutes Played (Z-Score)", 
     y = "Log Market Value"
   ) +
@@ -957,142 +961,137 @@ plot(pred_status) +
 
 \
 
-### Q5, Q6, & Q7: Relative Valuation (Forest Plot)
+### **Contextual Premiums and Discounts (Q5-Q7)** Figure 1D visualizes the valuation gaps across citizenship, position, and region.
 
--   Q5 (Homegrown): Is there a 'homegrown premium' or discount?
+-   **The "Domestic Discount" (Q5):** The coefficient for "Homegrown (Citizen)" falls strictly to the left of zero, confirming that domestic players are valued significantly lower than comparable foreign imports ($\beta=−0.19$), potentially reflecting the recruitment premium required to attract international talent.
 
--   The negative coefficient for "Homegrown (Citizen)" confirms a Domestic Discount (or Foreign Premium). Local players are valued significantly lower than comparable foreign imports.
+-   **Positional Hierarchy (Q6):** Attackers (the baseline) command the highest market value. All other positions show significant negative effects, with Goalkeepers facing the steepest penalty ($\beta=−1.06$), suggesting the market disproportionately rewards offensive output.
 
--   Q6 (Position): How much less is a defender valued compared to an attacker?
-
--   All defensive positions fall to the left of 0, confirming that Attackers (the baseline) hold the highest market value, with Goalkeepers facing the steepest discount.
-
--   Q7 (Region): What is the market premium for players in Europe vs. others?
-
--   While most regions overlap with 0 (no difference from Europe), Latin America shows a positive premium, suggesting players from this region act as a premium "export" brand in the global market.
+-   **The "Export Brand" Effect (Q7):** While most regional coefficients overlap with zero (indicating no difference from the European baseline), **Latin America** stands out as the only region with a positive premium ($\beta=0.19$). This suggests that South American players function as a "premium export brand" in the global market, distinct from other non-European origins.
 
 ```{r}
-plot_summs(final_model, 
+plot_summs(Model_3.2, 
            coefs = c("Homegrown (Citizen)" = "citizen_of_club_countryYes",
                      "Defender" = "positionDefender",
                      "Midfielder" = "positionMidfield",
                      "Goalkeeper" = "positionGoalkeeper",
                      "Latin America" = "RegionLatin America & Caribbean",
-                     "Asia & Pacific" = "RegionEast Asia & Pacific"),
-           colors = "#440154") + # Viridis Purple
-  labs(title = "Q5-Q7: Relative Valuation",
+                     "Asia & Pacific" = "RegionEast Asia & Pacific",
+                     "North America" = "RegionNorth America",
+                     "Middle East & N. Africa" = "RegionMiddle East & North Africa",
+                     "Sub-Saharan Africa" = "RegionSub-Saharan Africa"),
+           colors = "#440154", # Viridis Purple
+           point.shape = 18) + 
+  
+  labs(title = "D. Relative Valuation (Q5, Q6, Q7)",
        subtitle = "Discounts (Left) vs. Premiums (Right) relative to baseline",
        x = "Effect on Log Market Value") +
+  
   geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") +
+  theme_minimal() +
   theme(plot.title = element_text(face = "bold"))
 ```
 
 \
 
-Figure X displays the estimated club random effects from our cross-classified model. Substantial heterogeneity exists in both baseline valuations and temporal trajectories.
+Linear Trend Deviation (Center Panel): Clubs to the right (positive values) experienced faster overall value growth across the decade compared to the market average. Curvature Deviation (Right Panel): Positive values indicate a 'Convex' shape (accelerating growth or strong recovery), while negative values indicate a 'Concave' shape (diminishing returns or plateauing).
+
+### Club-Level Heterogeneity
+
+Figure below displays the estimated club random effects from our cross-classified model. Substantial heterogeneity exists in baseline valuations, temporal trends, and curvature.
+
+-   **Baseline Prestige (Panel A):** As expected, elite 'Super Clubs' such as **Manchester City** and **Bayern Munich** show massive positive intercepts, indicating that their players command a premium of \~30% purely due to the club's brand.
+
+-   **Linear Trend Deviation (Panel B):** Clubs to the right (positive values) experienced **faster overall value growth** across the decade compared to the market average. For example, **Arsenal** and **Liverpool** show strong positive deviations, confirming their role as high-growth environments.
+
+-   **Curvature Deviation (Panel C):** This panel reveals the *shape* of the trajectory. Positive values indicate a **'Convex'** shape (accelerating growth or resilient recovery), while negative values indicate a **'Concave'** shape (diminishing returns or plateauing), highlighting the different ways clubs navigated the market cycle.
 
 ```{r}
 #| echo: false
 #| fig-width: 8
 #| fig-height: 10
-#| 
-# ---------------------------------------------------------
-# 1. DIAGNOSTIC: Ensure Data & Model are Correct
-# ---------------------------------------------------------
-# Force-create a clean linear time variable (to avoid poly matrix issues)
-clean_player_df <- clean_player_df |>
-  mutate(time_linear = as.numeric(season_year_c)) # Strip attributes
-
-# Refit Model 4 specifically for this plot to guarantee safety
-# Note: We use 'time_linear' in the random effect to be 100% sure it's 1 dimension
-Plot_Model <- lmer(
-  usd_revenue_2024_log ~ 
-    poly(season_year_c, 3, raw = TRUE) + # Fixed effects use the Poly
-    age_c + I(age_c^2) + minutes_played + foreign_players + 
-    citizen_of_club_country + position + Region +
-    (1 | player_id) + 
-    (time_linear | club_id), # Random effect uses the clean linear vector
-  data = clean_player_df, 
-  control = lmerControl(optimizer = "bobyqa")
-)
-
-# ---------------------------------------------------------
-# 2. EXTRACT & PLOT
-# ---------------------------------------------------------
-# Extract Random Effects
-club_ranef <- ranef(Plot_Model, condVar = TRUE)$club_id
+#| # 1. Extract Random Effects from Model 3.2
+club_ranef <- ranef(Model_3.2, condVar = TRUE)$club_id
 post_var <- attr(club_ranef, "postVar")
 
-# Create Unique Metadata (One row per club)
-club_meta <- clean_player_df |>
-  mutate(club_id = as.character(club_id)) |>
-  group_by(club_id) |>
-  summarise(Club = first(Club)) |> 
+# 2. Metadata Dictionary
+club_meta <- clean_player_df %>%
+  mutate(club_id = as.character(club_id)) %>%
+  group_by(club_id) %>%
+  summarise(Club = first(Club)) %>% 
   ungroup()
 
-# Process Data
-club_random_results <- club_ranef |>
-  as.data.frame() |>
-  rownames_to_column("club_id") |>
-  rename(Intercept = `(Intercept)`, Slope = time_linear) |>
+# 3. Process Data (Robust for 3 Effects)
+club_random_results <- club_ranef %>%
+  as.data.frame() %>%
+  rownames_to_column("club_id") %>%
+  
+  # Rename by position: 1=ID, 2=Int, 3=Linear, 4=Quadratic
+  rename(Intercept = 2) %>%
+  { if(ncol(.) > 2) rename(., Linear = 3) else . } %>%
+  { if(ncol(.) > 3) rename(., Quadratic = 4) else . } %>%
   
   # Calculate CIs
   mutate(
     se_int = sqrt(post_var[1, 1, ]),
-    se_slp = sqrt(post_var[2, 2, ]),
+    se_lin = if("Linear" %in% names(.)) sqrt(post_var[2, 2, ]) else NA,
+    se_quad = if("Quadratic" %in% names(.)) sqrt(post_var[3, 3, ]) else NA,
+    
     Intercept_lower = Intercept - 1.96 * se_int,
     Intercept_upper = Intercept + 1.96 * se_int,
-    Slope_lower = Slope - 1.96 * se_slp,
-    Slope_upper = Slope + 1.96 * se_slp
-  ) |>
+    
+    Linear_lower = if("Linear" %in% names(.)) Linear - 1.96 * se_lin else NA,
+    Linear_upper = if("Linear" %in% names(.)) Linear + 1.96 * se_lin else NA,
+    
+    Quadratic_lower = if("Quadratic" %in% names(.)) Quadratic - 1.96 * se_quad else NA,
+    Quadratic_upper = if("Quadratic" %in% names(.)) Quadratic + 1.96 * se_quad else NA
+  ) %>%
   
-  # Convert to Percentage (exp(x) - 1)
-  # A slope of 0.02 becomes ~2%
-  mutate(across(where(is.numeric), ~ exp(.x) - 1)) |>
+  # Note: We do NOT convert to percentage here because orthogonal polys are abstract units
+  # We just plot the raw deviation values.
   
-  # Join Names
-  left_join(club_meta, by = "club_id") |>
-  
-  # Pivot for Plotting
-  select(Club, Intercept, Slope, ends_with("lower"), ends_with("upper")) |>
-  pivot_longer(cols = -Club, names_to = "Key", values_to = "Value") |>
-  separate(Key, into = c("Type", "Stat"), sep = "_", fill = "right") |>
-  mutate(Stat = replace_na(Stat, "Estimate")) |>
-  pivot_wider(names_from = Stat, values_from = Value) |>
+  left_join(club_meta, by = "club_id") %>%
+  select(Club, Intercept, Linear, Quadratic, ends_with("lower"), ends_with("upper")) %>%
+  pivot_longer(cols = -Club, names_to = "Key", values_to = "Value") %>%
+  separate(Key, into = c("Type", "Stat"), sep = "_", fill = "right") %>%
+  mutate(Stat = replace_na(Stat, "Estimate")) %>%
+  pivot_wider(names_from = Stat, values_from = Value) %>%
   drop_na(Estimate)
 
-# Plot with Free Scales
+# 4. Plot
 ggplot(club_random_results, aes(x = reorder(Club, Estimate), y = Estimate, color = Type)) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
-  geom_pointrange(aes(ymin = lower, ymax = upper), size = 0.6) +
-  facet_wrap(~Type, scales = "free_x", 
-             labeller = as_labeller(c("Intercept" = "Baseline Prestige", 
-                                      "Slope" = "Growth Deviation"))) +
+  geom_pointrange(aes(ymin = lower, ymax = upper), size = 0.5) +
+  
+  facet_wrap(~Type, scales = "free_x", nrow = 1,
+             labeller = as_labeller(c(
+               "Intercept" = "Baseline Prestige", 
+               "Linear" = "Linear Trend Deviation",
+               "Quadratic" = "Curvature Deviation"))) +
+  
   coord_flip() +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
   scale_color_viridis_d(option = "D", end = 0.8) +
   labs(
-    title = "Club-Level Deviations",
-    x = NULL, y = "Deviation from League Mean (%)"
+    title = "Club-Level Trajectory Deviations",
+    subtitle = "Estimates from Model 3.2 (Orthogonal Polynomials)",
+    x = NULL, y = "Deviation from Market Average"
   ) +
   theme(legend.position = "none")
 
   
 ```
 
-## Club-Level Heterogeneity
+## The "Prodigy Premium": Pricing Future Potential
 
-Figure X displays the estimated club random effects from our cross-classified model. Substantial heterogeneity exists in both baseline valuations and temporal trajectories.
+The largest positive random effects belong overwhelmingly to teenage phenoms, confirming that the market prices **potential** far higher than realized performance. **Lamine Yamal** exhibits the most extreme effect in the dataset: controlling for his age, position, and playing time, his market value is approximately **19.0 times higher** ($95\% \text{ CI}: [8.4, 43.1]$) than the model predicts. Similar "super-premiums" characterize other young stars like **Gavi** ($16.1\times$), **Florian Wirtz** ($15.5\times$), and **Jude Bellingham** ($11.8\times$).
 
-### Baseline Premiums and Discounts
+These extreme deviations highlight a fundamental feature of football valuation: **Option Value**. Clubs pay premiums for young players not for their current statistical output (which is often modest compared to prime-age veterans), but because they are purchasing a "call option" on future superstar performance. The random intercept absorbs this unmeasured "star quality"—a combination of technical ceiling and marketability that scouts perceive but standard metrics cannot capture.
 
-Intercepts: Consistent with the 'Super League' hypothesis, eight clubs command statistically significant market premiums purely due to their brand. Manchester City exhibits the largest baseline effect: controlling for individual performance and temporal trends, City players are valued approximately 31.3% higher than the league average ($\beta_{oj}$=0.31,95% CI\[0.18,0.46\]). Chelsea (+28.4%), Bayern Munich (+27.6%), and Barcelona (+26.7%) also command massive static premiums. Conversely, Sevilla (-31.9%) and Porto (-30.1%) face the steepest valuation discounts, confirming a tiered market structure where 'selling clubs' systematically trade at a discount.
+**The Barcelona Effect** There is a striking concentration of talent from FC Barcelona among the top outliers. Five of the top 11 premiums belong to Barcelona academy graduates or players: **Lamine Yamal** (1st), **Gavi** (2nd), **Pedri** (7th, $11.1\times$), **Ansu Fati** (10th, $9.5\times$), and **Pau Cubarsí** (11th, $9.0\times$). This suggests a potential **institutional multiplier**: the "La Masia" brand (Barcelona's academy) may systematically inflate the market's valuation of its graduates, or perhaps the club provides a unique platform that accelerates reputation faster than sporting output alone.
 
-### Growth Trajectories (Slopes)
+## The "Legacy Anomaly"
 
-The random linear slopes reveal distinct winners and losers in value accumulation over the decade. Arsenal (+11.0%) and Liverpool (+10.6%) act as the league's primary 'Incubators,' where player values accelerate significantly faster than the global market trend. In contrast, Manchester United (-10.4%) and Barcelona (-7.0%) exhibit the steepest negative deviations. This indicates that while these historic giants start with high baseline values, their assets tend to depreciate (or grow slower) relative to the market average over time.
-
-The Manchester United Paradox "Manchester United provides the starkest example of the 'diminishing returns' phenomenon observed in our variance correlation (r=−0.35). The club commands a high baseline premium of 21.6% (ranking 6th), yet suffers the worst growth trajectory in the dataset (-10.4% per standard deviation of time). This mathematically quantifies a 'stagnant giant': a brand that still boosts player value upon arrival ('The Theater of Dreams' effect) but fails to sustain that value growth compared to sharper rivals like Liverpool."
+Interestingly, the list of outliers is not exclusively young. **Gianluigi Buffon** (8th, $10.7\times$) and **Cristiano Ronaldo** (18th, $7.2\times$) appear alongside the teenagers. This reflects a **"Legacy Premium."** Just as prodigies are priced on future potential, icons are priced on historical achievement and commercial gravity. Our model, which relies on current-season statistics and penalizes advanced age via the quadratic term, underestimates these players because it cannot see their career history or commercial value. The random intercept thus serves as a catch-all for **Reputation**, capturing both the promise of the future (Yamal) and the glory of the past (Ronaldo).
 
 ```{r}
 #| echo: false
@@ -1160,200 +1159,16 @@ player_random_results |>
     panel.grid.minor = element_blank()) 
 ```
 
-### The "Prodigy Premium": Pricing Future Potential and Legacy
-
-The largest positive random effects belong overwhelmingly to teenage phenoms, confirming that the market prices potential far higher than current realized performance. Lamine Yamal exhibits the most extreme effect in the dataset: controlling for his age, position, and playing time, his market value is approximately 19.0 times higher (95% CI:\[8.4,43.1\]) than the model predicts. Similar "super-premiums" characterize other young stars like Gavi (16.1×), Florian Wirtz (15.5×), and Jude Bellingham (11.8×).
-
-These extreme deviations highlight a fundamental feature of football valuation: Option Value. Clubs pay premiums for young players not for their current statistical output (which is often modest compared to prime-age veterans), but because they are purchasing a "call option" on future superstar performance. The random intercept absorbs this unmeasured "star quality"—a combination of technical ceiling and marketability that scouts perceive but standard metrics cannot capture.
-
-The Barcelona Effect There is a striking concentration of talent from FC Barcelona among the top outliers. Five of the top 11 premiums belong to Barcelona academy graduates or players: Lamine Yamal (1st), Gavi (2nd), Pedri (7th, 11.1×), Ansu Fati (10th, 9.5×), and Pau Cubarsí (11th, 9.0×). This suggests a potential institutional multiplier: the "La Masia" brand (Barcelona's academy) may systematically inflate the market's valuation of its graduates, or perhaps the club provides a unique platform that accelerates reputation faster than sporting output alone.
-
-The Legacy Anomaly: Buffon and Ronaldo Interestingly, the list is not exclusively young. Gianluigi Buffon (8th, 10.7×) and Cristiano Ronaldo (18th, 7.2×) appear alongside the teenagers. This reflects the "Legacy Premium." Just as prodigies are priced on future potential, icons are priced on historical achievement and commercial gravity. Our model, which relies on current-season statistics, underestimates these players because it cannot see their career history or jersey sales potential. The random intercept thus serves as a catch-all for "Reputation," capturing both the promise of the future (Yamal) and the glory of the past (Ronaldo).
-
-\
+# Discussion
 
 ## Limitations
 
-While our model demonstrates strong predictive power (R2≈0.89), several limitations warrant mention:
+While our model demonstrates strong predictive power ($R^2 \approx 0.89$), several limitations warrant consideration:
 
-1.  **Small Cluster Size for Random Slopes:** We estimated random slopes for `Club`, but our dataset contains only 21 unique clubs. While the Likelihood Ratio Test supported the inclusion of this slope (p\<.001), variance estimates from small numbers of clusters should be interpreted with caution.
+1.  **Small Cluster Size:** We estimated a complex random effects structure (Intercept + Linear + Quadratic) for `Club`, despite our dataset containing only 21 unique clubs. While the Likelihood Ratio Test supported the inclusion of these slopes ($p < .001$), variance estimates derived from such a small number of clusters should be interpreted with caution.
+2.  **Normality of Residuals:** Diagnostic plots indicated deviation from normality in the extreme tails of the distribution. While the large sample size ($N=7,023$) ensures robust estimation of fixed effects, future iterations could employ robust standard errors or a Gamma GLMM to better handle these extremes.
+3.  **Endogeneity:** Predictors such as `minutes_played` are likely endogenous—since better players naturally accrue more playing time—and thus should be interpreted as associations reflecting "Squad Status" rather than purely causal effects.
 
-2.  **Normality of Residuals:** Diagnostic plots (QQ plots) indicated deviation from normality in the extreme tails of the distribution. While the large sample size (N=7023) ensures robust estimation of fixed effects, future iterations could employ robust standard errors or a Gamma GLMM to better handle these extremes.
+## 6.4 Conclusion
 
-3.  **Endogeneity:** Predictors such as `minutes_played` are likely endogenous (better players get more minutes). The coefficient for this variable should be interpreted as an association reflecting "Squad Status" rather than a purely causal effect of playing time.
-
-\newpage
-
-Bonus round, what happens when we fit a data to players with 3 or more seasons?
-
-Figure below illustrates the career trajectories of 50 randomly selected players (gray lines) contrasted with the top 6 highest-valued players (colored lines). The visualization confirms the model's ability to discriminate between the 'standard' career path—characterized by lower intercepts and flatter growth curves—and the 'Superstar' trajectory. Outliers like **\[Name\]** and **\[Name\]** exhibit not only higher baselines (random intercepts) but often distinctively convex growth shapes, indicating value accumulation that defies the typical biological depreciation curve observed in the general population.
-
-```{r}
-#| fig-width: 8
-#| fig-height: 6
-#| 
-
-
-mod_5_dat <- clean_player_df |> 
-  group_by(player_id) |> 
-  mutate(seasons = n()) |> 
-  ungroup() |> 
-  filter(seasons > 2)
-  
-  
-Model_5 <- lmer(
-  usd_revenue_2024_log ~ 
-    # first level fixed effect
-    # Use poly() with raw=TRUE 
-    poly(season_year_c, 3) + 
-    # player fixed effects
-    height_c + position + citizen_of_club_country + Region +
-    poly(age_c, 2) + 
-    goals + assists + red_cards + yellow_cards + minutes_played +
-    # club fixed effects
-    uefa_coefficient + foreign_players + 
-    # random effects
-    (poly(season_year_c, 2) | player_id) + (poly(season_year_c, 2) | club_id), 
-  data = mod_5_dat, REML = TRUE,   control = strict_control)
-
-summ(Model_5)
-
-
-final_model <- Model_5
-
-
-# Generate predictions for the full range of years
-# [all] tells it to use a dense grid for a smooth curve
-pred_trend <- ggpredict(final_model, terms = "season_year_c [all]") 
-
-plot(pred_trend) +
-  # Custom colors to match your Viridis Purple preference
-  geom_line(color = "#440154", linewidth = 1.5) + 
-  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), 
-              fill = "#440154", alpha = 0.2) +
-  # Labels and Theme
-  labs(
-    title = "Q1: Market Trajectory",
-    subtitle = "Cubic fit: Stagnation -> Boom -> Plateau",
-    x = "Season Year (Centered)", 
-    y = "Log Market Value"
-  ) +
-  theme_minimal() +
-  theme(plot.title = element_text(face = "bold"))
-
-
-# Generate predictions for Age
-# [all] ensures a smooth curve rather than just a few points
-pred_age <- ggpredict(final_model, terms = "age_c [all]") 
-
-plot(pred_age) +
-  # Custom colors (Viridis Blue #3b528b)
-  geom_line(color = "#3b528b", linewidth = 1.5) + 
-  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), fill = "#3b528b", alpha = 0.2) +
-  
-  # Labels and Theme matches your request
-  labs(
-    title = "Q2: The Career Arc",
-    subtitle = "Quadratic fit: Value peaks at approx. 27 years old",
-    x = "Age (Centered)", 
-    y = "Log Market Value"
-  ) +
-  theme_minimal() +
-  theme(plot.title = element_text(face = "bold"))
-
-
-# 1. DATA PREP & MODEL FIT (Force simple centering for plot)
-# This ensures x-axis is -7 to +4 (2013-2024), not Z-scores
-plot_data_prep <- clean_player_df %>%
-  mutate(season_year_c = season_year - 2020) %>% 
-  group_by(player_id) %>%
-  mutate(seasons = n()) %>%
-  ungroup() %>%
-  filter(seasons > 2)
-
-# Refit model on this specific data to guarantee scale match
-Plot_Model_5 <- lmer(
-  usd_revenue_2024_log ~ 
-    poly(season_year_c, 3) + 
-    height_c + position + citizen_of_club_country + Region +
-    poly(age_c, 2, raw = TRUE) + 
-    goals + assists + red_cards + yellow_cards + minutes_played +
-    uefa_coefficient + foreign_players +
-    (poly(season_year_c, 2) | player_id) + 
-    (poly(season_year_c, 2) | club_id),
-  data = plot_data_prep, 
-  control = lmerControl(optimizer = "bobyqa")
-)
-
-# 2. CALCULATE VALID RANGES (Trimming Logic)
-player_ranges <- plot_data_prep %>%
-  group_by(player_id) %>%
-  summarise(
-    min_year = min(season_year_c),
-    max_year = max(season_year_c)
-  ) %>%
-  mutate(player_id = as.character(player_id))
-
-# 3. SELECT PLAYERS
-re_raw <- ranef(Plot_Model_5)$player_id
-re_df <- data.frame(player_id = rownames(re_raw), Intercept = re_raw[,1])
-
-set.seed(42)
-bg_ids <- sample(re_df$player_id, 50)
-top_ids <- re_df %>% arrange(desc(Intercept)) %>% slice(1:6) %>% pull(player_id)
-all_ids <- unique(c(bg_ids, top_ids))
-
-# 4. PREDICT & TRIM
-id_filter <- paste0("player_id [", paste(all_ids, collapse = ","), "]")
-
-# Generate full grid
-raw_pred <- ggpredict(Plot_Model_5, 
-                      terms = c("season_year_c [all]", id_filter), 
-                      type = "random")
-
-# Filter out "Ghost Years"
-final_plot_data <- raw_pred %>%
-  as.data.frame() %>%
-  mutate(group = as.character(group)) %>%
-  left_join(player_ranges, by = c("group" = "player_id")) %>%
-  filter(x >= min_year & x <= max_year) %>% # <--- CRITICAL STEP
-  left_join(
-    plot_data_prep %>% 
-      mutate(player_id = as.character(player_id)) %>% 
-      distinct(player_id, name), 
-    by = c("group" = "player_id")
-  ) %>%
-  mutate(
-    Type = ifelse(group %in% top_ids, "Superstar", "Average"),
-    Label = ifelse(Type == "Superstar" & x == max_year, as.character(name), NA)
-  )
-
-# 5. PLOT
-ggplot(final_plot_data, aes(x = x + 2020, y = predicted, group = group)) +
-  geom_vline(xintercept = 2020, linetype = "dashed", color = "gray60") +
-  
-  # Background
-  geom_line(data = subset(final_plot_data, Type == "Average"), 
-            color = "gray80", size = 0.5, alpha = 0.6) +
-  
-  # Superstars
-  geom_line(data = subset(final_plot_data, Type == "Superstar"), 
-            aes(color = name), size = 1.5) +
-  
-  # Labels
-  geom_text(data = subset(final_plot_data, !is.na(Label)),
-            aes(label = name, color = name), 
-            hjust = -0.1, size = 3.5, fontface = "bold") +
-  
-  scale_color_viridis_d(option = "H") +
-  scale_x_continuous(breaks = seq(2013, 2024, 2), limits = c(2013, 2026)) +
-  
-  labs(
-    title = "Player Career Trajectories",
-    subtitle = "Predicted value only during active seasons (Model 5)",
-    x = "Season Year",
-    y = "Log Market Value (2024 USD)"
-  ) +
-  theme_minimal() +
-  theme(legend.position = "none")
-```
+Ultimately, this research highlights the necessity of moving beyond static, single-level analyses to capture the true complexity of the football transfer market. By rigorously modeling the cross-classified intersection of individual player trajectories and dynamic club contexts, we identified a **"Great Pause"** in 2020 where market growth hit zero, a strict biological valuation peak at age 27, and a massive 42% premium for starters. As the industry continues to professionalize, frameworks that account for the interplay of human capital, institutional prestige, and market cycles will remain indispensable for distinguishing genuine value from market noise.
