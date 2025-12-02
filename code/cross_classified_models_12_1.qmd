@@ -319,7 +319,8 @@ ggplot(clean_player_df, aes(x = season_year_c,
 
 ```{r}
 
-#Using bobyqa to handle the complex random effects structure and avoid gradient warnings
+# Using bobyqa to handle the complex random effects 
+## structure and avoid gradient warnings
 strict_control <- lmerControl(optimizer = "bobyqa",
                               optCtrl = list(maxfun = 200000))
 
@@ -674,7 +675,7 @@ $$
 \end{aligned}
 $$
 
-*Note: The subscripts ${tj}$ for Foreign and UEFA denote that these club attributes vary by time $t$.*
+*Note: The subscripts* ${tj}$ for Foreign and UEFA denote that these club attributes vary by time $t$.
 
 **Level 2a: Player Model (Time-Invariant Traits)**
 
@@ -708,14 +709,11 @@ $$
 
 ## Interpretation of Results
 
-**Temporal Dynamics: The "Great Pause"**
-Using raw polynomials centered at 2020 ($t=0$), our model mathematically pinpoints the moment the market froze. The **linear coefficient at the 2020 baseline is effectively zero** ($\pi_1 = 0.00, p = 0.93$), indicating that at the exact onset of the pandemic, the relentless inflation of the previous decade came to a complete halt. The significant negative quadratic ($\pi_2 = -0.27$) and cubic ($\pi_3 = -0.12$) terms confirm the transition from a pre-2019 "Boom" into a structural correction.
+**Temporal Dynamics: The "Great Pause"** Using raw polynomials centered at 2020 ($t=0$), our model mathematically pinpoints the moment the market froze. The **linear coefficient at the 2020 baseline is effectively zero** ($\pi_1 = 0.00, p = 0.93$), indicating that at the exact onset of the pandemic, the relentless inflation of the previous decade came to a complete halt. The significant negative quadratic ($\pi_2 = -0.27$) and cubic ($\pi_3 = -0.12$) terms confirm the transition from a pre-2019 "Boom" into a structural correction.
 
-**Club Context and Diversity**
-While we hypothesized a "Diversity Premium" for clubs with higher international representation, the fixed effect for `foreign_players` was positive but **not statistically significant** ($\pi_7 = 0.10, p = 0.32$) in the final model. Similarly, the `uefa_coefficient` showed no significant effect ($p = 0.70$). This suggests that once we account for the massive heterogeneity in **Club Random Effects** (Baseline Prestige and Growth Trajectories) and individual player reputation ($ICC \approx 0.78$), specific club-level metrics add little unique explanatory power.
+**Club Context and Diversity** While we hypothesized a "Diversity Premium" for clubs with higher international representation, the fixed effect for `foreign_players` was positive but **not statistically significant** ($\pi_7 = 0.10, p = 0.32$) in the final model. Similarly, the `uefa_coefficient` showed no significant effect ($p = 0.70$). This suggests that once we account for the massive heterogeneity in **Club Random Effects** (Baseline Prestige and Growth Trajectories) and individual player reputation ($ICC \approx 0.78$), specific club-level metrics add little unique explanatory power.
 
-**Squad Status and Homegrown Effects**
-Squad status remains the dominant behavioral driver. The standardized coefficient for minutes played ($\pi_6 = 0.35$) indicates a **42% valuation premium** ($e^{0.35}-1$) for key starters (+1 SD) compared to average players. Conversely, we observe a robust **"Domestic Discount,"** where homegrown citizens are valued approximately **17% lower** ($\gamma_2 = -0.19$) than comparable foreign imports.
+**Squad Status and Homegrown Effects** Squad status remains the dominant behavioral driver. The standardized coefficient for minutes played ($\pi_6 = 0.35$) indicates a **42% valuation premium** ($e^{0.35}-1$) for key starters (+1 SD) compared to average players. Conversely, we observe a robust **"Domestic Discount,"** where homegrown citizens are valued approximately **17% lower** ($\gamma_2 = -0.19$) than comparable foreign imports.
 
 ```{r}
 
@@ -762,7 +760,7 @@ year_sd <- sd(clean_player_df$season_year, na.rm = TRUE)
 year_center <- 2020 # You explicitly set center=2020
 
 # 2. Generate Predictions (on Z-score scale)
-pred_trend <- ggpredict(Model_3.2, terms = "season_year_c [all]") 
+pred_trend <- ggpredict(final_model, terms = "season_year_c [all]") 
 
 # 3. Back-Transform the X-axis
 plot_data <- pred_trend %>%
@@ -803,11 +801,16 @@ ggplot(plot_data, aes(x = year_real, y = predicted)) +
 
 \
 
-Below we visualize the predicted market value evolution for individual players during their active seasons, holding club and global market trends constant. The plot confirms that top-tier players follow a fundamentally different valuation logic than the general population: while the average player (gray lines) exhibits a relatively flat trajectory centered around the league mean, "Superstars" (colored lines) show massive vertical shifts and often steeper acceleration phases that outpace biological maturity. This "fanning out" of curves, particularly post-2020, mathematically illustrates the "Superstar Effect", where the gap between elite outliers and the field widens over time, and suggests that individual brand value can serve as a buffer against sector-wide downturns like the pandemic shock.
+The visualization confirms the complexity of club-level market dynamics by plotting the predicted trajectory for each of the 21 clubs individually. This faceted view highlights how clubs diverge from the global trend (the fixed effect):
+
+1\. Structural Stratification: The vertical position of each chart confirms the initial hierarchy (Random Intercepts), with elite clubs like Manchester City and Bayern Munich maintaining a consistently higher baseline than selling clubs (e.g., Sevilla).
+
+2\. Divergent Temporal Response: The distinct curvature of each line, particularly around the 2020 pandemic baseline, illustrates the significant variance in the random slopes. Clubs with concave trajectories (e.g., Juventus, Barcelona) plateaued or declined rapidly, confirming the risk of stagnation. Conversely, clubs with convex trajectories (e.g., Arsenal, Liverpool) show stronger momentum, indicating a more resilient recovery and active value generation throughout the decade.
 
 ```{r}
 #| fig-width: 8
 #| fig-height: 10
+#| 
 # 1. CREATE DATA FOR PLOTTING (Simple Centering, NOT Z-score)
 # This ensures -7 = 2013 and +4 = 2024
 plot_data_prep <- clean_player_df %>%
@@ -899,7 +902,7 @@ How does market value change as a player moves through their biological career a
 mean_age <- mean(clean_player_df$Age, na.rm = TRUE)
 
 # 2. Generate Predictions
-pred_age <- ggpredict(Model_3.2, terms = "age_c [all]") 
+pred_age <- ggpredict(final_model, terms = "age_c [all]") 
 
 # 3. Back-Transform X-axis
 plot_data_age <- pred_age %>%
@@ -943,7 +946,7 @@ Does being a key player (playing more than the average teammate) increase market
 
 ```{r}
 # Generate predictions for Minutes Played
-pred_status <- ggpredict(Model_3.2, terms = "minutes_played [all]") 
+pred_status <- ggpredict(final_model, terms = "minutes_played [all]") 
 
 plot(pred_status) +
   geom_line(color = "#21918c", linewidth = 1.5) + 
@@ -970,7 +973,7 @@ plot(pred_status) +
 -   **The "Export Brand" Effect (Q7):** While most regional coefficients overlap with zero (indicating no difference from the European baseline), **Latin America** stands out as the only region with a positive premium ($\beta=0.19$). This suggests that South American players function as a "premium export brand" in the global market, distinct from other non-European origins.
 
 ```{r}
-plot_summs(Model_3.2, 
+plot_summs(final_model, 
            coefs = c("Homegrown (Citizen)" = "citizen_of_club_countryYes",
                      "Defender" = "positionDefender",
                      "Midfielder" = "positionMidfield",
@@ -1011,7 +1014,7 @@ Figure below displays the estimated club random effects from our cross-classifie
 #| fig-width: 8
 #| fig-height: 10
 #| # 1. Extract Random Effects from Model 3.2
-club_ranef <- ranef(Model_3.2, condVar = TRUE)$club_id
+club_ranef <- ranef(final_model, condVar = TRUE)$club_id
 post_var <- attr(club_ranef, "postVar")
 
 # 2. Metadata Dictionary
