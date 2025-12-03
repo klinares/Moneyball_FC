@@ -103,7 +103,7 @@ vc <- as.data.frame(VarCorr(final_model))
 
 The European football transfer market has evolved from a subjective scouting exercise into a global financial industry exceeding €7 billion annually. For this study, we operationalize market value using crowd-sourced estimates from Transfermarkt, a metric widely validated in sports economics as a robust proxy for actual transfer fees (Herm et al., 2014). While foundational research identifies performance metrics like goals as primary drivers (Frick, 2007), more recent scholarship highlights a "Superstar Effect" where non-performance factors like brand visibility magnify valuation (Franck & Nüesch, 2012; Rosen, 1981). However, the market has recently bifurcated into a pre-2020 hyper-inflationary era, termed the "Neymar Effect" (Poli et al., 2017), and a post-2020 pandemic correction (Drewes et al., 2021). This trajectory was violently interrupted by the COVID-19 pandemic, which caused an estimated €8.7 billion revenue shortfall across European football (Deloitte, 2021). Existing models typically treat players as static units nested within single clubs, ignoring the dynamic reality where players transfer between teams and accumulate value from both their portable human capital and the institutional prestige of their current employer. Neglecting this cross-classified structure likely misestimates the true drivers of market value in this volatile era.\
 \
-To address these limitations, this study applies a cross-classified multilevel model to a decade of transfer data (2013–2024), centering the analysis at the 2020 pandemic baseline to quantify the impact of this structural break. By disentangling individual reputation from club context, we investigate four critical dynamics: the non-linear "Boom and Bust" market trajectory (RQ1)[^1], the biological constraints of the player career arc (RQ2)[^2], the valuation signal of "Squad Status" via relative playing time (RQ3)[^3], and the existence of contextual premiums for club diversity or discounts for domestic talent in a globalized labor market (RQ4[^4]-RQ5[^5]).
+To address these limitations, this study applies a cross-classified multilevel model to a decade of transfer data (2013–2024), centering the analysis at the 2020 pandemic baseline to quantify the impact of this structural break. This approach disentangles individual reputation from club context, allowing us to investigate four critical dynamics: the non-linear "Boom and Bust" market trajectory (RQ1)[^1], the biological constraints of the player career arc (RQ2)[^2], the valuation signal of "Squad Status" via relative playing time (RQ3)[^3], and the existence of contextual premiums for club diversity or discounts for domestic talent in a globalized labor market (RQ4[^4]-RQ5[^5]).
 
 [^1]: How has the transfer market evolved relative to the 2020 baseline? Specifically, does the market exhibit a non-linear "Boom and Bust" cycle that linear models miss?
 
@@ -226,8 +226,8 @@ p_2 <- clean_player_df |>
 # Combine with Patchwork
 combined_plot <- p_1 + p_2 + 
   plot_annotation(
-    title = "Figure 2: Market Value Impacted by Pandemic",
-    caption = "Dashed line represents the 2020 Pandemic start."
+    title = "Figure 2. Quadratic vs. Cubic Polynomial Fits for Market Value Over Time",
+    caption = "Dashed line marks the 2020 pandemic onset."
   )
 
 combined_plot
@@ -239,7 +239,7 @@ We employed sequential model building: (1) null model for ICC estimation; (2) li
 
 [^7]: We excluded player-level random slopes due to data sparsity; a majority of players appear in the dataset for only one or two seasons, making it mathematically impossible to disentangle their individual growth trajectories from residual error. In contrast, the club-level data provides a robust longitudinal structure with continuous observations across the decade, allowing for the stable estimation of club-specific market value trajectories.
 
-All analyses were conducted in R version `r getRversion()` using the `lme4 1.1-37` package for mixed-effects model estimation with a Restricted Maximum Likelihood (REML) method. REML was selected to provide unbiased estimates of the variance components (random effects) by accounting for the degrees of freedom lost when estimating the fixed effects, ensuring that club and player heterogeneity were not underestimated.. To ensure robust model convergence given the complexity of the random effects structure, we utilized the BOBYQA (Bound Optimization BY Quadratic Approximation) optimizer. This algorithm is specifically designed to handle boundary constraints (such as variance components approaching zero) more effectively than the default Nelder-Mead optimizer. . Significance tests used Satterthwaite approximations via the `lmerTest 3.1-3` package.
+All analyses were conducted in R version `r getRversion()` using the `lme4 1.1-37` package for mixed-effects model estimation with a Restricted Maximum Likelihood (REML) method. REML was selected to provide unbiased estimates of the variance components by accounting for the degrees of freedom lost when estimating fixed effects. To ensure robust model convergence given the complexity of the random effects structure, we utilized the BOBYQA optimizer, which handles boundary constraints more effectively than the default Nelder-Mead optimizer. Significance tests used Satterthwaite approximations via the `lmerTest 3.1-3` package.
 
 # Results
 
@@ -251,7 +251,7 @@ The unconditional means (null) model revealed substantial clustering at the play
 
 ## Model Diagnostics
 
-We evaluated the statistical assumptions underlying our cross-classified multilevel model through visual and quantitative diagnostics. The model converged successfully using the BOBYQA optimizer with no warnings, indicating stable estimation of all variance components. We examined the normality of random effects at both levels via quantile-quantile (Q-Q) plots. The player-level random intercepts ($n=2,159$) displayed excellent adherence to normality across the entire distribution, consistent with our large sample providing stable estimates of individual heterogeneity. The club-level random effects ($n=21$) showed minor departures from normality in the extreme tails, which is expected given the small number of Level 2 units; however, simulation studies demonstrate that multilevel models remain robust to such departures when the sample sizes at Level 1 are large (Maas & Hox, 2004). The residual versus fitted values plot revealed homoscedastic variance across the range of predicted values, with no systematic patterns suggesting model misspecification. We also assessed multicollinearity among the fixed effects using variance inflation factors (VIF); all values remained below 2.5, indicating no problematic collinearity. Full diagnostic plots are presented in Appendix C.
+The model converged successfully with no warnings. Q-Q plots confirmed that player-level random intercepts ($n=2,159$) adhered well to normality, while club-level random effects ($n=21$) showed minor tail departures expected with few Level 2 units (Maas & Hox, 2004). The residual versus fitted values plot revealed homoscedastic variance with no systematic patterns. Full diagnostic plots are presented in Appendix C.
 
 Table 1. Estimated Variance Components for Final Model
 
@@ -361,7 +361,7 @@ Using raw polynomials centered at 2020 ($t=0$), our model mathematically pinpoin
 
 ```{r}
 #| fig-width: 7
-#| fig-height: 6
+#| fig-height: 5
 # 1. CREATE DATA FOR PLOTTING (Simple Centering, NOT Z-score)
 # This ensures -7 = 2013 and +4 = 2024
 plot_data_prep <- clean_player_df %>%
@@ -429,8 +429,8 @@ ggplot(final_plot_data, aes(x = x + 2020, y = predicted)) +
                      limits = c(2013, 2024)) +
   
   labs(
-    title = "Figure 3. Club Trajectories Through the Pandemic (2013-2024)",
-    subtitle = "Predicted Log Market Value, Dash Line Begining of Pandemic",
+    title = "Figure 3. Club-Specific Market Value Trajectories (2013-2024)",
+    subtitle = "Dashed line marks pandemic onset; panels ordered by baseline prestige.",
     x = "Season Year",
     y = "Log Market Value (2024 USD)"
   ) +
@@ -517,7 +517,7 @@ ggplot(plot_data_age, aes(x = age_real, y = predicted)) +
 
 ### **Contextual Premiums and Discounts**
 
-Squad status remains the dominant behavioral driver. The standardized coefficient for minutes played ($\pi_6 = 0.35$) indicates a 42% valuation premium ($e^{0.35}-1$) for key starters (+1 SD) compared to average players. Conversely, we observe a robust "Domestic Discount," where homegrown citizens are valued approximately 17% lower ($\gamma_2 = -0.19$) than comparable foreign imports. While we hypothesized a "Diversity Premium" for clubs with higher international representation, the fixed effect for `foreign_players` was positive but not statistically significant ($\pi_7 = 0.10, p = 0.32$) in the final model. Similarly, the `uefa_coefficient` showed no significant effect ($p = 0.70$). This suggests that once we account for the massive heterogeneity in Club Random Effects (i.e., Baseline Prestige and Growth Trajectories) and individual player reputation ($ICC \approx 0.78$), specific club-level metrics add little unique explanatory power. In Figure 5, we present relative market valuation for Level 2 fixed effects (e.g., citizenship, region origin, and position). The coefficient for "Homegrown (Citizen)" falls strictly to the left of zero, confirming that domestic players are valued significantly lower than comparable foreign imports ($\beta=−0.19$), potentially reflecting the recruitment premium required to attract international talent. Attackers (the baseline) command the highest market value. All other positions show significant negative effects, with Goalkeepers facing the steepest penalty ($\beta=−1.06$), suggesting the market disproportionately rewards offensive output. While most regional coefficients overlap with zero (i.e., indicating no difference from the European baseline), Latin America stands out as the only region with a positive premium ($\beta=0.19$). This suggests that South American players function as a "premium export brand" in the global market, distinct from other non-European origins.
+Squad status remains the dominant behavioral driver. The standardized coefficient for minutes played ($\pi_6 = 0.35$) indicates a 42% valuation premium ($e^{0.35}-1$) for key starters (+1 SD) compared to average players. Conversely, we observe a robust "Domestic Discount," where homegrown citizens are valued approximately 17% lower ($\gamma_2 = -0.19$) than comparable foreign imports. While we hypothesized a "Diversity Premium" for clubs with higher international representation, the fixed effect for `foreign_players` was positive but not statistically significant ($\pi_7 = 0.10, p = 0.32$) in the final model. Similarly, the `uefa_coefficient` showed no significant effect ($p = 0.70$). This suggests that once we account for the massive heterogeneity in Club Random Effects (i.e., Baseline Prestige and Growth Trajectories) and individual player reputation ($ICC \approx 0.78$), specific club-level metrics add little unique explanatory power. In Figure 5, we present relative market valuation for Level 2 fixed effects (e.g., citizenship, region origin, and position). The coefficient for "Homegrown (Citizen)" falls strictly to the left of zero, confirming that domestic players are valued significantly lower than comparable foreign imports ($\gamma_2=-0.19$), potentially reflecting the recruitment premium required to attract international talent. Attackers (the baseline) command the highest market value. All other positions show significant negative effects, with Goalkeepers facing the steepest penalty ($\gamma_{pos}=-1.06$), suggesting the market disproportionately rewards offensive output. While most regional coefficients overlap with zero (indicating no difference from the European baseline), Latin America stands out as the only region with a positive premium ($\gamma_{region}=0.19$), suggesting South American players function as a "premium export brand" in the global market.
 
 ```{r}
 plot_summs(final_model, 
@@ -544,53 +544,13 @@ plot_summs(final_model,
 
 # Discussion
 
-This study demonstrates that player market value in elite football is driven primarily by persistent individual reputation but is meaningfully moderated by club context and market cycles. Our cross-classified approach properly attributes variance to portable player effects versus transient club effects. In this section, we synthesize our findings, articulate their theoretical contributions, and outline practical implications for stakeholders in the transfer market.
+This study demonstrates that player market value in elite football is driven primarily by persistent individual reputation ($ICC=0.78$) but is meaningfully moderated by club context and market cycles. Our cross-classified approach properly attributes variance to portable player effects versus transient club effects.
 
-## Theoretical Contributions
+Centering our temporal polynomial at 2020 provides direct evidence that the COVID-19 pandemic represented a fundamental discontinuity in the transfer market. The near-zero linear slope at this inflection point indicates that the decade-long inflationary trend abruptly halted, followed by market correction. The strict inverted-U relationship between age and market value, peaking at approximately 27 years, confirms that transfer markets price both current ability and future option value. The steepness of the post-peak decline (approximately 1.5 log points from age 27 to 35) reflects forward-looking assessment of remaining productive years.
 
-Our findings advance the literature on football economics in several important ways.
+The dominance of minutes played ($\pi_6=0.35$) over position-specific metrics suggests that markets rely heavily on managerial assessments as signals of underlying quality, consistent with signaling theory. A one standard deviation increase in relative playing time yields a 42% valuation premium. The finding that homegrown players are valued approximately 17% lower than comparable foreign imports ($\gamma_2=-0.19$) suggests domestic players may be systematically undervalued while international recruitment requires competitive bidding that inflates prices.
 
-**The Pandemic as a Structural Break.** Prior research has documented general inflation in player valuations (Poli et al., 2017), but few studies have rigorously tested for structural breaks in market dynamics. By centering our temporal polynomial at 2020, we provide direct evidence that the COVID-19 pandemic represented a fundamental discontinuity in the transfer market. The near-zero linear slope at this inflection point indicates that the decade-long inflationary trend abruptly halted, followed by a period of market correction captured by our negative quadratic and cubic terms. This finding suggests that external macroeconomic shocks can fundamentally alter the valuation calculus in professional sports.
-
-**Biological Determinism in Valuation.** The strict inverted-U relationship between age and market value, with a peak at approximately 27 years, extends the career arc literature to transfer market contexts. Unlike performance metrics that may plateau, market value appears to follow a more deterministic biological trajectory. The steepness of the post-peak decline (approximately 1.5 log points from age 27 to 35) reflects the market's forward-looking assessment of remaining productive years and resale potential. This finding underscores that transfer markets price both current ability and future option value.
-
-**Squad Status as a Market Signal.** The dominance of minutes played ($\beta=0.35$) over position-specific performance metrics (goals, assists) suggests that the market relies heavily on managerial assessments as signals of underlying quality. This finding aligns with signaling theory, where coaches possess private information about player quality that is revealed through squad selection decisions. The standardized coefficient indicates that a one standard deviation increase in relative playing time yields a 42% valuation premium, representing the single largest behavioral effect in our model.
-
-**The Domestic Discount Paradox.** Our finding that homegrown players are valued approximately 17% lower than comparable foreign imports presents a puzzle for economic theory. While labor market friction explanations would predict premiums for mobile workers who bear relocation costs, our results suggest an alternative mechanism: domestic players may be systematically undervalued because their availability is taken for granted, whereas international recruitment requires competitive bidding that inflates prices. This "scarcity premium" for foreign talent represents a potential market inefficiency that astute clubs could exploit.
-
-## Practical Implications
-
-Our findings carry actionable implications for multiple stakeholders in the football ecosystem.
-
-**For Buying Clubs.** The identified market inefficiencies suggest several value-seeking strategies. First, targeting domestic players may offer significant cost savings without sacrificing quality, as the 17% domestic discount appears unrelated to on-field performance. Second, the strong age effect implies that players approaching 27 represent peak value-for-money, as they offer immediate prime-year performance before the steep depreciation curve. Third, clubs can leverage our model to identify "undervalued" players whose market price falls below their predicted value based on observable characteristics.
-
-**For Selling Clubs.** The temporal dynamics reveal optimal timing strategies for player sales. The market correction following 2020 suggests that selling clubs should be attentive to macroeconomic conditions and broadcast revenue cycles when timing major sales. Additionally, the steep post-peak age depreciation argues for selling established players earlier rather than later, particularly those entering their late twenties. Clubs that delay sales risk substantial value erosion as players age beyond their peak market window.
-
-**For Agents and Players.** Individual career planning can benefit from understanding the structural determinants of market value. Players seeking to maximize their market value should prioritize securing starting positions (maximizing minutes played) over accumulating individual statistics, as squad status carries greater market weight. Furthermore, the biological constraints on valuation suggest that contract negotiations should front-load compensation for players approaching age 27, recognizing that subsequent contracts will occur on the declining portion of the age-value curve.
-
-## Key Findings Summary
-
-We summarize our substantive findings organized by research question:
-
-**Market Cycles.** The cubic temporal trend reveals distinct boom-bust phases rather than constant market growth. The rapid inflation period (2015-2019) following the Neymar transfer record and subsequent post-pandemic correction highlight the cyclical nature of transfer market valuations.
-
-**Biological Constraints.** The strict inverted-U age relationship, with peak value around age 27, confirms that physical peak represents the optimal balance between experience and athleticism, with practical implications for optimal transfer timing.
-
-**Squad Status Dominance.** Minutes played emerged as the strongest predictor, with starters valued over 40% higher than bench players. This universal signal transcends position-specific metrics, suggesting that coaches' implicit assessments are incorporated into market valuations.
-
-**Contextual Premiums.** The domestic discount for homegrown players suggests systematic biases that could be exploited for competitive advantage.
-
-## Limitations and Future Directions
-
-Several limitations warrant acknowledgment. First, our sample focuses exclusively on elite Big Five league clubs, limiting generalizability to lower divisions or emerging football markets where different valuation dynamics may operate. Second, minutes played is likely endogenous to market value; highly valued players may receive more playing time precisely because of their status, meaning our estimates should be interpreted as associations rather than causal effects. Future research could employ instrumental variable approaches, such as using injury-induced absences or managerial changes as exogenous variation in playing time. Third, we constrained the cubic time polynomial to be fixed at the club level due to convergence issues with higher-order random slopes; additional data or Bayesian estimation approaches may permit more flexible specifications. Fourth, residual diagnostics revealed minor departures from normality in the extreme tails, though our large sample size ensures robust estimation under asymptotic theory.
-
-Several promising directions emerge for future research. First, extending our cross-classified framework to lower-tier leagues would test whether the identified mechanisms generalize beyond elite contexts. Second, incorporating more granular performance data (e.g., expected goals, pressing statistics) could reveal which specific on-field contributions drive valuations beyond aggregate metrics. Third, examining how club financial health interacts with player valuation could illuminate whether distressed clubs systematically undervalue their assets. Finally, quasi-experimental designs exploiting policy changes (e.g., Brexit's impact on non-EU player quotas) could strengthen causal claims about contextual premiums and discounts.
-
-## Conclusion
-
-By properly modeling the cross-classified structure where players transfer between clubs, we quantify how individual performance, biological constraints, and club context jointly shape valuations in elite European football. The substantial player-level variance ($ICC=0.78$) confirms that persistent individual reputation dominates market assessments, while club context creates meaningful premiums and growth trajectories. Our findings reveal that the transfer market, while responsive to observable performance metrics, also incorporates forward-looking assessments of biological decline, managerial signals through squad selection, and contextual factors that create systematic premiums and discounts. These patterns represent both economic regularities that clubs can anticipate and potential inefficiencies that astute market participants can exploit. As the football transfer market continues to evolve in scale and sophistication, rigorous multilevel modeling approaches offer a principled framework for understanding the complex interplay of individual talent, institutional context, and market dynamics.
-
-\newpage
+In conclusion, the substantial player-level variance confirms that persistent individual reputation dominates market assessments, while club context creates meaningful premiums and growth trajectories. The transfer market incorporates forward-looking assessments of biological decline, managerial signals through squad selection, and contextual factors that create systematic premiums and discounts. These patterns represent both economic regularities that clubs can anticipate and potential inefficiencies that astute market participants can exploit.
 
 # References {.unnumbered}
 
@@ -843,9 +803,9 @@ calculate_lrt_mixture(model_time_cubic, model_slope_quadratic)
 ## Figure 6. Model Diagnostic Plots {.unnumbered}
 
 ```{r}
-#| fig-width: 8
-#| fig-height: 7
-#| fig-cap: "Diagnostic plots for the final cross-classified multilevel model. Panel A shows the Q-Q plot for player random intercepts (n=2,159), Panel B shows the Q-Q plot for club random intercepts (n=21), and Panel C displays residuals versus fitted values to assess homoscedasticity."
+#| fig-width: 7
+#| fig-height: 5.5
+#| fig-cap: "Diagnostic plots: (A) Q-Q plot for player random intercepts, (B) Q-Q plot for club random intercepts, (C) residuals versus fitted values."
 
 # Extract random effects
 player_re <- ranef(final_model)$player_id[, 1]
@@ -911,9 +871,9 @@ p3 <- ggplot(resid_df, aes(x = fitted, y = residuals)) +
 ## Figure 7. Club Random Effects Correlation Structure {.unnumbered}
 
 ```{r}
-#| fig-width: 6
-#| fig-height: 5
-#| fig-cap: "Scatterplot matrix showing correlations among club-level random effects (intercept, linear slope, and quadratic slope). Strong correlations suggest that clubs with higher baseline prestige also exhibit distinct growth trajectories."
+#| fig-width: 5
+#| fig-height: 4
+#| fig-cap: "Correlations among club-level random effects (intercept, linear slope, quadratic slope)."
 
 # Extract club random effects
 re <- ranef(final_model)$club_id
@@ -948,3 +908,19 @@ rm(dat)
 rm(clean_player_df)
 gc()
 ```
+
+\newpage
+
+# Appendix D
+
+## Acknowledgement of AI Assistance {.unnumbered}
+
+We acknowledge the use of AI-assisted tools (GitHub Copilot and Claude) during the preparation of this manuscript. These tools were used for:
+
+1. **Coding assistance**: Generating and debugging R code for data visualization, particularly for creating the faceted club trajectory plots (Figure 3) and diagnostic visualizations (Figure 6).
+
+2. **Resolving convergence issues**: Troubleshooting model convergence problems with the cross-classified multilevel model, including optimizer selection (BOBYQA) and parameter constraints.
+
+3. **Code documentation**: Improving comments and annotations in the model syntax presented in Appendix B.
+
+All statistical analyses, interpretations, and substantive conclusions were developed and verified by the authors. The AI tools served as coding assistants and did not contribute to the research design, data collection, or theoretical framework of this study.
