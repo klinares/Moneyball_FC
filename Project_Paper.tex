@@ -1,5 +1,4 @@
 % Options for packages loaded elsewhere
-% Options for packages loaded elsewhere
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
 \PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
@@ -7,23 +6,21 @@
 \documentclass[
   12pt,
 ]{article}
-\usepackage{xcolor}
-\usepackage[top=1in,bottom=1in,left=1in,right=1in]{geometry}
+
 \usepackage{amsmath,amssymb}
-\setcounter{secnumdepth}{5}
 \usepackage{iftex}
 \ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
 \else % if luatex or xetex
-  \usepackage{unicode-math} % this also loads fontspec
+  \usepackage{unicode-math}
   \defaultfontfeatures{Scale=MatchLowercase}
   \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
 \fi
 \usepackage{lmodern}
-\ifPDFTeX\else
-  % xetex/luatex font selection
+\ifPDFTeX\else  
+    % xetex/luatex font selection
 \fi
 % Use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
@@ -41,6 +38,10 @@
 }{% if KOMA class
   \KOMAoptions{parskip=half}}
 \makeatother
+\usepackage{xcolor}
+\usepackage[top=1in,bottom=1in,left=1in,right=1in]{geometry}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\setcounter{secnumdepth}{5}
 % Make \paragraph and \subparagraph free-standing
 \makeatletter
 \ifx\paragraph\undefined\else
@@ -106,7 +107,8 @@
 \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
 \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
 
-\usepackage{longtable,booktabs,array}
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}\usepackage{longtable,booktabs,array}
 \usepackage{calc} % for calculating minipage widths
 % Correct order of tables after \paragraph or \subparagraph
 \usepackage{etoolbox}
@@ -118,33 +120,17 @@
 \makesavenoteenv{longtable}
 \usepackage{graphicx}
 \makeatletter
-\newsavebox\pandoc@box
-\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
-  \sbox\pandoc@box{#1}%
-  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
-  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
-  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
-  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
-  \else\usebox{\pandoc@box}%
-  \fi%
-}
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
 % Set default figure placement to htbp
+\makeatletter
 \def\fps@figure{htbp}
 \makeatother
-
-
-
-
-
-\setlength{\emergencystretch}{3em} % prevent overfull lines
-
-\providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-
-
-
- 
-
 
 \usepackage{booktabs}
 \usepackage{longtable}
@@ -206,9 +192,14 @@
 \@ifpackageloaded{caption}{}{\usepackage{caption}}
 \@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
 \makeatother
+
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
 \usepackage{bookmark}
+
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\urlstyle{same}
+\urlstyle{same} % disable monospaced font for URLs
 \hypersetup{
   pdftitle={Multilevel Determinants of Player Market Value in Elite European Football},
   pdfauthor={Kevin Linares; Jianing Zou; Namit Shrivastava; Sagnik Chakravarti},
@@ -225,6 +216,7 @@ Football}
 \author{Kevin Linares \and Jianing Zou \and Namit
 Shrivastava \and Sagnik Chakravarti}
 \date{}
+
 \begin{document}
 \maketitle
 
@@ -250,32 +242,39 @@ static units nested within single clubs, ignoring the dynamic reality
 where players transfer between teams and accumulate value from both
 their portable human capital and the institutional prestige of their
 current employer. Neglecting this cross-classified structure likely
-misestimates the true drivers of market value in this volatile era.\\
-\strut \\
-To address these limitations, this study applies a cross-classified
+misestimates the true drivers of market value in this volatile era. To
+address these limitations, this study applies a cross-classified
 multilevel model to a decade of transfer data (2013--2024), centering
 the analysis at the 2020 pandemic baseline to quantify the impact of
-this structural break. By disentangling individual reputation from club
-context, we investigate four critical dynamics: the non-linear ``Boom
-and Bust'' market trajectory (RQ1)\footnote{How has the transfer market
-  evolved relative to the 2020 baseline? Specifically, does the market
-  exhibit a non-linear ``Boom and Bust'' cycle that linear models miss?},
-the biological constraints of the player career arc (RQ2)\footnote{How
-  does market valuation evolve across a player's biological career, and
-  at what specific age does this value peak?}, the valuation signal of
-``Squad Status'' via relative playing time (RQ3)\footnote{To what degree
-  does ``Squad Status''---defined by relative playing time---predict
-  market value independent of raw performance output?}, and the
-existence of contextual premiums for club diversity or discounts for
-domestic talent in a globalized labor market
-(RQ4\footnote{How is club-level international diversity associated with
-  player valuations in a globalized labor market?}-RQ5\footnote{How does
-  the market valuation of domestic players compare to that of imported
-  talent when controlling for performance and club context?}).
+this structural break. We attempt to disentangle individual reputation
+from club context by investigate four critical dynamics:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  The non-linear ``Boom and Bust'' market trajectory. How has the
+  transfer market evolved relative to the 2020 baseline? Specifically,
+  does the market exhibit a non-linear ``Boom and Bust'' cycle that
+  linear models miss?
+\item
+  The biological constraints of the player career arc. How does market
+  valuation evolve across a player's biological career, and at what
+  specific age does this value peak?
+\item
+  The valuation signal of ``Squad Status'' via relative playing time. To
+  what degree does ``Squad Status''---defined by relative playing
+  time---predict market value independent of raw performance output?
+\item
+  The existence of contextual premiums for club diversity or discounts
+  for domestic talent in a globalized labor market. How does squad
+  internationalization affect player market values, and do domestic
+  players face a valuation penalty compared to foreign players?
+\end{enumerate}
 
 \section{Method}\label{method}
 
-\subsection{Sample and Variables}\label{sample-and-variables}
+\subsection{Sample and Data}\label{sample-and-data}
 
 We obtained data from Transfermarkt and UEFA official rankings, both
 publicly available sources. We used purposive sampling to select the top
@@ -305,8 +304,7 @@ and the club's UEFA coefficient, which serves as a proxy for recent
 competitive success and prestige. For further descriptive statistics on
 each variable see Appendix A, Table1.
 
-\subsection{Cross-Classified Data
-Structure}\label{cross-classified-data-structure}
+\subsection{Model Specification}\label{model-specification}
 
 Our data exhibit a cross-classified structure where players (\emph{i})
 are constant units, but club membership (\emph{j}) changes over time
@@ -315,17 +313,12 @@ club-level predictors update to reflect the new club's characteristics.
 This structure requires modeling player and club as crossed random
 effects rather than nested effects. Figure 1 is a visual of a
 cross-classified model example of three players that either move through
-clubs or remain in the same club throughout their career.
+clubs or remain in the same club throughout their career. Crucially,
+because club attributes like internationalization and UEFA ranking vary
+year-to-year, they are modeled as Level 1 (time-varying) predictors
+rather than static Level 2 traits.
 
-\pandocbounded{\includegraphics[keepaspectratio]{Project_Paper_files/figure-pdf/unnamed-chunk-1-1.pdf}}
-
-\subsection{Model Specification}\label{model-specification}
-
-We specify a cross-classified multilevel model to partition the variance
-in market value across observations (\(t\)), players (\(i\)), and clubs
-(\(j\)). Crucially, because club attributes like internationalization
-and UEFA ranking vary year-to-year, they are modeled as Level 1
-(time-varying) predictors rather than static Level 2 traits.
+\includegraphics{Project_Paper_files/figure-pdf/unnamed-chunk-1-1.pdf}
 
 \textbf{Level 1: Observation Model (Time-Varying Effects)}
 
@@ -377,7 +370,7 @@ Starter vs.~Bench) independent of team-level rotation policies, while
 performance metrics were centered by position to account for
 role-specific expectations.
 
-\pandocbounded{\includegraphics[keepaspectratio]{Project_Paper_files/figure-pdf/unnamed-chunk-2-1.pdf}}
+\includegraphics{Project_Paper_files/figure-pdf/unnamed-chunk-2-1.pdf}
 
 \subsection{Model Building and Statistical
 Software}\label{model-building-and-statistical-software}
@@ -402,7 +395,7 @@ results (p\textless.05) and lower values on both information criteria
 were retained for subsequent analysis. We describe each model in
 Appendix 2, Table 2 alongside ICC, AIC, and BIC values.
 
-All analyses were conducted in R version 4.5.1 using the
+All analyses were conducted in R version 4.4.1 using the
 \texttt{lme4\ 1.1-37} package for mixed-effects model estimation with a
 Restricted Maximum Likelihood (REML) method. REML was selected to
 provide unbiased estimates of the variance components (random effects)
@@ -552,7 +545,7 @@ convex trajectories (e.g., Arsenal, Liverpool) show stronger momentum,
 indicating a more resilient recovery and active value generation
 throughout the decade.
 
-\pandocbounded{\includegraphics[keepaspectratio]{Project_Paper_files/figure-pdf/unnamed-chunk-5-1.pdf}}
+\includegraphics{Project_Paper_files/figure-pdf/unnamed-chunk-5-1.pdf}
 
 \subsubsection{Biological Age}\label{biological-age}
 
@@ -568,7 +561,7 @@ player's value drops by approximately 1.5 log points (from a peak of
 17.0 to 15.5) as they age from 27 to 35, reflecting the market's heavy
 discount on older assets with limited resale potential.
 
-\pandocbounded{\includegraphics[keepaspectratio]{Project_Paper_files/figure-pdf/unnamed-chunk-7-1.pdf}}
+\includegraphics{Project_Paper_files/figure-pdf/unnamed-chunk-7-1.pdf}
 
 \subsubsection{\texorpdfstring{\textbf{Contextual Premiums and
 Discounts}}{Contextual Premiums and Discounts}}\label{contextual-premiums-and-discounts}
@@ -603,7 +596,7 @@ positive premium (\(\beta=0.19\)). This suggests that South American
 players function as a ``premium export brand'' in the global market,
 distinct from other non-European origins.
 
-\pandocbounded{\includegraphics[keepaspectratio]{Project_Paper_files/figure-pdf/unnamed-chunk-8-1.pdf}}
+\includegraphics{Project_Paper_files/figure-pdf/unnamed-chunk-8-1.pdf}
 
 \section{Discussion}\label{discussion}
 
@@ -989,11 +982,11 @@ ICC)}\label{table-1.-model-fit-comparison-aic-bic-and-icc}
 BIC, and ICC)}
 
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1757}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.4324}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1351}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1216}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1351}}@{}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1667}}@{}}
 \toprule\noalign{}
 \endhead
 \bottomrule\noalign{}
@@ -1023,7 +1016,7 @@ Plots}\label{figure-6.-model-diagnostic-plots}
 
 \begin{figure}[H]
 
-{\centering \pandocbounded{\includegraphics[keepaspectratio]{Project_Paper_files/figure-pdf/unnamed-chunk-12-1.pdf}}
+{\centering \includegraphics{Project_Paper_files/figure-pdf/unnamed-chunk-12-1.pdf}
 
 }
 
@@ -1042,7 +1035,7 @@ Correlation Structure}
 
 \begin{figure}[H]
 
-{\centering \pandocbounded{\includegraphics[keepaspectratio]{Project_Paper_files/figure-pdf/unnamed-chunk-13-1.pdf}}
+{\centering \includegraphics{Project_Paper_files/figure-pdf/unnamed-chunk-13-1.pdf}
 
 }
 
@@ -1052,6 +1045,18 @@ correlations suggest that clubs with higher baseline prestige also
 exhibit distinct growth trajectories.}
 
 \end{figure}%
+
+\newpage
+
+\section{Appendix D}\label{appendix-d}
+
+We relied on AI, specifically Claude, to assist us with the latex for
+our equation since at we had difficulty rendering the quarto file.
+Additionally, we sometimes used the assistance of AI to help us with our
+visualization, such as how removing specific grid lines in the
+background, or specific bold font. Finally, we had convergence issues
+specifically when attempting to introduce a random slope of year within
+players and we sought the wisdom of AI to come up with a solution below.
 
 
 
