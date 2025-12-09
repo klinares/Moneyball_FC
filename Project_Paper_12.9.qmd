@@ -1,6 +1,6 @@
 ---
 title: "Player Market Value in Elite European Football"
-author: "Kevin Linares, Jianing Zou, Namit Shrivastava, & Sagnik Chakravarti"
+author: "Kevin Linares, Jianing Zou, Namit Shrivastava, & Sagnik Chakravarty"
 affiliation: "University of Maryland"
 format:
   pdf:
@@ -58,7 +58,7 @@ theme_set(theme_minimal(base_size = 12))
 
 # Setting repository path for macOS
 #repo_path <- "/Users/namomac/Desktop/Moneyball_FC/inputs/"
-repo_path <- "D:/repos/Moneyball_FC/inputs/"
+repo_path <- "/Users/sagnikchakravarty/Moneyball_FC/inputs/"
 #repo_path <- "/Users/jianing/Desktop/UMD/学习/SURV 687  Applications of Statistical Modeling/Final Project/Moneyball_FC-main/inputs/"
 # Reading data
 dat <- read_parquet(paste0(repo_path, "player_df.parquet"))

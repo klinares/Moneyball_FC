@@ -1,6 +1,6 @@
 ---
 title: "Player Market Value in Elite European Football"
-author: "Kevin Linares, Jianing Zou, Namit Shrivastava, & Sagnik Chakravarti"
+author: "Kevin Linares, Jianing Zou, Namit Shrivastava, & Sagnik Chakravarty"
 affiliation: "University of Maryland"
 format:
   pdf:
