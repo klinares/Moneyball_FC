@@ -588,7 +588,7 @@ plot_summs(final_model,
 
 # Discussion
 
-Our cross-classified multilevel model successfully addressed the methodological challenge of players transferring between clubs over time, properly partitioning variance between portable player reputation and club-level effects. The model converged without warnings, and diagnostic plots confirmed that distributional assumptions were reasonably satisfied—player-level random intercepts adhered closely to normality, while minor tail departures in club-level effects were expected given only 21 Level 2 units. The residuals versus fitted values plot showed homoscedastic variance with no systematic patterns, indicating adequate specification.
+Our cross-classified multilevel model successfully addressed the methodological challenge of players transferring between clubs over time, properly partitioning variance between portable player reputation and club-level effects. The model converged without warnings, and diagnostic plots confirmed that distributional assumptions were reasonably satisfied i.e., player-level random intercepts adhered closely to normality, while minor tail departures in club-level effects were expected given only 21 Level 2 units. The residuals versus fitted values plot showed homoscedastic variance with no systematic patterns, indicating adequate specification.
 
 The model effectively answered our four research questions. The cubic time polynomial captured the hypothesized boom-and-bust cycle, with the 2020 centering strategy isolating the pandemic's structural impact. The quadratic age term confirmed the inverted-U career trajectory, identifying the peak valuation age. Squad status, operationalized through within-club standardized minutes, emerged as a stronger predictor than raw performance metrics, and the inclusion of region-of-origin effects revealed geographic valuation disparities.
 
@@ -976,7 +976,7 @@ fig_heatmap
 
 ```
 
-Figure 2 displays the correlation structure among club-level random effects. The non statistically significantly negative correlation between intercept and linear slope (r = -0.063) indicates that clubs with higher baseline prestige experienced slower subsequent growth—a regression-to-the-mean pattern where elite clubs had less room for appreciation while smaller clubs showed steeper trajectories. The positive correlation between linear and quadratic terms (r = 0.749) suggests that clubs with faster initial growth also experienced more pronounced deceleration around the pandemic period.
+Figure 2 displays the correlation structure among club-level random effects. The non statistically significantly negative correlation between intercept and linear slope (r = -0.063) indicates that clubs with higher baseline prestige experienced slower subsequent growth i.e., a regression-to-the-mean pattern where elite clubs had less room for appreciation while smaller clubs showed steeper trajectories. The positive correlation between linear and quadratic terms (r = 0.749) suggests that clubs with faster initial growth also experienced more pronounced deceleration around the pandemic period.
 
 ```{r}
 # Clean up workspace
