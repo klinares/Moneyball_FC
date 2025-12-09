@@ -234,18 +234,14 @@ bifurcated into a pre-2020 hyper-inflationary era, termed the ``Neymar
 Effect'' (Poli et al., 2017), and a post-2020 pandemic correction
 (Drewes et al., 2021), with COVID-19 causing an estimated €8.7 billion
 revenue shortfall (Deloitte, 2021) that serves as a natural structural
-break for analysis. We measure market value using Transfermarkt
-estimates, validated as a robust proxy for actual transfer fees (Herm et
-al., 2014). Existing models typically treat players as static units
-nested within single clubs, ignoring that players transfer between teams
-and accumulate value from both portable human capital and institutional
-club prestige---a cross-classified structure is particularly important
-when club-level pandemic shocks may differentially affect valuations. We
+break for analysis. Using Transfermarkt estimates as validated proxies
+for transfer fees (Herm et al., 2014), we fit a cross-classified
+multilevel model to account for players transferring between clubs. We
 address this gap by fitting a cross-classified multilevel model to a
 decade of data (2013--2024), centering at the 2020 baseline to isolate
 pandemic impacts while accounting for player movements across clubs. We
 attempt to disentangle individual reputation from club context by
-investigate four critical dynamics:
+investigate four critical d
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -278,9 +274,7 @@ From these clubs we identified players who had a full season from 2013
 through 2024 resulting in a sample of 7,023 player-season observations
 from 2,159 unique players across. After listwise deletion of cases with
 missing citizenship data (approximately 2\% loss), players averaged 26.5
-years of age (\emph{SD} = 4.6). Critically, 441 players (20.4\%) played
-for multiple clubs during the study period, justifying our
-cross-classified modeling approach.
+years of age (\emph{SD} = 4.6).
 
 Our primary outcome variable is the natural logarithm of the player's
 inflation-adjusted yearly average market value (in 2024 USD). Predictors
@@ -291,7 +285,7 @@ performance and status, captured by goals, assists, red/yellow cards,
 and playing time; and (3) club context, specifically the proportion of
 foreign players on the roster and the club's UEFA coefficient, which
 serves as a proxy for recent competitive success and prestige. For
-further descriptive statistics on each variable see Appendix A, Table1.
+further descriptive statistics on each variable see Appendix A, Table 1.
 
 \subsection{Model Specification}\label{model-specification}
 
@@ -306,7 +300,7 @@ effects. Figure 1 visualizes our cross-classified design.
 The log-transformed market value for player \(i\) at club \(j\) in
 season \(t\) is modeled as:
 
-\begin{equation}\phantomsection\label{eq-model}{
+\[
 \begin{aligned}
 \log(\text{MV})_{tij} = \quad & \gamma_{00} + u_i + v_j \\[6pt]
 & + (\gamma_1 + w_{1j})\text{Year}_t + (\gamma_2 + w_{2j})\text{Year}_t^2 + \gamma_3\text{Year}_t^3 \\[6pt]
@@ -317,7 +311,7 @@ season \(t\) is modeled as:
 & + \beta_1\text{Height}_i + \beta_2\text{Citizen}_{ij} + \boldsymbol{\beta}'_{pos}\mathbf{D}^{pos}_i + \boldsymbol{\beta}'_{reg}\mathbf{D}^{reg}_i \\[6pt]
 & + \epsilon_{tij}
 \end{aligned}
-}\end{equation}
+\]
 
 The model includes three sources of random variation:
 \(u_i \sim N(0, \tau^2_u)\) captures persistent player reputation,
@@ -330,31 +324,21 @@ unstructured covariance matrix.
 
 Season year is centered at 2020 to isolate the pandemic's structural
 impact, with cubic polynomial terms capturing the hypothesized
-``Boom-and-Bust'' cycle. Age is grand-mean centered (\(\bar{A} = 26.5\)
-years) with a quadratic term to model the biological career arc. Minutes
-played is standardized within each club-year to measure squad status
-independent of team rotation policies, while goals and assists are
-position-centered to capture performance relative to role-specific
-expectations. The vectors \(\mathbf{D}^{pos}_i\) and
-\(\mathbf{D}^{reg}_i\) contain dummy variables for player position
-(reference: Attacker) and region of origin (reference: Europe \& Central
-Asia), respectively. Citizenship status (\(\text{Citizen}_{ij}\))
-indicates whether player \(i\) holds citizenship in club \(j\)'s
-country.
-
-\subsection{Centering Strategies}\label{centering-strategies}
-
-We apply a strategic centering and transformation strategy to isolate
-the pandemic's structural impact and test non-linear market dynamics by
-centering season year at the onset of COVID-19 in 2020. We include
-polynomial terms to capture theorized non-linearities (Figure 2): a
-cubic term for time to model the ``Boom-and-Bust'' cycle (e.g.,
-pre-pandemic inflation, post-pandemic correction).\footnote{Performance
-  expectations vary by role: A goal from a striker is routine while for
-  a defender is exceptional. Position-centering transforms raw counts
-  into ``performance above expectation'' metrics, ensuring the model
-  captures relative contributions rather than treating goals and assists
-  equally.}
+``Boom-and-Bust'' cycle (see Figure 2). Age is grand-mean centered
+(\(\bar{A} = 26.5\) years) with a quadratic term to model the biological
+career arc. Minutes played is standardized within each club-year to
+measure squad status independent of team rotation policies, while goals
+and assists are position-centered to capture performance relative to
+role-specific expectations.\footnote{Performance expectations vary by
+  role: A goal from a striker is routine while for a defender is
+  exceptional. Position-centering transforms raw counts into
+  ``performance above expectation'' metrics, ensuring the model captures
+  relative contributions rather than treating goals and assists equally.}
+The vectors \(\mathbf{D}^{pos}_i\) and \(\mathbf{D}^{reg}_i\) contain
+dummy variables for player position (reference: Attacker) and region of
+origin (reference: Europe \& Central Asia), respectively. Citizenship
+status (\(\text{Citizen}_{ij}\)) indicates whether player \(i\) holds
+citizenship in club \(j\)'s country.
 
 \includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-2-1.pdf}
 
@@ -397,7 +381,7 @@ random slope variances in Appendix B.
 The unconditional means (null) model revealed substantial clustering at
 the player level. Player-level variance accounted for 78\% of the total
 variance (\(ICC_{player}=.75\)), while club-level variance accounted for
-5\% (\(ICC_{club}=.03\)), highlighting that persistent individual
+3\% (\(ICC_{club}=.03\)), highlighting that persistent individual
 heterogeneity dominates market valuations. Regarding temporal dynamics,
 model comparisons favored a cubic fixed effect for season year over a
 linear specification, \(\chi^2(2)=45.66, p<.001\). We subsequently
@@ -423,16 +407,10 @@ trajectories.\footnote{While we included random linear and quadratic
 best-fitting model incorporates these complex random effects alongside
 time-varying player and club predictors (\(\chi^2(19)=5626, p<.001\)
 compared to random slopes model). Model comparisons are shown in
-Appendix C, Table 1.
-
-Our final model converged successfully with no warnings. Q-Q plots
-confirmed that player-level random intercepts (\(n=2,159\)) adhered well
-to normality, while club-level random effects (\(n=21\)) showed minor
-tail departures expected with few Level 2 units (Maas \& Hox, 2004). The
-residual versus fitted values plot revealed homoscedastic variance with
-no systematic patterns. Full diagnostic plots are presented in Appendix
-C. Here we output our final model's variance components and fixed
-effects.
+Appendix C, Table 1. Our final model converged successfully and model
+diagnostic plots (see Appendix C, Figure 1) confirmed normality of
+random effects and homoscedastic residuals, along with the correlation
+structure captured in Appendix C, Figure 2.
 
 \begin{table}[H]
 \centering
@@ -456,36 +434,56 @@ Component & Symbol & Variance & SD\\
 \centering
 \caption{Fixed Effects Estimates from Final Model}
 \centering
-\fontsize{11}{13}\selectfont
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\fontsize{10}{12}\selectfont
 \begin{threeparttable}
 \begin{tabular}[t]{>{}llrrrrl}
 \toprule
 Predictor & Symbol & $\hat{\gamma}/\hat{\beta}$ & SE & $t$ & \% Change & \\
 \midrule
-\textbf{Year (linear)} & $\gamma_1$ & 0.002 & 0.030 & 0.08 & 0.2 & \\
-\textbf{Year²} & $\gamma_2$ & -0.270 & 0.024 & -11.05 & -23.7 & ***\\
-\textbf{Year³} & $\gamma_3$ & -0.117 & 0.011 & -10.98 & -11.0 & ***\\
-\textbf{Height} & $\beta_1$ & 0.010 & 0.004 & 2.81 & 1.0 & **\\
-\textbf{Defender} & $\beta_{pos,1}$ & -0.403 & 0.058 & -6.97 & -33.2 & ***\\
-\textbf{Goalkeeper} & $\beta_{pos,2}$ & -1.059 & 0.095 & -11.17 & -65.3 & ***\\
-\textbf{Midfielder} & $\beta_{pos,3}$ & -0.190 & 0.058 & -3.29 & -17.3 & **\\
-\textbf{Domestic citizen} & $\beta_2$ & -0.185 & 0.031 & -5.89 & -16.9 & ***\\
-\textbf{Age (linear)} & $\gamma_4$ & 0.019 & 0.004 & 5.02 & 1.9 & ***\\
-\textbf{Age²} & $\gamma_5$ & -0.024 & 0.000 & -63.08 & -2.4 & ***\\
-\textbf{Goals} & $\gamma_7$ & 0.005 & 0.002 & 2.36 & 0.5 & *\\
-\textbf{Assists} & $\gamma_8$ & 0.010 & 0.003 & 3.51 & 1.0 & ***\\
-\textbf{Red cards} & $\gamma_9$ & 0.009 & 0.022 & 0.42 & 0.9 & \\
-\textbf{Yellow cards} & $\gamma_{10}$ & -0.002 & 0.003 & -0.49 & -0.2 & \\
-\textbf{Minutes (Z)} & $\gamma_6$ & 0.350 & 0.013 & 26.20 & 41.9 & ***\\
-\textbf{UEFA Coefficient} & $\gamma_{12}$ & 0.000 & 0.001 & -0.39 & 0.0 & \\
-\textbf{Proportion of Foreign Players} & $\gamma_{11}$ & 0.103 & 0.104 & 0.99 & 10.8 & \\
+\addlinespace[0.3em]
+\multicolumn{7}{l}{\textit{Temporal Dynamics}}\\
+\hspace{1em}\textbf{Year (linear)} & $\gamma_1$ & 0.002 & 0.030 & 0.08 & 0.2 & \\
+\hspace{1em}\textbf{Year²} & $\gamma_2$ & -0.270 & 0.024 & -11.05 & -23.7 & ***\\
+\hspace{1em}\textbf{Year³} & $\gamma_3$ & -0.117 & 0.011 & -10.98 & -11.0 & ***\\
+\addlinespace[0.3em]
+\multicolumn{7}{l}{\textit{Career Arc}}\\
+\hspace{1em}\textbf{Age (linear)} & $\gamma_4$ & 0.019 & 0.004 & 5.02 & 1.9 & ***\\
+\hspace{1em}\textbf{Age²} & $\gamma_5$ & -0.024 & 0.000 & -63.08 & -2.4 & ***\\
+\addlinespace[0.3em]
+\multicolumn{7}{l}{\textit{Performance}}\\
+\hspace{1em}\textbf{Goals} & $\gamma_7$ & 0.005 & 0.002 & 2.36 & 0.5 & *\\
+\hspace{1em}\textbf{Assists} & $\gamma_8$ & 0.010 & 0.003 & 3.51 & 1.0 & ***\\
+\hspace{1em}\textbf{Red cards} & $\gamma_9$ & 0.009 & 0.022 & 0.42 & 0.9 & \\
+\hspace{1em}\textbf{Yellow cards} & $\gamma_{10}$ & -0.002 & 0.003 & -0.49 & -0.2 & \\
+\hspace{1em}\textbf{Minutes (Z)} & $\gamma_6$ & 0.350 & 0.013 & 26.20 & 41.9 & ***\\
+\addlinespace[0.3em]
+\multicolumn{7}{l}{\textit{Club Context}}\\
+\hspace{1em}\textbf{UEFA Coefficient} & $\gamma_{12}$ & 0.000 & 0.001 & -0.39 & 0.0 & \\
+\hspace{1em}\textbf{Foreign players \%} & $\gamma_{11}$ & 0.103 & 0.104 & 0.99 & 10.8 & \\
+\addlinespace[0.3em]
+\multicolumn{7}{l}{\textit{Player Characteristics}}\\
+\hspace{1em}\textbf{Height} & $\beta_1$ & 0.010 & 0.004 & 2.81 & 1.0 & **\\
+\hspace{1em}\textbf{Domestic citizen} & $\beta_2$ & -0.185 & 0.031 & -5.89 & -16.9 & ***\\
+\addlinespace[0.3em]
+\multicolumn{7}{l}{\textit{Position (ref: Attacker)}}\\
+\hspace{1em}\textbf{Defender} & $\beta_{pos,1}$ & -0.403 & 0.058 & -6.97 & -33.2 & ***\\
+\hspace{1em}\textbf{Goalkeeper} & $\beta_{pos,2}$ & -1.059 & 0.095 & -11.17 & -65.3 & ***\\
+\hspace{1em}\textbf{Midfielder} & $\beta_{pos,3}$ & -0.190 & 0.058 & -3.29 & -17.3 & **\\
+\addlinespace[0.3em]
+\multicolumn{7}{l}{\textit{Region (ref: Europe)}}\\
+\hspace{1em}\textbf{East Asia \& Pacific} & $\beta_{reg,1}$ & -0.426 & 0.204 & -2.08 & -34.7 & *\\
+\hspace{1em}\textbf{Latin America} & $\beta_{reg,2}$ & 0.188 & 0.061 & 3.09 & 20.7 & **\\
+\hspace{1em}\textbf{Middle East \& N. Africa} & $\beta_{reg,3}$ & -0.097 & 0.238 & -0.41 & -9.2 & \\
+\hspace{1em}\textbf{North America} & $\beta_{reg,4}$ & -0.059 & 0.217 & -0.27 & -5.7 & \\
+\hspace{1em}\textbf{Sub-Saharan Africa} & $\beta_{reg,5}$ & 0.064 & 0.100 & 0.63 & 6.6 & \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[para]
 \item \textit{Note: } 
 \item *** p < .001, ** p < .01, * p < .05
 \end{tablenotes}
-\end{threeparttable}
+\end{threeparttable}}
 \end{table}
 
 \subsubsection{Market Evolution}\label{market-evolution}
@@ -493,114 +491,93 @@ Predictor & Symbol & $\hat{\gamma}/\hat{\beta}$ & SE & $t$ & \% Change & \\
 Using raw polynomials centered at 2020 (\(t=0\)), our model
 mathematically pinpoints the moment the market froze. The linear
 coefficient at the 2020 baseline is effectively zero
-(\(\pi_1 = 0.00, p = 0.93\)), indicating that at the exact onset of the
-pandemic, the relentless inflation of the previous decade came to a
-complete halt. The significant negative quadratic (\(\pi_2 = -0.27\))
-and cubic (\(\pi_3 = -0.12\)) terms confirm the transition from a
-pre-2019 ``Boom'' into a structural correction. Figure 3 visualizes the
-complexity of club-level market dynamics by plotting the predicted
-trajectory for all clubs individually. This faceted view highlights how
-clubs diverge from the global trend. The vertical position of each chart
-confirms the initial hierarchy (e.g., random Intercepts), with elite
-clubs like Manchester City and Bayern Munich maintaining a consistently
-higher baseline than selling clubs (e.g., Sevilla, Porto). The distinct
-curvature of each line, particularly around the 2020 pandemic baseline,
-illustrates the significant variance in the random slopes. Clubs with
-concave trajectories (e.g., Juventus, Barcelona) plateaued or declined
-rapidly, confirming the risk of stagnation. Conversely, clubs with
-convex trajectories (e.g., Arsenal, Liverpool) show stronger momentum,
-indicating a more resilient recovery and active value generation
-throughout the decade.
-
-\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-4-1.pdf}
+(\(\gamma_1 = 0.00, p = 0.93\)), indicating that at the exact onset of
+the pandemic, the relentless inflation of the previous decade came to a
+complete halt. The significant negative quadratic (\(\gamma_2 = -0.27\))
+and cubic (\(\gamma_3 = -0.12\)) terms confirm the transition from a
+pre-2019 ``Boom'' into a structural correction. Appendix C, Figure 3
+displays club specific trajectories, with panels ordered by baseline
+prestige. Elite clubs maintain higher valuations throughout, while
+trajectory curvature varies substantially. Clubs like Barcelona and
+Juventus show concave patterns indicating stagnation, whereas Arsenal
+and Liverpool display more resilient recovery, indicating a more
+resilient recovery and active value generation throughout the decade.
 
 \subsubsection{Biological Age}\label{biological-age}
 
 Our model predicts the peak age to be 26.9\footnote{We use the delta
   method, specifically Taylor series approximation, to propagate
   uncertainty through nonlinear transformation of
-  \(-\beta_{age} / (2 \times \beta_{age^2})\).} for optimal transfer
-market value we visualize in Figure 4 the biological constraints on
-valuation. The curve rises steeply as players transition from
-`prospects' (Age 17--23), flattens into a `prime' plateau between ages
-26 and 28, and declines steadily thereafter. The model predicts that a
-player's value drops by approximately 1.5 log points (from a peak of
-17.0 to 15.5) as they age from 27 to 35, reflecting the market's heavy
-discount on older assets with limited resale potential.
+  \(-\gamma_{4} / (2 \times \gamma_{5})\).} for optimal transfer market
+value. We visualize in Figure 3 the biological constraints on valuation.
+The model predicts peak valuation at age 27, with values dropping
+approximately 1.5 log points by age 35, reflecting the market's discount
+on older assets with limited resale potential.
 
-\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-6-1.pdf}
+\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-5-1.pdf}
 
 \subsubsection{\texorpdfstring{\textbf{Contextual Premiums and
 Discounts}}{Contextual Premiums and Discounts}}\label{contextual-premiums-and-discounts}
 
-Squad status remains the dominant behavioral driver. The standardized
-coefficient for minutes played (\(\pi_6 = 0.35\)) indicates a 42\%
-valuation premium (\(e^{0.35}-1\)) for key starters (+1 SD) compared to
-average players. Conversely, we observe a robust ``Domestic Discount,''
-where homegrown citizens are valued approximately 17\% lower
-(\(\gamma_2 = -0.19\)) than comparable foreign imports. While we
-hypothesized a ``Diversity Premium'' for clubs with higher international
-representation, the fixed effect for \texttt{foreign\_players} was
-positive but not statistically significant (\(\pi_7 = 0.10, p = 0.32\))
-in the final model. Similarly, the \texttt{uefa\_coefficient} showed no
-significant effect (\(p = 0.70\)). This suggests that once we account
-for the massive heterogeneity in Club Random Effects (i.e., Baseline
-Prestige and Growth Trajectories) and individual player reputation
-(\(ICC \approx 0.78\)), specific club-level metrics add little unique
-explanatory power. In Figure 5, we present relative market valuation for
-Level 2 fixed effects (e.g., citizenship, region origin, and position).
-The coefficient for ``Homegrown (Citizen)'' falls strictly to the left
-of zero, confirming that domestic players are valued significantly lower
-than comparable foreign imports (\(\gamma_2=-0.19\)), potentially
-reflecting the recruitment premium required to attract international
-talent. Attackers (the baseline) command the highest market value. All
-other positions show significant negative effects, with Goalkeepers
-facing the steepest penalty (\(\gamma_{pos}=-1.06\)), suggesting the
-market disproportionately rewards offensive output. While most regional
-coefficients overlap with zero (indicating no difference from the
-European baseline), Latin America stands out as the only region with a
-positive premium (\(\gamma_{region}=0.19\)), suggesting South American
-players function as a ``premium export brand'' in the global market.
+Squad status remains the dominant behavioral driver, with a one standard
+deviation increase in relative playing time yielding a 42\% valuation
+premium \(\gamma_6=.35\). Homegrown players face a 17\% discount
+relative to foreign imports \(\beta_2=-.19\), potentially reflecting the
+recruitment premium required to attract international talent. Neither
+squad internationalization \(\gamma_{11}=.10, p=.32\) nor UEFA
+coefficient (\(p=.70\)) reached significance, suggesting these metrics
+add little beyond club random effects. Figure 4 summarizes Level 2 fixed
+effects. Attackers command the highest valuations, with Goalkeepers
+facing the steepest positional penalty \(\beta_{pos,2}=-1.06\). Among
+regions, only Latin America shows a significant premium
+\(\beta_{reg, 2}=.19\) suggesting South American players function as a
+``premium export brand'' in the global market.
 
-\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-7-1.pdf}
+\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-6-1.pdf}
 
 \section{Discussion}\label{discussion}
 
-This study demonstrates that player market value in elite football is
-driven primarily by persistent individual reputation (\(ICC=0.78\)) but
-is meaningfully moderated by club context and market cycles. Our
-cross-classified approach properly attributes variance to portable
-player effects versus transient club effects.
+Our cross-classified multilevel model successfully addressed the
+methodological challenge of players transferring between clubs over
+time, properly partitioning variance between portable player reputation
+and club-level effects. The model converged without warnings, and
+diagnostic plots confirmed that distributional assumptions were
+reasonably satisfied---player-level random intercepts adhered closely to
+normality, while minor tail departures in club-level effects were
+expected given only 21 Level 2 units. The residuals versus fitted values
+plot showed homoscedastic variance with no systematic patterns,
+indicating adequate specification.
 
-Centering our temporal polynomial at 2020 provides direct evidence that
-the COVID-19 pandemic represented a fundamental discontinuity in the
-transfer market. The near-zero linear slope at this inflection point
-indicates that the decade-long inflationary trend abruptly halted,
-followed by market correction. The strict inverted-U relationship
-between age and market value, peaking at approximately 27 years,
-confirms that transfer markets price both current ability and future
-option value. The steepness of the post-peak decline (approximately 1.5
-log points from age 27 to 35) reflects forward-looking assessment of
-remaining productive years.
+The model effectively answered our four research questions. The cubic
+time polynomial captured the hypothesized boom-and-bust cycle, with the
+2020 centering strategy isolating the pandemic's structural impact. The
+quadratic age term confirmed the inverted-U career trajectory,
+identifying the peak valuation age. Squad status, operationalized
+through within-club standardized minutes, emerged as a stronger
+predictor than raw performance metrics, and the inclusion of
+region-of-origin effects revealed geographic valuation disparities.
 
-The dominance of minutes played (\(\pi_6=0.35\)) over position-specific
-metrics suggests that markets rely heavily on managerial assessments as
-signals of underlying quality, consistent with signaling theory. A one
-standard deviation increase in relative playing time yields a 42\%
-valuation premium. The finding that homegrown players are valued
-approximately 17\% lower than comparable foreign imports
-(\(\gamma_2=-0.19\)) suggests domestic players may be systematically
-undervalued while international recruitment requires competitive bidding
-that inflates prices.
+Several limitations warrant consideration. First, our sample comprises
+only elite clubs from top European leagues, limiting generalizability to
+lower divisions or non-European markets. Second, Transfermarkt
+valuations, while validated as proxies for transfer fees, reflect
+crowd-sourced estimates rather than actual transaction prices. Third,
+our model cannot capture unobserved factors such as injury history,
+contract length, or agent influence that likely affect valuations.
+Finally, the small number of clubs constrains the complexity of random
+effects we could estimate, preventing inclusion of a random cubic slope.
 
-In conclusion, the substantial player-level variance confirms that
-persistent individual reputation dominates market assessments, while
-club context creates meaningful premiums and growth trajectories. The
-transfer market incorporates forward-looking assessments of biological
-decline, managerial signals through squad selection, and contextual
-factors that create systematic premiums and discounts. These patterns
-represent both economic regularities that clubs can anticipate and
-potential inefficiencies that astute market participants can exploit.
+These findings carry practical implications for European football
+economics. Clubs may exploit the domestic discount by investing in
+homegrown talent development rather than paying recruitment premiums for
+foreign players of comparable quality. The strong signaling value of
+playing time suggests that loan strategies to increase minutes for young
+players could yield valuation returns beyond skill development alone.
+Additionally, the Latin American premium indicates continued market
+inefficiencies that selling clubs in South America might leverage in
+transfer negotiations. As the market continues to recover from
+pandemic-era corrections, understanding these valuation dynamics becomes
+increasingly important for sustainable club financial planning.
 
 \newpage
 
@@ -816,11 +793,11 @@ ICC)}\label{table-1.-model-fit-comparison-aic-bic-and-icc}
 BIC, and ICC)}
 
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1918}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2329}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1918}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1918}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1918}}@{}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1781}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2877}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1781}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1781}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1781}}@{}}
 \toprule\noalign{}
 \endhead
 \bottomrule\noalign{}
@@ -844,24 +821,57 @@ residual diagnostics (QQ plots) to select the most parsimonious and
 robust fit & & & \\
 \end{longtable}
 
-\subsection*{Figure 6. Model Diagnostic
-Plots}\label{figure-6.-model-diagnostic-plots}
-\addcontentsline{toc}{subsection}{Figure 6. Model Diagnostic Plots}
+\newpage
+
+\subsection*{Figure 1. Model Diagnostic
+Plots}\label{figure-1.-model-diagnostic-plots}
+\addcontentsline{toc}{subsection}{Figure 1. Model Diagnostic Plots}
+
+\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-10-1.pdf}
+
+Figure 1 presents diagnostic plots assessing model assumptions. The Q-Q
+plots confirmed that player-level random intercepts (\(n=2,159\))
+adhered well to normality, while club-level random effects (\(n=21\))
+showed minor tail departures expected with few Level 2 units (Maas \&
+Hox, 2004). The residuals versus fitted values plot (Panel C) reveals
+homoscedastic variance with no systematic patterns, supporting the
+model's distributional assumptions.
+
+\newpage
+
+\subsection*{Figure 2. Club Random Effects Correlation
+Structure}\label{figure-2.-club-random-effects-correlation-structure}
+\addcontentsline{toc}{subsection}{Figure 2. Club Random Effects
+Correlation Structure}
 
 \includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-11-1.pdf}
 
-Diagnostic plots: (A) Q-Q plot for player random intercepts, (B) Q-Q
-plot for club random intercepts, (C) residuals versus fitted values.
+Figure 2 displays the correlation structure among club-level random
+effects. The non statistically significantly negative correlation
+between intercept and linear slope (r = -0.063) indicates that clubs
+with higher baseline prestige experienced slower subsequent growth---a
+regression-to-the-mean pattern where elite clubs had less room for
+appreciation while smaller clubs showed steeper trajectories. The
+positive correlation between linear and quadratic terms (r = 0.749)
+suggests that clubs with faster initial growth also experienced more
+pronounced deceleration around the pandemic period.
 
-\subsection*{Figure 7. Club Random Effects Correlation
-Structure}\label{figure-7.-club-random-effects-correlation-structure}
-\addcontentsline{toc}{subsection}{Figure 7. Club Random Effects
-Correlation Structure}
+\newpage
+
+\subsection{Figure 3. Club-Specific Market Value Trajectories
+(2013-2024)}\label{figure-3.-club-specific-market-value-trajectories-2013-2024}
 
 \includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-12-1.pdf}
 
-Correlations among club-level random effects (intercept, linear slope,
-quadratic slope).
+Figure 3 displays predicted market value trajectories for each of the 21
+clubs, ordered by baseline prestige. The vertical positioning of panels
+confirms the club hierarchy, with elite clubs (Manchester United,
+Manchester City, Chelsea) maintaining consistently higher valuations
+than selling clubs (Sevilla, Benfica, Porto). The curvature of
+individual trajectories reveals heterogeneity in pandemic response:
+clubs like Barcelona and Juventus show concave patterns indicating
+stagnation, while Arsenal and Liverpool display convex trajectories
+suggesting more resilient recovery.
 
 \newpage
 
