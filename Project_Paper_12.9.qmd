@@ -146,7 +146,6 @@ tibble(
 
 ```
 
-
 The log-transformed market value for player $i$ at club $j$ in season $t$ is modeled as:
 
 $$
@@ -166,13 +165,11 @@ The model includes three sources of random variation: $u_i \sim N(0, \tau^2_u)$ 
 
 Season year is centered at 2020 to isolate the pandemic's structural impact, with cubic polynomial terms capturing the hypothesized "Boom-and-Bust" cycle. Age is grand-mean centered ($\bar{A} = 26.5$ years) with a quadratic term to model the biological career arc. Minutes played is standardized within each club-year to measure squad status independent of team rotation policies, while goals and assists are position-centered to capture performance relative to role-specific expectations. The vectors $\mathbf{D}^{pos}_i$ and $\mathbf{D}^{reg}_i$ contain dummy variables for player position (reference: Attacker) and region of origin (reference: Europe & Central Asia), respectively. Citizenship status ($\text{Citizen}_{ij}$) indicates whether player $i$ holds citizenship in club $j$'s country.
 
+## Centering Strategies
 
+We apply a strategic centering and transformation strategy to isolate the pandemic's structural impact and test non-linear market dynamics by centering season year at the onset of COVID-19 in 2020. We include polynomial terms to capture theorized non-linearities (Figure 2): a cubic term for time to model the "Boom-and-Bust" cycle (e.g., pre-pandemic inflation, post-pandemic correction).[^2]
 
-## Variables and Centering Strategies
-
-We apply a strategic centering and transformation strategy to isolate the pandemic's structural impact and test non-linear market dynamics by centering season year at the onset of COVID-19 in 2020. We include polynomial terms to capture theorized non-linearities (Figure 2): a cubic term for time to model the "Boom-and-Bust" cycle (e.g., pre-pandemic inflation, post-pandemic correction), and a quadratic term for Age to test the biological "Inverted-U" career trajectory. Minutes Played was standardized within each club-year to isolate player squad status (e.g., Starter vs. Bench) from team rotation policies, while performance metrics were position-centered to account for role-specific expectations.[^3]
-
-[^3]: Performance expectations vary by role: A goal from a striker is routine while for a defender is exceptional. Position-centering transforms raw counts into "performance above expectation" metrics, ensuring the model captures relative contributions rather than treating goals and assists equally.
+[^2]: Performance expectations vary by role: A goal from a striker is routine while for a defender is exceptional. Position-centering transforms raw counts into "performance above expectation" metrics, ensuring the model captures relative contributions rather than treating goals and assists equally.
 
 ```{r}
 #| fig-width: 7
@@ -218,23 +215,27 @@ combined_plot
 
 ## Model Building and Statistical Software
 
-We employed sequential model building: (1) null model for ICC estimation; (2) linear time polynomial; (3) cubic time polynomial; (4) random slope for quadratic time at club level[^4]; (5) player/club-season Level 1 predictors with quadratic age, and all code is found in Appendix B. Model selection and comparison was guided by Likelihood Ratio Tests (LRT) to evaluate the statistical significance of nested model improvements, and the Akaike Information Criterion (AIC) and Bayesian Information Criterion (BIC). Models yielding significant LRT results (p\<.05) and lower values on both information criteria were retained for subsequent analysis. We describe each model in Appendix C, Table 1 alongside ICC, AIC, and BIC values.
+We employed sequential model building: (1) null model for ICC estimation; (2) linear time polynomial; (3) cubic time polynomial; (4) random slope for quadratic time at club level[^3]; (5) player/club-season Level 1 predictors with quadratic age, and all code is found in Appendix B. Model selection and comparison was guided by Likelihood Ratio Tests (LRT) to evaluate the statistical significance of nested model improvements, and the Akaike Information Criterion (AIC) and Bayesian Information Criterion (BIC). Models yielding significant LRT results (p\<.05) and lower values on both information criteria were retained for subsequent analysis. We describe each model in Appendix C, Table 1 alongside ICC, AIC, and BIC values.
 
-[^4]: We excluded player-level random slopes due to data sparsity; a majority of players appear in the dataset for only one or two seasons, making it mathematically impossible to disentangle their individual growth trajectories from residual error. In contrast, the club-level data provides a robust longitudinal structure with continuous observations across the decade, allowing for the stable estimation of club-specific market value trajectories.
+[^3]: We excluded player-level random slopes due to data sparsity; a majority of players appear in the dataset for only one or two seasons, making it mathematically impossible to disentangle their individual growth trajectories from residual error. In contrast, the club-level data provides a robust longitudinal structure with continuous observations across the decade, allowing for the stable estimation of club-specific market value trajectories.
 
 All analyses were conducted in R version `r getRversion()` using the `lme4 1.1-37` package for mixed-effects model estimation with a Restricted Maximum Likelihood (REML) method. REML was selected to provide unbiased estimates of the variance components by accounting for the degrees of freedom lost when estimating fixed effects. We utilized the BOBYQA optimizer, which handles boundary constraints more effectively than the default Nelder-Mead optimizer, to ensure robust model convergence given the complexity of the random effects structure. Significance tests used Satterthwaite approximations via the `lmerTest 3.1-3` package, as well as our own function to test random slope variances in Appendix B.
 
 # Results
 
-The unconditional means (null) model revealed substantial clustering at the player level. Player-level variance accounted for 78% of the total variance ($ICC_{player}=.75$), while club-level variance accounted for 5% ($ICC_{club}=.03$), highlighting that persistent individual heterogeneity dominates market valuations. Regarding temporal dynamics, model comparisons favored a cubic fixed effect for season year over a linear specification, $\chi^2(2)=45.66, p<.001$. We subsequently tested for club-specific heterogeneity in growth trajectories. A likelihood ratio test using a 50:50 mixture of $\chi^2_1$ and $\chi^2_2$ distributions[^5] confirmed that adding a random linear slope significantly improved model fit compared to the random-intercept model, $\chi^2(5)=97.13, p<.001$, indicating that clubs differ significantly not only in their growth rates but also in the curvature of their market value trajectories.[^6] Consequently, our final best-fitting model incorporates these complex random effects alongside time-varying player and club predictors ($\chi^2(19)=5626, p<.001$ compared to random slopes model). Model comparisons are shown in Appendix C, Table 1. Here we output our final model's variance components and fixed effects.
+The unconditional means (null) model revealed substantial clustering at the player level. Player-level variance accounted for 78% of the total variance ($ICC_{player}=.75$), while club-level variance accounted for 5% ($ICC_{club}=.03$), highlighting that persistent individual heterogeneity dominates market valuations. Regarding temporal dynamics, model comparisons favored a cubic fixed effect for season year over a linear specification, $\chi^2(2)=45.66, p<.001$. We subsequently tested for club-specific heterogeneity in growth trajectories. A likelihood ratio test using a 50:50 mixture of $\chi^2_1$ and $\chi^2_2$ distributions[^4] confirmed that adding a random linear slope significantly improved model fit compared to the random-intercept model, $\chi^2(5)=97.13, p<.001$, indicating that clubs differ significantly not only in their growth rates but also in the curvature of their market value trajectories.[^5] Consequently, our final best-fitting model incorporates these complex random effects alongside time-varying player and club predictors ($\chi^2(19)=5626, p<.001$ compared to random slopes model). Model comparisons are shown in Appendix C, Table 1.
 
-[^5]: We test whether a random slope with quadratic season year at the club level has better fit to the data. We find evidence supporting the need to include these random slopes using a likelihood ratio test with an alternative hypothesis, $H_A=\tau_{11} > 0$ since variance should be larger than 0. To test this hypothesis we use the likelihood ratio test (LRT) simply by $-2[\text{log likelihood}_{reduced} - \text{log likelihood}_{full}]$ to examine the difference. This code can be found in Appendix B.
+[^4]: We test whether a random slope with quadratic season year at the club level has better fit to the data. We find evidence supporting the need to include these random slopes using a likelihood ratio test with an alternative hypothesis, $H_A=\tau_{11} > 0$ since variance should be larger than 0. To test this hypothesis we use the likelihood ratio test (LRT) simply by $-2[\text{log likelihood}_{reduced} - \text{log likelihood}_{full}]$ to examine the difference. This code can be found in Appendix B.
 
-[^6]: While we included random linear and quadratic slopes, a random cubic slope was excluded due to over-parameterization. Estimating only 21 clubs led to singularity; therefore, the quadratic specification represents the maximal complexity supported by the data.
+[^5]: While we included random linear and quadratic slopes, a random cubic slope was excluded due to over-parameterization. Estimating only 21 clubs led to singularity; therefore, the quadratic specification represents the maximal complexity supported by the data.
 
-Our final model converged successfully with no warnings. Q-Q plots confirmed that player-level random intercepts ($n=2,159$) adhered well to normality, while club-level random effects ($n=21$) showed minor tail departures expected with few Level 2 units (Maas & Hox, 2004). The residual versus fitted values plot revealed homoscedastic variance with no systematic patterns. Full diagnostic plots are presented in Appendix C.
+Our final model converged successfully with no warnings. Q-Q plots confirmed that player-level random intercepts ($n=2,159$) adhered well to normality, while club-level random effects ($n=21$) showed minor tail departures expected with few Level 2 units (Maas & Hox, 2004). The residual versus fitted values plot revealed homoscedastic variance with no systematic patterns. Full diagnostic plots are presented in Appendix C. Here we output our final model's variance components and fixed effects.
 
 ```{r}
+## ============================================================================
+## VARIANCE COMPONENTS TABLE WITH NOTATION
+## ============================================================================
+
 # 1. Get Variance-Covariance Matrix (VCV) and convert to data frame
 vc_summary <- as.data.frame(VarCorr(final_model))
 
@@ -259,31 +260,44 @@ resid_var <- vc_summary %>%
   filter(grp == "Residual") %>%
   pull(vcov)
 
-# 3. Create the final display table
+# 3. Create the final display table with notation
 vc_display <- tibble(
   Component = c(
     "Player (Reputation)", 
     "Club (Baseline Prestige)", 
     "Club (Linear Growth)", 
     "Club (Quadratic Curvature)", 
-    "Residual (Unexplained)"
+    "Residual"
+  ),
+  Symbol = c(
+    "$\\tau^2_u$",
+    "$\\tau^2_v$",
+    "$\\tau^2_{w1}$",
+    "$\\tau^2_{w2}$",
+    "$\\sigma^2$"
   ),
   Variance = c(player_var, club_int_var, club_lin_var, club_quad_var, resid_var),
   SD = sqrt(Variance)
 )
 
-# 4. Render with gt
-kable(vc_display, digits = 4, format = "latex", linesep = "",
+# 4. Render with kable
+kable(vc_display, 
+      digits = 4, 
+      format = "latex", 
+      linesep = "",
+      escape = FALSE,  # Important: allows LaTeX math symbols
       caption = "Estimated Variance Components for Final Model",
-      booktabs = FALSE) %>%
+      col.names = c("Component", "Symbol", "Variance", "SD"),
+      booktabs = TRUE) %>%
   kable_styling(latex_options = "HOLD_position", 
                 font_size = 11) %>%
   column_spec(1, bold = TRUE)
 
 
-```
+## ============================================================================
+## FIXED EFFECTS TABLE WITH NOTATION
+## ============================================================================
 
-```{r}
 fx <- tidy(final_model, effects = "fixed", conf.int = TRUE) |>
   mutate(
     pct = (exp(estimate) - 1) * 100,
@@ -293,6 +307,7 @@ fx <- tidy(final_model, effects = "fixed", conf.int = TRUE) |>
       p.value < 0.05 ~ "*",
       TRUE ~ ""
     ),
+    # Clean term names
     term_clean = case_when(
       term == "(Intercept)" ~ "Intercept",
       str_detect(term, "year_c.*1") ~ "Year (linear)",
@@ -301,8 +316,8 @@ fx <- tidy(final_model, effects = "fixed", conf.int = TRUE) |>
       str_detect(term, "age_c.*1") ~ "Age (linear)",
       str_detect(term, "age_c.*2") ~ "Age²",
       term == "height_c" ~ "Height",
-      term == "goals_c" ~ "Goals",
-      term == "assists_c" ~ "Assists",
+      term == "goals" ~ "Goals",
+      term == "assists" ~ "Assists",
       term == "red_cards" ~ "Red cards",
       term == "yellow_cards" ~ "Yellow cards",
       term == "minutes_played" ~ "Minutes (Z)",
@@ -315,19 +330,48 @@ fx <- tidy(final_model, effects = "fixed", conf.int = TRUE) |>
       term == "foreign_players" ~ "Proportion of Foreign Players",
       str_detect(term, "Region") ~ str_replace(term, "Region", ""),
       TRUE ~ term
+    ),
+    # Add notation symbols
+    symbol = case_when(
+      term == "(Intercept)" ~ "$\\gamma_{00}$",
+      str_detect(term, "year_c.*1") ~ "$\\gamma_1$",
+      str_detect(term, "year_c.*2") ~ "$\\gamma_2$",
+      str_detect(term, "year_c.*3") ~ "$\\gamma_3$",
+      str_detect(term, "age_c.*1") ~ "$\\gamma_4$",
+      str_detect(term, "age_c.*2") ~ "$\\gamma_5$",
+      term == "minutes_played" ~ "$\\gamma_6$",
+      term == "goals" ~ "$\\gamma_7$",
+      term == "assists" ~ "$\\gamma_8$",
+      term == "red_cards" ~ "$\\gamma_9$",
+      term == "yellow_cards" ~ "$\\gamma_{10}$",
+      term == "foreign_players" ~ "$\\gamma_{11}$",
+      term == "uefa_coefficient" ~ "$\\gamma_{12}$",
+      term == "height_c" ~ "$\\beta_1$",
+      term == "citizen_of_club_countryYes" ~ "$\\beta_2$",
+      term == "positionDefender" ~ "$\\beta_{pos,1}$",
+      term == "positionGoalkeeper" ~ "$\\beta_{pos,2}$",
+      term == "positionMidfield" ~ "$\\beta_{pos,3}$",
+      str_detect(term, "Region") ~ "$\\beta_{reg}$",
+      TRUE ~ ""
     )
   )
 
+# Filter and select columns for display
 fx_display <- fx |>
   filter(!str_detect(term_clean, "Intercept|Region|Asia|Africa|America|Middle")) |>
-  select(term_clean, estimate, std.error, statistic, pct, sig)
+  select(term_clean, symbol, estimate, std.error, statistic, pct, sig)
 
+# Render with kable
 kable(fx_display, 
-      digits = c(0, 3, 3, 2, 1, 0), 
+      digits = c(0, 0, 3, 3, 2, 1, 0), 
       format = "latex", 
       linesep = "",
+      escape = FALSE,  # Important: allows LaTeX math symbols
       caption = "Fixed Effects Estimates from Final Model",
-      col.names = c("Predictor", "β", "SE", "t", "% Change", "")) %>%
+      col.names = 
+        c("Predictor", "Symbol", 
+          "$\\hat{\\gamma}/\\hat{\\beta}$", "SE", "$t$", "\\% Change", ""),
+      booktabs = TRUE) %>%
   kable_styling(latex_options = "HOLD_position", 
                 font_size = 11,
                 full_width = FALSE) %>%
@@ -335,6 +379,8 @@ kable(fx_display,
   footnote(general = "*** p < .001, ** p < .01, * p < .05",
            footnote_as_chunk = TRUE, 
            threeparttable = TRUE)
+
+
 ```
 
 ### Market Evolution
@@ -425,9 +471,9 @@ ggplot(final_plot_data, aes(x = x + 2020, y = predicted)) +
 
 ### Biological Age
 
-Our model predicts the peak age to be 26.9[^7] for optimal transfer market value we visualize in Figure 4 the biological constraints on valuation. The curve rises steeply as players transition from 'prospects' (Age 17–23), flattens into a 'prime' plateau between ages 26 and 28, and declines steadily thereafter. The model predicts that a player's value drops by approximately 1.5 log points (from a peak of 17.0 to 15.5) as they age from 27 to 35, reflecting the market's heavy discount on older assets with limited resale potential.
+Our model predicts the peak age to be 26.9[^6] for optimal transfer market value we visualize in Figure 4 the biological constraints on valuation. The curve rises steeply as players transition from 'prospects' (Age 17–23), flattens into a 'prime' plateau between ages 26 and 28, and declines steadily thereafter. The model predicts that a player's value drops by approximately 1.5 log points (from a peak of 17.0 to 15.5) as they age from 27 to 35, reflecting the market's heavy discount on older assets with limited resale potential.
 
-[^7]: We use the delta method, specifically Taylor series approximation, to propagate uncertainty through nonlinear transformation of $-\beta_{age} / (2 \times \beta_{age^2})$.
+[^6]: We use the delta method, specifically Taylor series approximation, to propagate uncertainty through nonlinear transformation of $-\beta_{age} / (2 \times \beta_{age^2})$.
 
 ```{r}
 # average age
@@ -779,7 +825,7 @@ calculate_lrt_mixture(model_time_cubic, model_slope_quadratic)
 ## Table 1. Model Fit Comparison (AIC, BIC, and ICC) {.unnumbered}
 
 |  |  |  |  |  |
-|-------------|----------------------|-------------|-------------|-------------|
+|--------------|-----------------|--------------|--------------|--------------|
 | **Models** | **Purpose & Research Justification** | ICCplayer/ club | AIC | BIC |
 | **Null** | Calculate ICC and partition variance between players and clubs before adding predictors | .75/.03 | 20105.19 | 20132.62 |
 | **Time Linear** | Test for a general linear trend in market value growth | .76/.03 | 20050.17 | 20084.46 |

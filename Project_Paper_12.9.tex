@@ -342,24 +342,19 @@ Asia), respectively. Citizenship status (\(\text{Citizen}_{ij}\))
 indicates whether player \(i\) holds citizenship in club \(j\)'s
 country.
 
-\subsection{Variables and Centering
-Strategies}\label{variables-and-centering-strategies}
+\subsection{Centering Strategies}\label{centering-strategies}
 
 We apply a strategic centering and transformation strategy to isolate
 the pandemic's structural impact and test non-linear market dynamics by
 centering season year at the onset of COVID-19 in 2020. We include
 polynomial terms to capture theorized non-linearities (Figure 2): a
 cubic term for time to model the ``Boom-and-Bust'' cycle (e.g.,
-pre-pandemic inflation, post-pandemic correction), and a quadratic term
-for Age to test the biological ``Inverted-U'' career trajectory. Minutes
-Played was standardized within each club-year to isolate player squad
-status (e.g., Starter vs.~Bench) from team rotation policies, while
-performance metrics were position-centered to account for role-specific
-expectations.\footnote{Performance expectations vary by role: A goal
-  from a striker is routine while for a defender is exceptional.
-  Position-centering transforms raw counts into ``performance above
-  expectation'' metrics, ensuring the model captures relative
-  contributions rather than treating goals and assists equally.}
+pre-pandemic inflation, post-pandemic correction).\footnote{Performance
+  expectations vary by role: A goal from a striker is routine while for
+  a defender is exceptional. Position-centering transforms raw counts
+  into ``performance above expectation'' metrics, ensuring the model
+  captures relative contributions rather than treating goals and assists
+  equally.}
 
 \includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-2-1.pdf}
 
@@ -428,8 +423,7 @@ trajectories.\footnote{While we included random linear and quadratic
 best-fitting model incorporates these complex random effects alongside
 time-varying player and club predictors (\(\chi^2(19)=5626, p<.001\)
 compared to random slopes model). Model comparisons are shown in
-Appendix C, Table 1. Here we output our final model's variance
-components and fixed effects.
+Appendix C, Table 1.
 
 Our final model converged successfully with no warnings. Q-Q plots
 confirmed that player-level random intercepts (\(n=2,159\)) adhered well
@@ -437,23 +431,24 @@ to normality, while club-level random effects (\(n=21\)) showed minor
 tail departures expected with few Level 2 units (Maas \& Hox, 2004). The
 residual versus fitted values plot revealed homoscedastic variance with
 no systematic patterns. Full diagnostic plots are presented in Appendix
-C.
+C. Here we output our final model's variance components and fixed
+effects.
 
 \begin{table}[H]
 \centering
 \caption{Estimated Variance Components for Final Model}
 \centering
 \fontsize{11}{13}\selectfont
-\begin{tabular}[t]{>{}l|r|r}
-\hline
-Component & Variance & SD\\
-\hline
-\textbf{Player (Reputation)} & 0.9254 & 0.9620\\
-\textbf{Club (Baseline Prestige)} & 0.0541 & 0.2326\\
-\textbf{Club (Linear Growth)} & 0.0105 & 0.1025\\
-\textbf{Club (Quadratic Curvature)} & 0.0073 & 0.0855\\
-\textbf{Residual (Unexplained)} & 0.2070 & 0.4550\\
-\hline
+\begin{tabular}[t]{>{}llrr}
+\toprule
+Component & Symbol & Variance & SD\\
+\midrule
+\textbf{Player (Reputation)} & $\tau^2_u$ & 0.9254 & 0.9620\\
+\textbf{Club (Baseline Prestige)} & $\tau^2_v$ & 0.0541 & 0.2326\\
+\textbf{Club (Linear Growth)} & $\tau^2_{w1}$ & 0.0105 & 0.1025\\
+\textbf{Club (Quadratic Curvature)} & $\tau^2_{w2}$ & 0.0073 & 0.0855\\
+\textbf{Residual} & $\sigma^2$ & 0.2070 & 0.4550\\
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -463,28 +458,28 @@ Component & Variance & SD\\
 \centering
 \fontsize{11}{13}\selectfont
 \begin{threeparttable}
-\begin{tabular}[t]{>{}l|r|r|r|r|l}
-\hline
-Predictor & β & SE & t & \% Change & \\
-\hline
-\textbf{Year (linear)} & 0.002 & 0.030 & 0.08 & 0.2 & \\
-\textbf{Year²} & -0.270 & 0.024 & -11.05 & -23.7 & ***\\
-\textbf{Year³} & -0.117 & 0.011 & -10.98 & -11.0 & ***\\
-\textbf{Height} & 0.010 & 0.004 & 2.81 & 1.0 & **\\
-\textbf{Defender} & -0.403 & 0.058 & -6.97 & -33.2 & ***\\
-\textbf{Goalkeeper} & -1.059 & 0.095 & -11.17 & -65.3 & ***\\
-\textbf{Midfielder} & -0.190 & 0.058 & -3.29 & -17.3 & **\\
-\textbf{Domestic citizen} & -0.185 & 0.031 & -5.89 & -16.9 & ***\\
-\textbf{Age (linear)} & 0.019 & 0.004 & 5.02 & 1.9 & ***\\
-\textbf{Age²} & -0.024 & 0.000 & -63.08 & -2.4 & ***\\
-\textbf{goals} & 0.005 & 0.002 & 2.36 & 0.5 & *\\
-\textbf{assists} & 0.010 & 0.003 & 3.51 & 1.0 & ***\\
-\textbf{Red cards} & 0.009 & 0.022 & 0.42 & 0.9 & \\
-\textbf{Yellow cards} & -0.002 & 0.003 & -0.49 & -0.2 & \\
-\textbf{Minutes (Z)} & 0.350 & 0.013 & 26.20 & 41.9 & ***\\
-\textbf{UEFA Coefficient} & 0.000 & 0.001 & -0.39 & 0.0 & \\
-\textbf{Proportion of Foreign Players} & 0.103 & 0.104 & 0.99 & 10.8 & \\
-\hline
+\begin{tabular}[t]{>{}llrrrrl}
+\toprule
+Predictor & Symbol & $\hat{\gamma}/\hat{\beta}$ & SE & $t$ & \% Change & \\
+\midrule
+\textbf{Year (linear)} & $\gamma_1$ & 0.002 & 0.030 & 0.08 & 0.2 & \\
+\textbf{Year²} & $\gamma_2$ & -0.270 & 0.024 & -11.05 & -23.7 & ***\\
+\textbf{Year³} & $\gamma_3$ & -0.117 & 0.011 & -10.98 & -11.0 & ***\\
+\textbf{Height} & $\beta_1$ & 0.010 & 0.004 & 2.81 & 1.0 & **\\
+\textbf{Defender} & $\beta_{pos,1}$ & -0.403 & 0.058 & -6.97 & -33.2 & ***\\
+\textbf{Goalkeeper} & $\beta_{pos,2}$ & -1.059 & 0.095 & -11.17 & -65.3 & ***\\
+\textbf{Midfielder} & $\beta_{pos,3}$ & -0.190 & 0.058 & -3.29 & -17.3 & **\\
+\textbf{Domestic citizen} & $\beta_2$ & -0.185 & 0.031 & -5.89 & -16.9 & ***\\
+\textbf{Age (linear)} & $\gamma_4$ & 0.019 & 0.004 & 5.02 & 1.9 & ***\\
+\textbf{Age²} & $\gamma_5$ & -0.024 & 0.000 & -63.08 & -2.4 & ***\\
+\textbf{Goals} & $\gamma_7$ & 0.005 & 0.002 & 2.36 & 0.5 & *\\
+\textbf{Assists} & $\gamma_8$ & 0.010 & 0.003 & 3.51 & 1.0 & ***\\
+\textbf{Red cards} & $\gamma_9$ & 0.009 & 0.022 & 0.42 & 0.9 & \\
+\textbf{Yellow cards} & $\gamma_{10}$ & -0.002 & 0.003 & -0.49 & -0.2 & \\
+\textbf{Minutes (Z)} & $\gamma_6$ & 0.350 & 0.013 & 26.20 & 41.9 & ***\\
+\textbf{UEFA Coefficient} & $\gamma_{12}$ & 0.000 & 0.001 & -0.39 & 0.0 & \\
+\textbf{Proportion of Foreign Players} & $\gamma_{11}$ & 0.103 & 0.104 & 0.99 & 10.8 & \\
+\bottomrule
 \end{tabular}
 \begin{tablenotes}[para]
 \item \textit{Note: } 
@@ -517,7 +512,7 @@ convex trajectories (e.g., Arsenal, Liverpool) show stronger momentum,
 indicating a more resilient recovery and active value generation
 throughout the decade.
 
-\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-5-1.pdf}
+\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-4-1.pdf}
 
 \subsubsection{Biological Age}\label{biological-age}
 
@@ -533,7 +528,7 @@ player's value drops by approximately 1.5 log points (from a peak of
 17.0 to 15.5) as they age from 27 to 35, reflecting the market's heavy
 discount on older assets with limited resale potential.
 
-\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-7-1.pdf}
+\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-6-1.pdf}
 
 \subsubsection{\texorpdfstring{\textbf{Contextual Premiums and
 Discounts}}{Contextual Premiums and Discounts}}\label{contextual-premiums-and-discounts}
@@ -567,7 +562,7 @@ European baseline), Latin America stands out as the only region with a
 positive premium (\(\gamma_{region}=0.19\)), suggesting South American
 players function as a ``premium export brand'' in the global market.
 
-\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-8-1.pdf}
+\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-7-1.pdf}
 
 \section{Discussion}\label{discussion}
 
@@ -821,11 +816,11 @@ ICC)}\label{table-1.-model-fit-comparison-aic-bic-and-icc}
 BIC, and ICC)}
 
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1757}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2973}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1757}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1757}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1757}}@{}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1918}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2329}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1918}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1918}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1918}}@{}}
 \toprule\noalign{}
 \endhead
 \bottomrule\noalign{}
@@ -853,7 +848,7 @@ robust fit & & & \\
 Plots}\label{figure-6.-model-diagnostic-plots}
 \addcontentsline{toc}{subsection}{Figure 6. Model Diagnostic Plots}
 
-\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-12-1.pdf}
+\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-11-1.pdf}
 
 Diagnostic plots: (A) Q-Q plot for player random intercepts, (B) Q-Q
 plot for club random intercepts, (C) residuals versus fitted values.
@@ -863,7 +858,7 @@ Structure}\label{figure-7.-club-random-effects-correlation-structure}
 \addcontentsline{toc}{subsection}{Figure 7. Club Random Effects
 Correlation Structure}
 
-\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-13-1.pdf}
+\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-12-1.pdf}
 
 Correlations among club-level random effects (intercept, linear slope,
 quadratic slope).
