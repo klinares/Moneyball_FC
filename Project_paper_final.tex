@@ -224,7 +224,7 @@ Chakravarti}
 \maketitle
 
 
-\vspace{-2cm}
+\vspace{-1.5cm}
 
 \section{Introduction}\label{introduction}
 
@@ -263,7 +263,9 @@ investigate four critical dynamics:
   valuations?
 \end{enumerate}
 
-\subsection{Sample and Data}\label{sample-and-data}
+\section{Method}\label{method}
+
+\subsubsection{Sample and Data}\label{sample-and-data}
 
 We obtained data from Transfermarkt and UEFA official rankings using
 purposive sampling to select the top 21 European clubs based on 10-year
@@ -290,7 +292,7 @@ coefficient, which serves as a proxy for recent competitive success and
 prestige. For further descriptive statistics on each variable see
 Appendix A, Table 1.
 
-\subsection{Model Specification}\label{model-specification}
+\subsubsection{Model Specification}\label{model-specification}
 
 Our data exhibit a cross-classified structure where players (\(i\)) are
 observed repeatedly over time (\(t\)), but club membership (\(j\))
@@ -298,7 +300,7 @@ changes when players transfer between teams. This structure requires
 modeling players and clubs as crossed random effects rather than nested
 effects. Figure 1 visualizes our cross-classified design.
 
-\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-1-1.pdf}
+\includegraphics{Project_paper_final_files/figure-pdf/unnamed-chunk-1-1.pdf}
 
 \[
 \begin{aligned}
@@ -340,9 +342,9 @@ origin (reference: Europe \& Central Asia), respectively. Citizenship
 status (\(\text{Citizen}_{ij}\)) indicates whether player \(i\) holds
 citizenship in club \(j\)'s country.
 
-\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-2-1.pdf}
+\includegraphics{Project_paper_final_files/figure-pdf/unnamed-chunk-2-1.pdf}
 
-\subsection{Model Testing and Statistical
+\subsubsection{Model Testing and Statistical
 Software}\label{model-testing-and-statistical-software}
 
 We employed sequential model building: (1) null model for ICC
@@ -472,7 +474,7 @@ Predictor & Symbol & $\hat{\gamma}/\hat{\beta}$ & SE & $t$ & \% Change & \\
 \end{threeparttable}}
 \end{table}
 
-\subsection{Market Evolution}\label{market-evolution}
+\subsubsection{Market Evolution}\label{market-evolution}
 
 Using raw polynomials centered at 2020 (\(t=0\)), our model
 mathematically pinpoints the moment the market froze. The linear
@@ -489,9 +491,9 @@ patterns indicating stagnation, whereas Arsenal and Liverpool display
 more resilient recovery and active value generation throughout the
 decade.
 
-\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-4-1.pdf}
+\includegraphics{Project_paper_final_files/figure-pdf/unnamed-chunk-4-1.pdf}
 
-\subsection{Biological Age}\label{biological-age}
+\subsubsection{Biological Age}\label{biological-age}
 
 Our model predicts the peak age to be 26.9\footnote{We use the delta
   method, specifically Taylor series approximation, to propagate
@@ -502,9 +504,9 @@ The model predicts peak valuation at age 27, with values dropping
 approximately 1.5 log points by age 35, reflecting the market's discount
 on older assets with limited resale potential.
 
-\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-6-1.pdf}
+\includegraphics{Project_paper_final_files/figure-pdf/unnamed-chunk-6-1.pdf}
 
-\subsection{\texorpdfstring{\textbf{Contextual Premiums and
+\subsubsection{\texorpdfstring{\textbf{Contextual Premiums and
 Discounts}}{Contextual Premiums and Discounts}}\label{contextual-premiums-and-discounts}
 
 Squad status remains the dominant behavioral driver, with a one standard
@@ -516,12 +518,12 @@ squad internationalization \(\gamma_{11}=.10, p=.32\) nor UEFA
 coefficient (\(p=.70\)) reached significance, suggesting these metrics
 add little beyond club random effects. Figure 5 summarizes Level 2 fixed
 effects. Attackers command the highest valuations, with Goalkeepers
-facing the steepest positional penalty \(\beta_{pos,2}=-1.06\). Among
-regions, only Latin America shows a significant premium
-\(\beta_{reg, 2}=.19\) suggesting South American players function as a
-``premium export brand'' in the global market.
+facing the steepest positional penalty \(\beta_{pos,2}=-1.06\). Latin
+America shows a significant premium \(\beta_{reg, 2}=.19\) suggesting
+South American players function as a ``premium export brand'' in the
+global market.
 
-\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-7-1.pdf}
+\includegraphics{Project_paper_final_files/figure-pdf/unnamed-chunk-7-1.pdf}
 
 \section{Discussion}\label{discussion}
 
@@ -545,7 +547,7 @@ through within-club standardized minutes, emerged as a stronger
 predictor than raw performance metrics, and the inclusion of
 region-of-origin effects revealed geographic valuation disparities.
 
-\subsection{Limitations}\label{limitations}
+\subsubsection{Limitations}\label{limitations}
 
 Several limitations warrant consideration. First, our sample comprises
 only elite clubs from top European leagues, limiting generalizability to
@@ -557,7 +559,7 @@ contract length, or agent influence that likely affect valuations.
 Finally, the small number of clubs constrains the complexity of random
 effects we could estimate, preventing inclusion of a random cubic slope.
 
-\subsection{Implications}\label{implications}
+\subsubsection{Implications}\label{implications}
 
 These findings carry practical implications for European football
 economics. Clubs may exploit the domestic discount by investing in
@@ -798,10 +800,10 @@ BIC, and ICC)}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1806}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2778}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3750}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1806}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1806}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1806}}@{}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1389}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1250}}@{}}
 \toprule\noalign{}
 \endhead
 \bottomrule\noalign{}
@@ -830,7 +832,7 @@ robust fit & & & \\
 \subsection*{}\label{section}
 \addcontentsline{toc}{subsection}{}
 
-\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-11-1.pdf}
+\includegraphics{Project_paper_final_files/figure-pdf/unnamed-chunk-11-1.pdf}
 
 Q-Q plots confirmed that player-level random intercepts (n = 2,159)
 adhered well to normality, while club-level random effects (n = 21)
@@ -840,7 +842,7 @@ homoscedastic variance with no systematic patterns.
 
 \newpage
 
-\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-12-1.pdf}
+\includegraphics{Project_paper_final_files/figure-pdf/unnamed-chunk-12-1.pdf}
 
 HEAD The correlation between club intercept and linear slope was weak
 and non-significant (r = -0.06), suggesting minimal
