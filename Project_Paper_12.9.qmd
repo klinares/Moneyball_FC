@@ -592,7 +592,7 @@ plot_summs(final_model,
 
 # Discussion
 
-Our cross-classified multilevel model successfully addressed the methodological challenge of players transferring between clubs over time, properly partitioning variance between portable player reputation and club-level effects. The model converged without warnings, and diagnostic plots confirmed that distributional assumptions were reasonably satisfied—player-level random intercepts adhered closely to normality, while minor tail departures in club-level effects were expected given only 21 Level 2 units. The residuals versus fitted values plot showed homoscedastic variance with no systematic patterns, indicating adequate specification.
+Our cross-classified multilevel model successfully addressed the methodological challenge of players transferring between clubs over time, properly partitioning variance between portable player reputation and club-level effects. The model converged without warnings, and diagnostic plots confirmed that distributional assumptions were reasonably satisfied i.e., player-level random intercepts adhered closely to normality, while minor tail departures in club-level effects were expected given only 21 Level 2 units. The residuals versus fitted values plot showed homoscedastic variance with no systematic patterns, indicating adequate specification.
 
 The model effectively answered our four research questions. The cubic time polynomial captured the hypothesized boom-and-bust cycle, with the 2020 centering strategy isolating the pandemic's structural impact. The quadratic age term confirmed the inverted-U career trajectory, identifying the peak valuation age. Squad status, operationalized through within-club standardized minutes, emerged as a stronger predictor than raw performance metrics, and the inclusion of region-of-origin effects revealed geographic valuation disparities.
 
@@ -849,7 +849,7 @@ calculate_lrt_mixture(model_time_cubic, model_slope_quadratic)
 ## Table 1. Model Fit Comparison (AIC, BIC, and ICC) {.unnumbered}
 
 |  |  |  |  |  |
-|-------------|---------------------------|-------------|----------|----------|
+|---------------|-------------------------|-------------|----------|----------|
 | **Models** | **Purpose & Research Justification** | ICCplayer/ club | AIC | BIC |
 | **Null** | Calculate ICC and partition variance between players and clubs before adding predictors | .75/.03 | 20105.19 | 20132.62 |
 | **Time Linear** | Test for a general linear trend in market value growth | .76/.03 | 20050.17 | 20084.46 |
@@ -984,7 +984,7 @@ fig_heatmap
 
 ```
 
-The correlation between club intercept and linear slope was weak and non-significant (r = -0.06), suggesting minimal regression-to-the-mean. The positive correlation between linear and quadratic slopes (r = 0.75) indicates that clubs with faster initial growth experienced more pronounced curvature around the pandemic period.
+HEAD The correlation between club intercept and linear slope was weak and non-significant (r = -0.06), suggesting minimal regression-to-the-mean. The positive correlation between linear and quadratic slopes (r = 0.75) indicates that clubs with faster initial growth experienced more pronounced curvature around the pandemic period.
 
 ```{r}
 # Clean up workspace
