@@ -41,7 +41,7 @@
 \usepackage{xcolor}
 \usepackage[top=1in,bottom=1in,left=1in,right=1in]{geometry}
 \setlength{\emergencystretch}{3em} % prevent overfull lines
-\setcounter{secnumdepth}{5}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
 % Make \paragraph and \subparagraph free-standing
 \makeatletter
 \ifx\paragraph\undefined\else
@@ -227,35 +227,33 @@ Chakravarti}
 The European football transfer market has evolved from a scouting
 exercise to a global financial industry generating €38bn in revenue
 (Deloitte, 2025). While key research identifies performance metrics like
-goals as drivers for player valuation (Frick, 2007), more recent
-scholarship highlights non-performance factors such as brand visibility
-(Franck \& Nüesch, 2012; Rosen, 1981). However, the market has recently
-bifurcated into a pre-2020 hyper-inflationary era, termed the ``Neymar
-Effect'' (Poli et al., 2017), and a post-2020 pandemic correction
-(Drewes et al., 2021), with COVID-19 causing an estimated €8.7 billion
-revenue shortfall (Deloitte, 2021) that serves as a natural structural
-break for analysis. Using Transfermarkt estimates as validated proxies
-for transfer fees (Herm et al., 2014), we fit a cross-classified
-multilevel model to account for players transferring between clubs. We
-address this gap by fitting a cross-classified multilevel model to a
-decade of data (2013--2024), centering at the 2020 baseline to isolate
-pandemic impacts while accounting for player movements across clubs. We
-attempt to disentangle individual reputation from club context by
-investigate four critical d
+goals as drivers for player valuation (Frick, 2007), recent scholarship
+highlights non-performance factors such as brand visibility (Franck \&
+Nüesch, 2012; Rosen, 1981). However, the market has recently bifurcated
+into a pre-2020 hyper-inflationary era (Poli et al., 2017), and a
+post-2020 pandemic correction (Drewes et al., 2021), with COVID-19
+causing an estimated €8.7 billion revenue shortfall (Deloitte, 2021).
+Using Transfermarkt estimates as validated proxies for transfer fees
+(Herm et al., 2014), we fit a cross-classified multilevel model to
+account for players transferring between clubs. We address this gap by
+fitting a cross-classified multilevel model to a decade of data
+(2013--2024), centering at the 2020 baseline to isolate pandemic impacts
+while accounting for player movements across clubs. Specifically, we
+investigate four critical dynamics:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  What non-linear ``Boom and Bust'' (i.e., rapid economic expansion met
-  with sharp contraction) patterns characterize the transfer market's
-  evolution relative to the 2020 pandemic baseline?
+  What non-linear ``Boom and Bust'' (i.e., economic expansion, sharp
+  contraction) patterns characterize the transfer market's evolution
+  relative to the pandemic baseline?
 \item
   At what age does player market valuation reach its peak across the
   biological career trajectory?
 \item
-  To what degree does squad status---defined by relative playing
-  time---predict market value independent of raw performance output?
+  To what degree does squad status predict market value independent of
+  raw performance?
 \item
   How does squad internationalization affect individual player market
   valuations?
@@ -270,13 +268,13 @@ averaged UEFA coefficient rankings\footnote{UEFA coefficient rankings
   rank national associations and clubs based on their performance in
   European competitions, which determines qualification spots and
   seeding for tournaments like the Champions League and Europa League.}.
-From these clubs we identified players who had a full season from 2013
-through 2024 resulting in a sample of 7,023 player-season observations
-from 2,159 unique players across. After listwise deletion of cases with
-missing citizenship data (approximately 2\% loss), players averaged 26.5
-years of age (\emph{SD} = 4.6).
+Players from these clubs who had at least a full season during our time
+frame were selected resulting in a sample of 7,023 player-season
+observations from 2,159 unique players across. After listwise deletion
+of cases with missing citizenship data (\textasciitilde2\% loss),
+players averaged 26.5 years of age (\emph{SD} = 4.6).
 
-Our primary outcome variable is the natural logarithm of the player's
+Our outcome variable is the natural logarithm of the player's
 inflation-adjusted yearly average market value (in 2024 USD). Predictors
 are categorized into three distinct domains: (1) Player Characteristics,
 including age, height, position (Attacker, Midfielder, etc.), and
@@ -292,13 +290,10 @@ further descriptive statistics on each variable see Appendix A, Table 1.
 Our data exhibit a cross-classified structure where players (\(i\)) are
 observed repeatedly over time (\(t\)), but club membership (\(j\))
 changes when players transfer between teams. This structure requires
-modeling player and club as crossed random effects rather than nested
+modeling players and clubs as crossed random effects rather than nested
 effects. Figure 1 visualizes our cross-classified design.
 
 \includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-1-1.pdf}
-
-The log-transformed market value for player \(i\) at club \(j\) in
-season \(t\) is modeled as:
 
 \[
 \begin{aligned}
@@ -387,30 +382,18 @@ model comparisons favored a cubic fixed effect for season year over a
 linear specification, \(\chi^2(2)=45.66, p<.001\). We subsequently
 tested for club-specific heterogeneity in growth trajectories. A
 likelihood ratio test using a 50:50 mixture of \(\chi^2_1\) and
-\(\chi^2_2\) distributions\footnote{We test whether a random slope with
-  quadratic season year at the club level has better fit to the data. We
-  find evidence supporting the need to include these random slopes using
-  a likelihood ratio test with an alternative hypothesis,
-  \(H_A=\tau_{11} > 0\) since variance should be larger than 0. To test
-  this hypothesis we use the likelihood ratio test (LRT) simply by
-  \(-2[\text{log likelihood}_{reduced} - \text{log likelihood}_{full}]\)
-  to examine the difference. This code can be found in Appendix B.}
-confirmed that adding a random linear slope significantly improved model
-fit compared to the random-intercept model, \(\chi^2(5)=97.13, p<.001\),
-indicating that clubs differ significantly not only in their growth
-rates but also in the curvature of their market value
-trajectories.\footnote{While we included random linear and quadratic
-  slopes, a random cubic slope was excluded due to
-  over-parameterization. Estimating only 21 clubs led to singularity;
-  therefore, the quadratic specification represents the maximal
-  complexity supported by the data.} Consequently, our final
-best-fitting model incorporates these complex random effects alongside
-time-varying player and club predictors (\(\chi^2(19)=5626, p<.001\)
-compared to random slopes model). Model comparisons are shown in
-Appendix C, Table 1. Our final model converged successfully and model
-diagnostic plots (see Appendix C, Figure 1) confirmed normality of
-random effects and homoscedastic residuals, along with the correlation
-structure captured in Appendix C, Figure 2.
+\(\chi^2_2\) distributions confirmed that adding a random linear slope
+significantly improved model fit compared to the random-intercept model,
+\(\chi^2(5)=97.13, p<.001\), indicating that clubs differ significantly
+not only in their growth rates but also in the curvature of their market
+value trajectories. Consequently, our final best-fitting model
+incorporates these complex random effects alongside time-varying player
+and club predictors (\(\chi^2(19)=5626, p<.001\) compared to random
+slopes model). Model comparisons are shown in Appendix C, Table 1. Our
+final model converged successfully and model diagnostic plots (see
+Appendix C, Figure 1) confirmed normality of random effects and
+homoscedastic residuals, along with the correlation structure captured
+in Appendix C, Figure 2.
 
 \begin{table}[H]
 \centering
@@ -495,13 +478,15 @@ coefficient at the 2020 baseline is effectively zero
 the pandemic, the relentless inflation of the previous decade came to a
 complete halt. The significant negative quadratic (\(\gamma_2 = -0.27\))
 and cubic (\(\gamma_3 = -0.12\)) terms confirm the transition from a
-pre-2019 ``Boom'' into a structural correction. Appendix C, Figure 3
-displays club specific trajectories, with panels ordered by baseline
-prestige. Elite clubs maintain higher valuations throughout, while
-trajectory curvature varies substantially. Clubs like Barcelona and
-Juventus show concave patterns indicating stagnation, whereas Arsenal
-and Liverpool display more resilient recovery, indicating a more
-resilient recovery and active value generation throughout the decade.
+pre-2019 ``Boom'' into a structural correction. Figure 3 displays club
+specific trajectories, with panels ordered by baseline prestige. Elite
+clubs maintain higher valuations throughout, while trajectory curvature
+varies substantially. Clubs like Barcelona and Juventus show concave
+patterns indicating stagnation, whereas Arsenal and Liverpool display
+more resilient recovery, indicating a more resilient recovery and active
+value generation throughout the decade.
+
+\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-4-1.pdf}
 
 \subsubsection{Biological Age}\label{biological-age}
 
@@ -509,12 +494,12 @@ Our model predicts the peak age to be 26.9\footnote{We use the delta
   method, specifically Taylor series approximation, to propagate
   uncertainty through nonlinear transformation of
   \(-\gamma_{4} / (2 \times \gamma_{5})\).} for optimal transfer market
-value. We visualize in Figure 3 the biological constraints on valuation.
+value. We visualize in Figure 4 the biological constraints on valuation.
 The model predicts peak valuation at age 27, with values dropping
 approximately 1.5 log points by age 35, reflecting the market's discount
 on older assets with limited resale potential.
 
-\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-5-1.pdf}
+\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-6-1.pdf}
 
 \subsubsection{\texorpdfstring{\textbf{Contextual Premiums and
 Discounts}}{Contextual Premiums and Discounts}}\label{contextual-premiums-and-discounts}
@@ -526,14 +511,14 @@ relative to foreign imports \(\beta_2=-.19\), potentially reflecting the
 recruitment premium required to attract international talent. Neither
 squad internationalization \(\gamma_{11}=.10, p=.32\) nor UEFA
 coefficient (\(p=.70\)) reached significance, suggesting these metrics
-add little beyond club random effects. Figure 4 summarizes Level 2 fixed
+add little beyond club random effects. Figure 5 summarizes Level 2 fixed
 effects. Attackers command the highest valuations, with Goalkeepers
 facing the steepest positional penalty \(\beta_{pos,2}=-1.06\). Among
 regions, only Latin America shows a significant premium
 \(\beta_{reg, 2}=.19\) suggesting South American players function as a
 ``premium export brand'' in the global market.
 
-\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-6-1.pdf}
+\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-7-1.pdf}
 
 \section{Discussion}\label{discussion}
 
@@ -573,9 +558,9 @@ homegrown talent development rather than paying recruitment premiums for
 foreign players of comparable quality. The strong signaling value of
 playing time suggests that loan strategies to increase minutes for young
 players could yield valuation returns beyond skill development alone.
-Additionally, the Latin American premium indicates continued market
-inefficiencies that selling clubs in South America might leverage in
-transfer negotiations. As the market continues to recover from
+The Latin American premium reflects the continued marketability of South
+American talent in European football, potentially driven by historical
+success and brand recognition . As the market continues to recover from
 pandemic-era corrections, understanding these valuation dynamics becomes
 increasingly important for sustainable club financial planning.
 
@@ -674,8 +659,16 @@ Description & Raw Stats (Mean/SD) & Transformation Strategy\\
 
 \subsection{Annotated Model Syntax}\label{annotated-model-syntax}
 
+\small
+
 \begin{Shaded}
 \begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(lme4)}
+\FunctionTok{library}\NormalTok{(lmerTest)}
+
+\CommentTok{\# Model control for convergence}
+\NormalTok{strict\_control }\OtherTok{\textless{}{-}} \FunctionTok{lmerControl}\NormalTok{(}\AttributeTok{optimizer =} \StringTok{"bobyqa"}\NormalTok{)}
+
 \CommentTok{\#\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_}
 \CommentTok{\# MODEL SPECIFICATION \& FITTING}
 
@@ -686,7 +679,6 @@ Description & Raw Stats (Mean/SD) & Transformation Strategy\\
                    \AttributeTok{data =}\NormalTok{ clean\_player\_df, }
                    \AttributeTok{REML =} \ConstantTok{TRUE}\NormalTok{, }
                    \AttributeTok{control =}\NormalTok{ strict\_control)}
-
 
 \CommentTok{\# 2. MODEL LINEAR TIME TREND}
 \CommentTok{\# Purpose: Test for general linear inflation in market values }
@@ -752,29 +744,33 @@ Description & Raw Stats (Mean/SD) & Transformation Strategy\\
     \CommentTok{\# The mixture is 0.5 * ChiSq(2) + 0.5 * ChiSq(3)}
 \NormalTok{    p\_val }\OtherTok{=} \FloatTok{0.5} \SpecialCharTok{*} \FunctionTok{pchisq}\NormalTok{(lrt\_stat, }\AttributeTok{df =} \DecValTok{2}\NormalTok{, }\AttributeTok{lower.tail =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{+} 
       \FloatTok{0.5} \SpecialCharTok{*} \FunctionTok{pchisq}\NormalTok{(lrt\_stat, }\AttributeTok{df =} \DecValTok{3}\NormalTok{, }\AttributeTok{lower.tail =} \ConstantTok{FALSE}\NormalTok{)}
-    
-\NormalTok{  \} }\ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ (df\_diff }\SpecialCharTok{==} \DecValTok{2}\NormalTok{) \{}
+\NormalTok{    \} }\ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ (df\_diff }\SpecialCharTok{==} \DecValTok{2}\NormalTok{) \{}
     \CommentTok{\# Going from 1 Random Effect (Int) {-}\textgreater{} 2 Random Effects (Int+Lin)}
     \CommentTok{\# Adds 1 variance + 1 covariance = 2 parameters}
 \NormalTok{    p\_val }\OtherTok{=} \FloatTok{0.5} \SpecialCharTok{*} \FunctionTok{pchisq}\NormalTok{(lrt\_stat, }\AttributeTok{df =} \DecValTok{1}\NormalTok{, }\AttributeTok{lower.tail =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{+} 
       \FloatTok{0.5} \SpecialCharTok{*} \FunctionTok{pchisq}\NormalTok{(lrt\_stat, }\AttributeTok{df =} \DecValTok{2}\NormalTok{, }\AttributeTok{lower.tail =} \ConstantTok{FALSE}\NormalTok{)}
-    
-\NormalTok{  \} }\ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ (df\_diff }\SpecialCharTok{==} \DecValTok{1}\NormalTok{) \{}
+\NormalTok{    \} }\ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ (df\_diff }\SpecialCharTok{==} \DecValTok{1}\NormalTok{) \{}
     \CommentTok{\# Adding a single parameter (e.g. just a variance, no covariance)}
 \NormalTok{    p\_val }\OtherTok{=} \FloatTok{0.5} \SpecialCharTok{*} \FunctionTok{pchisq}\NormalTok{(lrt\_stat, }\AttributeTok{df =} \DecValTok{0}\NormalTok{, }\AttributeTok{lower.tail =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{+} 
       \FloatTok{0.5} \SpecialCharTok{*} \FunctionTok{pchisq}\NormalTok{(lrt\_stat, }\AttributeTok{df =} \DecValTok{1}\NormalTok{, }\AttributeTok{lower.tail =} \ConstantTok{FALSE}\NormalTok{)}
-    
-\NormalTok{  \} }\ControlFlowTok{else}\NormalTok{ \{}
+\NormalTok{    \} }\ControlFlowTok{else}\NormalTok{ \{}
     \CommentTok{\# Fallback for standard fixed effects comparisons}
-\NormalTok{    p\_val }\OtherTok{=} \FunctionTok{pchisq}\NormalTok{(lrt\_stat, }\AttributeTok{df =}\NormalTok{ df\_diff, }\AttributeTok{lower.tail =} \ConstantTok{FALSE}\NormalTok{)}
-\NormalTok{  \}}
+\NormalTok{    p\_val }\OtherTok{=} \FunctionTok{pchisq}\NormalTok{(lrt\_stat, }\AttributeTok{df =}\NormalTok{ df\_diff, }\AttributeTok{lower.tail =} \ConstantTok{FALSE}\NormalTok{)\}}
   
   \CommentTok{\# Output}
   \FunctionTok{cat}\NormalTok{(}\StringTok{"LRT Statistic:"}\NormalTok{, }\FunctionTok{round}\NormalTok{(lrt\_stat, }\DecValTok{4}\NormalTok{),  df\_diff, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
-  \FunctionTok{cat}\NormalTok{(}\StringTok{"P{-}Value:       "}\NormalTok{, }\FunctionTok{format.pval}\NormalTok{(p\_val, }\AttributeTok{eps =}\NormalTok{ .}\DecValTok{0001}\NormalTok{), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
-\NormalTok{  \}}
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"P{-}Value:       "}\NormalTok{, }\FunctionTok{format.pval}\NormalTok{(p\_val, }\AttributeTok{eps =}\NormalTok{ .}\DecValTok{0001}\NormalTok{), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)\}}
 \end{Highlighting}
 \end{Shaded}
+
+We test whether a random slope with quadratic season year at the club
+level has better fit to the data. We find evidence supporting the need
+to include these random slopes using a likelihood ratio test with an
+alternative hypothesis, \(H_A=\tau_{11} > 0\) since variance should be
+larger than 0. To test this hypothesis we use the likelihood ratio test
+(LRT) simply by
+\(-2[\text{log likelihood}_{reduced} - \text{log likelihood}_{full}]\)
+to examine the difference.
 
 \begin{verbatim}
 LRT Statistic: 97.1306 
@@ -785,6 +781,8 @@ P-Value:        < 0.0001
 
 \newpage
 
+\normalsize
+
 \section{Appendix C}\label{appendix-c}
 
 \subsection*{Table 1. Model Fit Comparison (AIC, BIC, and
@@ -794,10 +792,10 @@ BIC, and ICC)}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1781}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2877}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3699}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1781}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1781}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1781}}@{}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1370}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1370}}@{}}
 \toprule\noalign{}
 \endhead
 \bottomrule\noalign{}
@@ -823,11 +821,10 @@ robust fit & & & \\
 
 \newpage
 
-\subsection*{Figure 1. Model Diagnostic
-Plots}\label{figure-1.-model-diagnostic-plots}
-\addcontentsline{toc}{subsection}{Figure 1. Model Diagnostic Plots}
+\subsection*{}\label{section}
+\addcontentsline{toc}{subsection}{}
 
-\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-10-1.pdf}
+\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-11-1.pdf}
 
 Figure 1 presents diagnostic plots assessing model assumptions. The Q-Q
 plots confirmed that player-level random intercepts (\(n=2,159\))
@@ -839,12 +836,7 @@ model's distributional assumptions.
 
 \newpage
 
-\subsection*{Figure 2. Club Random Effects Correlation
-Structure}\label{figure-2.-club-random-effects-correlation-structure}
-\addcontentsline{toc}{subsection}{Figure 2. Club Random Effects
-Correlation Structure}
-
-\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-11-1.pdf}
+\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-12-1.pdf}
 
 Figure 2 displays the correlation structure among club-level random
 effects. The non statistically significantly negative correlation
@@ -855,23 +847,6 @@ appreciation while smaller clubs showed steeper trajectories. The
 positive correlation between linear and quadratic terms (r = 0.749)
 suggests that clubs with faster initial growth also experienced more
 pronounced deceleration around the pandemic period.
-
-\newpage
-
-\subsection{Figure 3. Club-Specific Market Value Trajectories
-(2013-2024)}\label{figure-3.-club-specific-market-value-trajectories-2013-2024}
-
-\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-12-1.pdf}
-
-Figure 3 displays predicted market value trajectories for each of the 21
-clubs, ordered by baseline prestige. The vertical positioning of panels
-confirms the club hierarchy, with elite clubs (Manchester United,
-Manchester City, Chelsea) maintaining consistently higher valuations
-than selling clubs (Sevilla, Benfica, Porto). The curvature of
-individual trajectories reveals heterogeneity in pandemic response:
-clubs like Barcelona and Juventus show concave patterns indicating
-stagnation, while Arsenal and Liverpool display convex trajectories
-suggesting more resilient recovery.
 
 \newpage
 
