@@ -107,7 +107,7 @@ The European football transfer market has evolved from a subjective scouting exe
 
 1.  The non-linear "Boom and Bust" market trajectory. How has the transfer market evolved relative to the 2020 baseline? Specifically, does the market exhibit a non-linear "Boom and Bust" cycle that linear models miss?
 2.  The biological constraints of the player career arc. How does market valuation evolve across a player's biological career, and at what specific age does this value peak?
-3.  The valuation signal of "Squad Status" via relative playing time. To what degree does "Squad Status"—defined by relative playing time—predict market value independent of raw performance output?
+3.  The valuation signal of "Squad Status" via relative playing time. To what degree does "Squad Status", which is defined by relative playing time, is required predict market value independent of raw performance output?
 4.  The existence of contextual premiums for club diversity or discounts for domestic talent in a globalized labor market. How does squad internationalization affect player market values, and do domestic players face a valuation penalty compared to foreign players?
 
 # Method
