@@ -146,6 +146,8 @@
 \usepackage[normalem]{ulem}
 \usepackage{makecell}
 \usepackage{xcolor}
+\usepackage{indentfirst}
+\setlength{\parindent}{2em}
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
 \usepackage{threeparttable}
@@ -222,6 +224,8 @@ Chakravarti}
 \maketitle
 
 
+\vspace{-2cm}
+
 \section{Introduction}\label{introduction}
 
 The European football transfer market has evolved from a scouting
@@ -232,13 +236,13 @@ highlights non-performance factors such as brand visibility (Franck \&
 Nüesch, 2012; Rosen, 1981). However, the market has recently bifurcated
 into a pre-2020 hyper-inflationary era (Poli et al., 2017), and a
 post-2020 pandemic correction (Drewes et al., 2021), with COVID-19
-causing an estimated €8.7 billion revenue shortfall (Deloitte, 2021).
-Using Transfermarkt estimates as validated proxies for transfer fees
-(Herm et al., 2014), we fit a cross-classified multilevel model to
-account for players transferring between clubs. We address this gap by
-fitting a cross-classified multilevel model to a decade of data
-(2013--2024), centering at the 2020 baseline to isolate pandemic impacts
-while accounting for player movements across clubs. Specifically, we
+causing an estimated €8.7bn revenue shortfall (Deloitte, 2021). Using
+Transfermarkt estimates as validated proxies for transfer fees (Herm et
+al., 2014), we fit a cross-classified multilevel model to account for
+players transferring between clubs. We address this gap by fitting a
+cross-classified multilevel model to a decade of data (2013--2024),
+centering at the 2020 baseline to isolate pandemic impacts while
+accounting for player movements across clubs. Specifically, we
 investigate four critical dynamics:
 
 \begin{enumerate}
@@ -250,10 +254,10 @@ investigate four critical dynamics:
   relative to the pandemic baseline?
 \item
   At what age does player market valuation reach its peak across the
-  biological career trajectory?
+  career trajectory?
 \item
   To what degree does squad status predict market value independent of
-  raw performance?
+  performance?
 \item
   How does squad internationalization affect individual player market
   valuations?
@@ -275,15 +279,16 @@ of cases with missing citizenship data (\textasciitilde2\% loss),
 players averaged 26.5 years of age (\emph{SD} = 4.6).
 
 Our outcome variable is the natural logarithm of the player's
-inflation-adjusted yearly average market value (in 2024 USD). Predictors
-are categorized into three distinct domains: (1) Player Characteristics,
-including age, height, position (Attacker, Midfielder, etc.), and
-citizenship status relative to the club (homegrown vs.~foreign); (2)
-performance and status, captured by goals, assists, red/yellow cards,
-and playing time; and (3) club context, specifically the proportion of
-foreign players on the roster and the club's UEFA coefficient, which
-serves as a proxy for recent competitive success and prestige. For
-further descriptive statistics on each variable see Appendix A, Table 1.
+inflation-adjusted yearly average market value (MV) in 2024 USD.
+Predictors are categorized into three distinct domains: (1) Player
+Characteristics, including age, height, position (Attacker, Midfielder,
+etc.), and citizenship status relative to the club (homegrown
+vs.~foreign); (2) performance and status, captured by goals, assists,
+red/yellow cards, and playing time; and (3) club context, specifically
+the proportion of foreign players on the roster and the club's UEFA
+coefficient, which serves as a proxy for recent competitive success and
+prestige. For further descriptive statistics on each variable see
+Appendix A, Table 1.
 
 \subsection{Model Specification}\label{model-specification}
 
@@ -325,7 +330,7 @@ career arc. Minutes played is standardized within each club-year to
 measure squad status independent of team rotation policies, while goals
 and assists are position-centered to capture performance relative to
 role-specific expectations.\footnote{Performance expectations vary by
-  role: A goal from a striker is routine while for a defender is
+  role, as a goal from a striker is routine while for a defender is
   exceptional. Position-centering transforms raw counts into
   ``performance above expectation'' metrics, ensuring the model captures
   relative contributions rather than treating goals and assists equally.}
@@ -337,8 +342,8 @@ citizenship in club \(j\)'s country.
 
 \includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-2-1.pdf}
 
-\subsection{Model Building and Statistical
-Software}\label{model-building-and-statistical-software}
+\subsection{Model Testing and Statistical
+Software}\label{model-testing-and-statistical-software}
 
 We employed sequential model building: (1) null model for ICC
 estimation; (2) linear time polynomial; (3) cubic time polynomial; (4)
@@ -374,7 +379,7 @@ random slope variances in Appendix B.
 \section{Results}\label{results}
 
 The unconditional means (null) model revealed substantial clustering at
-the player level. Player-level variance accounted for 78\% of the total
+the player level. Player-level variance accounted for 75\% of the total
 variance (\(ICC_{player}=.75\)), while club-level variance accounted for
 3\% (\(ICC_{club}=.03\)), highlighting that persistent individual
 heterogeneity dominates market valuations. Regarding temporal dynamics,
@@ -389,11 +394,9 @@ not only in their growth rates but also in the curvature of their market
 value trajectories. Consequently, our final best-fitting model
 incorporates these complex random effects alongside time-varying player
 and club predictors (\(\chi^2(19)=5626, p<.001\) compared to random
-slopes model). Model comparisons are shown in Appendix C, Table 1. Our
-final model converged successfully and model diagnostic plots (see
-Appendix C, Figure 1) confirmed normality of random effects and
-homoscedastic residuals, along with the correlation structure captured
-in Appendix C, Figure 2.
+slopes model). Model comparisons are shown in Appendix C. Our final
+model converged successfully with diagnostic plots confirming normality
+and homoscedasticity assumptions.
 
 \begin{table}[H]
 \centering
@@ -469,7 +472,7 @@ Predictor & Symbol & $\hat{\gamma}/\hat{\beta}$ & SE & $t$ & \% Change & \\
 \end{threeparttable}}
 \end{table}
 
-\subsubsection{Market Evolution}\label{market-evolution}
+\subsection{Market Evolution}\label{market-evolution}
 
 Using raw polynomials centered at 2020 (\(t=0\)), our model
 mathematically pinpoints the moment the market froze. The linear
@@ -483,12 +486,12 @@ specific trajectories, with panels ordered by baseline prestige. Elite
 clubs maintain higher valuations throughout, while trajectory curvature
 varies substantially. Clubs like Barcelona and Juventus show concave
 patterns indicating stagnation, whereas Arsenal and Liverpool display
-more resilient recovery, indicating a more resilient recovery and active
-value generation throughout the decade.
+more resilient recovery and active value generation throughout the
+decade.
 
 \includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-4-1.pdf}
 
-\subsubsection{Biological Age}\label{biological-age}
+\subsection{Biological Age}\label{biological-age}
 
 Our model predicts the peak age to be 26.9\footnote{We use the delta
   method, specifically Taylor series approximation, to propagate
@@ -501,7 +504,7 @@ on older assets with limited resale potential.
 
 \includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-6-1.pdf}
 
-\subsubsection{\texorpdfstring{\textbf{Contextual Premiums and
+\subsection{\texorpdfstring{\textbf{Contextual Premiums and
 Discounts}}{Contextual Premiums and Discounts}}\label{contextual-premiums-and-discounts}
 
 Squad status remains the dominant behavioral driver, with a one standard
@@ -542,6 +545,8 @@ through within-club standardized minutes, emerged as a stronger
 predictor than raw performance metrics, and the inclusion of
 region-of-origin effects revealed geographic valuation disparities.
 
+\subsection{Limitations}\label{limitations}
+
 Several limitations warrant consideration. First, our sample comprises
 only elite clubs from top European leagues, limiting generalizability to
 lower divisions or non-European markets. Second, Transfermarkt
@@ -552,6 +557,8 @@ contract length, or agent influence that likely affect valuations.
 Finally, the small number of clubs constrains the complexity of random
 effects we could estimate, preventing inclusion of a random cubic slope.
 
+\subsection{Implications}\label{implications}
+
 These findings carry practical implications for European football
 economics. Clubs may exploit the domestic discount by investing in
 homegrown talent development rather than paying recruitment premiums for
@@ -560,14 +567,13 @@ playing time suggests that loan strategies to increase minutes for young
 players could yield valuation returns beyond skill development alone.
 The Latin American premium reflects the continued marketability of South
 American talent in European football, potentially driven by historical
-success and brand recognition . As the market continues to recover from
+success and brand recognition. As the market continues to recover from
 pandemic-era corrections, understanding these valuation dynamics becomes
 increasingly important for sustainable club financial planning.
 
 \newpage
 
-\section*{References}\label{references}
-\addcontentsline{toc}{section}{References}
+\section{References}\label{references}
 
 Deloitte. (2021). \emph{Riding the challenge: Annual Review of Football
 Finance 2021}. Deloitte Sports Business Group.
@@ -603,10 +609,10 @@ Football Observatory.
 \section{Appendix A}\label{appendix-a}
 
 \subsection*{\texorpdfstring{Table 1: Variable Descriptions and
-Descriptive Statistics (\emph{N}=7,168
-raw)}{Table 1: Variable Descriptions and Descriptive Statistics (N=7,168 raw)}}\label{table-1-variable-descriptions-and-descriptive-statistics-n7168-raw}
+Descriptive Statistics
+(\emph{N}=7,168)}{Table 1: Variable Descriptions and Descriptive Statistics (N=7,168)}}\label{table-1-variable-descriptions-and-descriptive-statistics-n7168}
 \addcontentsline{toc}{subsection}{Table 1: Variable Descriptions and
-Descriptive Statistics (\emph{N}=7,168 raw)}
+Descriptive Statistics (\emph{N}=7,168)}
 
 \begin{table}[!h]
 \centering\begingroup\fontsize{10}{12}\selectfont
@@ -826,27 +832,21 @@ robust fit & & & \\
 
 \includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-11-1.pdf}
 
-Figure 1 presents diagnostic plots assessing model assumptions. The Q-Q
-plots confirmed that player-level random intercepts (\(n=2,159\))
-adhered well to normality, while club-level random effects (\(n=21\))
+Q-Q plots confirmed that player-level random intercepts (n = 2,159)
+adhered well to normality, while club-level random effects (n = 21)
 showed minor tail departures expected with few Level 2 units (Maas \&
-Hox, 2004). The residuals versus fitted values plot (Panel C) reveals
-homoscedastic variance with no systematic patterns, supporting the
-model's distributional assumptions.
+Hox, 2004). The residuals versus fitted values plot revealed
+homoscedastic variance with no systematic patterns.
 
 \newpage
 
 \includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-12-1.pdf}
 
-Figure 2 displays the correlation structure among club-level random
-effects. The non statistically significantly negative correlation
-between intercept and linear slope (r = -0.063) indicates that clubs
-with higher baseline prestige experienced slower subsequent growth---a
-regression-to-the-mean pattern where elite clubs had less room for
-appreciation while smaller clubs showed steeper trajectories. The
-positive correlation between linear and quadratic terms (r = 0.749)
-suggests that clubs with faster initial growth also experienced more
-pronounced deceleration around the pandemic period.
+The correlation between club intercept and linear slope was weak and
+non-significant (r = -0.06), suggesting minimal regression-to-the-mean.
+The positive correlation between linear and quadratic slopes (r = 0.75)
+indicates that clubs with faster initial growth experienced more
+pronounced curvature around the pandemic period.
 
 \newpage
 
@@ -864,7 +864,7 @@ during the preparation of this manuscript. These tools were used for:
 \item
   \textbf{Coding assistance}: Generating and debugging R code for data
   visualization, particularly for creating the faceted club trajectory
-  plots (Figure 3) and diagnostic visualizations (Figure 6).
+  plots (Figure 3) and diagnostic visualizations.
 \item
   \textbf{Resolving convergence issues}: Troubleshooting model
   convergence problems with the cross-classified multilevel model,
