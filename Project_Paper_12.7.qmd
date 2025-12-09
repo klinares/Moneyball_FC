@@ -19,19 +19,8 @@ format:
         \usepackage{threeparttable}
         \usepackage{setspace}
         \doublespacing
-author:
-  - name: Kevin Linares
-    affiliations:
-      - name: University of Maryland
-  - name: Jianing Zou
-    affiliations:
-      - name: University of Maryland
-  - name: Namit Shrivastava
-    affiliations:
-      - name: University of Maryland
-  - name: Sagnik Chakravarti
-    affiliations:
-      - name: University of Maryland
+author: "Kevin Linares, Jianing Zou, Namit Shrivastava, and Sagnik Chakravarti"
+affiliation: "University of Maryland"
 execute:
   echo: false
   warning: false
@@ -64,15 +53,19 @@ options(scipen = 999)
 theme_set(theme_minimal(base_size = 12))
 
 # Setting repository path for macOS
-repo_path <- "/Users/namomac/Desktop/Moneyball_FC/inputs/"
-#repo_path <- "D:/repos/Moneyball_FC/inputs/"
+# repo_path <- "/Users/namomac/Desktop/Moneyball_FC/inputs/"
+repo_path <- "D:/repos/Moneyball_FC/inputs/"
 #repo_path <- "/Users/jianing/Desktop/UMD/学习/SURV 687  Applications of Statistical Modeling/Final Project/Moneyball_FC-main/inputs/"
 # Reading data
 dat <- read_parquet(paste0(repo_path, "player_df.parquet"))
 
 # Source file for models and data processing
-source("/Users/namomac/Desktop/Moneyball_FC/Project_Paper_files/source_code.R")
+#source("/Users/namomac/Desktop/Moneyball_FC/Project_Paper_files/source_code.R")
 #source("source_code.R")
+source(str_c(
+  str_replace(repo_path, "inputs", "Project_Paper_files"), 
+  "source_code.R")
+)
 ```
 
 ```{r data-prep}
@@ -176,8 +169,7 @@ $$\begin{aligned}
 
 The player-club intercept ($\pi_{0ij}$) is decomposed into a fixed component based on static player characteristics and a random player effect ($u_{0i}$):
 
-$$ \pi_{0ij} = \beta_{0j} + \gamma_{1}(\text{Height}_{i}) + \gamma_{2}(\text{Citizen}_{ij}) + \mathbf{\Gamma}_{demog} + u_{0i} $$
-$$\begin{aligned}
+$$ \pi_{0ij} = \beta_{0j} + \gamma_{1}(\text{Height}_{i}) + \gamma_{2}(\text{Citizen}_{ij}) + \mathbf{\Gamma}_{demog} + u_{0i} $$ $$\begin{aligned}
 \mathbf{\Gamma}_{\text{demog}}
 &=
 \sum_{k=1}^{K-1} \gamma_{\text{pos},k} \, 
@@ -191,8 +183,6 @@ $$\begin{aligned}
 The club baseline ($\beta_{0j}$) and the time-varying slope parameters ($\pi_{1j}, \pi_{2j}$) include random effects to allow for heterogeneity in both growth velocity and trajectory curvature:
 
 $$ \begin{aligned} \beta_{0j} &= \delta_{00} + v_{0j} \quad &\text{(Baseline Prestige)} \\ \pi_{1j} &= \delta_{10} + v_{1j} \quad &\text{(Linear Growth Deviation)} \\ \pi_{2j} &= \delta_{20} + v_{2j} \quad &\text{(Quadratic Curvature Deviation)} \\ \pi_{3} &= \delta_{30} \quad &\text{(Fixed Cubic Trend)} \end{aligned} $$
-
-
 
 **Variance-Covariance Structure**
 
@@ -807,7 +797,7 @@ calculate_lrt_mixture(model_time_cubic, model_slope_quadratic)
 ## Table 1. Model Fit Comparison (AIC, BIC, and ICC) {.unnumbered}
 
 |  |  |  |  |  |
-|-------------|------------------------------|----------|----------|----------|
+|-------------|----------------------------|-------------|----------|---------|
 | **Models** | **Purpose & Research Justification** | ICCplayer/ club | AIC | BIC |
 | **Null** | Calculate ICC and partition variance between players and clubs before adding predictors | .75/.03 | 20105.19 | 20132.62 |
 | **Time Linear** | Test for a general linear trend in market value growth | .76/.03 | 20050.17 | 20084.46 |

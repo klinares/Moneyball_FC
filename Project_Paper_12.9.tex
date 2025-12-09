@@ -151,6 +151,8 @@
 \usepackage{threeparttable}
 \usepackage{setspace}
 \doublespacing
+\usepackage{titling}
+\setlength{\droptitle}{-1in}
 \makeatletter
 \@ifpackageloaded{caption}{}{\usepackage{caption}}
 \AtBeginDocument{%
@@ -202,7 +204,7 @@
 \urlstyle{same} % disable monospaced font for URLs
 \hypersetup{
   pdftitle={Player Market Value in Elite European Football},
-  pdfauthor={Kevin Linares; Jianing Zou; Namit Shrivastava; Sagnik Chakravarti},
+  pdfauthor={Kevin Linares, Jianing Zou, Namit Shrivastava, \& Sagnik Chakravarti},
   colorlinks=true,
   linkcolor={blue},
   filecolor={Maroon},
@@ -212,8 +214,8 @@
 
 
 \title{Player Market Value in Elite European Football}
-\author{Kevin Linares \and Jianing Zou \and Namit
-Shrivastava \and Sagnik Chakravarti}
+\author{Kevin Linares, Jianing Zou, Namit Shrivastava, \& Sagnik
+Chakravarti}
 \date{}
 
 \begin{document}
@@ -222,56 +224,46 @@ Shrivastava \and Sagnik Chakravarti}
 
 \section{Introduction}\label{introduction}
 
-The European football transfer market has evolved from a subjective
-scouting exercise into a global financial industry exceeding €7 billion
-annually. For this study, we operationalize market value using
-crowd-sourced estimates from Transfermarkt, a metric widely validated in
-sports economics as a robust proxy for actual transfer fees (Herm et
-al., 2014). While foundational research identifies performance metrics
-like goals as primary drivers (Frick, 2007), more recent scholarship
-highlights a ``Superstar Effect'' where non-performance factors like
-brand visibility magnify valuation (Franck \& Nüesch, 2012; Rosen,
-1981). However, the market has recently bifurcated into a pre-2020
-hyper-inflationary era, termed the ``Neymar Effect'' (Poli et al.,
-2017), and a post-2020 pandemic correction (Drewes et al., 2021). This
-trajectory was violently interrupted by the COVID-19 pandemic, which
-caused an estimated €8.7 billion revenue shortfall across European
-football (Deloitte, 2021). Existing models typically treat players as
-static units nested within single clubs, ignoring the dynamic reality
-where players transfer between teams and accumulate value from both
-their portable human capital and the institutional prestige of their
-current employer. Neglecting this cross-classified structure likely
-misestimates the true drivers of market value in this volatile era. To
-address these limitations, this study applies a cross-classified
-multilevel model to a decade of transfer data (2013--2024), centering
-the analysis at the 2020 pandemic baseline to quantify the impact of
-this structural break. We attempt to disentangle individual reputation
-from club context by investigate four critical dynamics:
+The European football transfer market has evolved from a scouting
+exercise to a global financial industry generating €38bn in revenue
+(Deloitte, 2025). While key research identifies performance metrics like
+goals as drivers for player valuation (Frick, 2007), more recent
+scholarship highlights non-performance factors such as brand visibility
+(Franck \& Nüesch, 2012; Rosen, 1981). However, the market has recently
+bifurcated into a pre-2020 hyper-inflationary era, termed the ``Neymar
+Effect'' (Poli et al., 2017), and a post-2020 pandemic correction
+(Drewes et al., 2021), with COVID-19 causing an estimated €8.7 billion
+revenue shortfall (Deloitte, 2021) that serves as a natural structural
+break for analysis. We measure market value using Transfermarkt
+estimates, validated as a robust proxy for actual transfer fees (Herm et
+al., 2014). Existing models typically treat players as static units
+nested within single clubs, ignoring that players transfer between teams
+and accumulate value from both portable human capital and institutional
+club prestige---a cross-classified structure is particularly important
+when club-level pandemic shocks may differentially affect valuations. We
+address this gap by fitting a cross-classified multilevel model to a
+decade of data (2013--2024), centering at the 2020 baseline to isolate
+pandemic impacts while accounting for player movements across clubs. We
+attempt to disentangle individual reputation from club context by
+investigate four critical dynamics:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  The non-linear ``Boom and Bust'' market trajectory. How has the
-  transfer market evolved relative to the 2020 baseline? Specifically,
-  does the market exhibit a non-linear ``Boom and Bust'' cycle that
-  linear models miss?
+  What non-linear ``Boom and Bust'' (i.e., rapid economic expansion met
+  with sharp contraction) patterns characterize the transfer market's
+  evolution relative to the 2020 pandemic baseline?
 \item
-  The biological constraints of the player career arc. How does market
-  valuation evolve across a player's biological career, and at what
-  specific age does this value peak?
+  At what age does player market valuation reach its peak across the
+  biological career trajectory?
 \item
-  The valuation signal of ``Squad Status'' via relative playing time. To
-  what degree does ``Squad Status''---defined by relative playing
+  To what degree does squad status---defined by relative playing
   time---predict market value independent of raw performance output?
 \item
-  The existence of contextual premiums for club diversity or discounts
-  for domestic talent in a globalized labor market. How does squad
-  internationalization affect player market values, and do domestic
-  players face a valuation penalty compared to foreign players?
+  How does squad internationalization affect individual player market
+  valuations?
 \end{enumerate}
-
-\section{Method}\label{method}
 
 \subsection{Sample and Data}\label{sample-and-data}
 
@@ -303,70 +295,52 @@ further descriptive statistics on each variable see Appendix A, Table1.
 
 \subsection{Model Specification}\label{model-specification}
 
-Our data exhibit a cross-classified structure where players (\emph{i})
-are constant units, but club membership (\emph{j}) changes over time
-(\emph{t}). When a player transfers from club \(j_1\) to club \(j_2\),
-club-level predictors such as internationalization and UEFA ranking that
-vary by year, are updated to reflect the new club's characteristics.
-Figure 1 visualizes our cross-classified design with an example from
-three players.
+Our data exhibit a cross-classified structure where players (\(i\)) are
+observed repeatedly over time (\(t\)), but club membership (\(j\))
+changes when players transfer between teams. This structure requires
+modeling player and club as crossed random effects rather than nested
+effects. Figure 1 visualizes our cross-classified design.
 
-\includegraphics{Project_Paper_files/figure-pdf/unnamed-chunk-1-1.pdf}
+\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-1-1.pdf}
 
-This structure requires modeling player and club as crossed random
-effects rather than nested effects. Crucially, because club attributes
-like internationalization and UEFA ranking vary year-to-year, they are
-modeled as Level 1 (time-varying) predictors rather than static Level 2
-traits.
+The log-transformed market value for player \(i\) at club \(j\) in
+season \(t\) is modeled as:
 
-\textbf{Level 1: Observation Model (Time-Varying Effects)}
+\begin{equation}\phantomsection\label{eq-model}{
+\begin{aligned}
+\log(\text{MV})_{tij} = \quad & \gamma_{00} + u_i + v_j \\[6pt]
+& + (\gamma_1 + w_{1j})\text{Year}_t + (\gamma_2 + w_{2j})\text{Year}_t^2 + \gamma_3\text{Year}_t^3 \\[6pt]
+& + \gamma_4\text{Age}_{ti} + \gamma_5\text{Age}_{ti}^2 \\[6pt]
+& + \gamma_6\text{Minutes}_{tij} + \gamma_7\text{Goals}_{tij} + \gamma_8\text{Assists}_{tij} \\[6pt]
+& + \gamma_9\text{RedCards}_{tij} + \gamma_{10}\text{YellowCards}_{tij} \\[6pt]
+& + \gamma_{11}\text{Foreign}_{tj} + \gamma_{12}\text{UEFA}_{tj} \\[6pt]
+& + \beta_1\text{Height}_i + \beta_2\text{Citizen}_{ij} + \boldsymbol{\beta}'_{pos}\mathbf{D}^{pos}_i + \boldsymbol{\beta}'_{reg}\mathbf{D}^{reg}_i \\[6pt]
+& + \epsilon_{tij}
+\end{aligned}
+}\end{equation}
 
-At the observation level, the log-transformed market value is modeled as
-a function of the player-club intercept (\(\pi_{0ij}\)), algebraic time
-trends, biological aging, and dynamic contextual metrics:
+The model includes three sources of random variation:
+\(u_i \sim N(0, \tau^2_u)\) captures persistent player reputation,
+\(v_j \sim N(0, \tau^2_v)\) captures baseline club prestige, and
+\(\epsilon_{tij} \sim N(0, \sigma^2)\) is the residual. The random
+slopes \(w_{1j}\) and \(w_{2j}\) allow clubs to differ in their linear
+and quadratic market value trajectories over time; together with
+\(v_j\), they follow a multivariate normal distribution with an
+unstructured covariance matrix.
 
-\[ \begin{aligned} \log(\text{MV})_{tij} &= \pi_{0ij} + \pi_{1j}(\text{Year}_{t}) + \pi_{2j}(\text{Year}^2_{t}) + \pi_{3}(\text{Year}^3_{t}) + \pi_{4}(\text{Age}_{it} - \bar{A}) + \pi_{5}(\text{Age}_{it} - \bar{A})^2 \\ &+ \pi_{6}(\text{Mins}_{Z,it}) + \pi_{7}(\text{Foreign}_{tj}) + \pi_{8}(\text{UEFA}_{tj}) + \mathbf{\Pi}_{perf} + \epsilon_{tij} \end{aligned} \]
-
-\emph{Note: MV = Market Value. The subscripts} \({tj}\) for Foreign and
-UEFA denote that these club attributes vary by time \(t\).
-
-\[ \begin{aligned}
-\boldsymbol{\Pi}_{perf}
-&=
-\pi_9(\text{Goals}_{tij}) 
-+ \pi_{10}(\text{Assists}_{tij}) 
-+ \pi_{11}(\text{RedCards}_{tij}) 
-+ \pi_{12}(\text{YellowCards}_{tij})
-\end{aligned}\]
-
-\textbf{Level 2a: Player Model (Time-Invariant Traits)}
-
-The player-club intercept (\(\pi_{0ij}\)) is decomposed into a fixed
-component based on static player characteristics and a random player
-effect (\(u_{0i}\)):
-
-\[ \pi_{0ij} = \beta_{0j} + \gamma_{1}(\text{Height}_{i}) + \gamma_{2}(\text{Citizen}_{ij}) + \mathbf{\Gamma}_{demog} + u_{0i} \]
-
-\[ \begin{aligned}
-\mathbf{\Gamma}_{\text{demog}}
-&=
-\sum_{k=1}^{K-1} \gamma_{\text{pos},k} \, 
-(\text{Position}_{ik})
-\;+\;
-\sum_{r=1}^{R-1} \gamma_{\text{reg},r} \, (\text{Region}_{ir})
-\end{aligned}\]
-
-\textbf{Level 2b: Club Model (Contextual Trajectories)}
-
-The club baseline (\(\beta_{0j}\)) and the time-varying slope parameters
-(\(\pi_{1j}, \pi_{2j}\)) include random effects to allow for
-heterogeneity in both growth velocity and trajectory curvature:
-
-\[ \begin{aligned} \beta_{0j} &= \delta_{00} + v_{0j} \text{(Baseline Prestige)}, \quad \pi_{1j} = \delta_{10} + v_{1j} \text{(Linear Growth Deviation)} \\ \pi_{2j} &= \delta_{20} + v_{2j}  \text{(Quadratic Curvature Deviation)}, \quad \pi_{3} = \delta_{30} \text{(Fixed Cubic Trend)} \end{aligned} \]
-
-\textbf{Variance-Covariance Structure}
-
-\[ u_{0i} \sim N(0, \sigma^2_{u}) \quad , \quad  \begin{pmatrix} v_{0j} \\ v_{1j} \\ v_{2j} \end{pmatrix} \sim N \left( \mathbf{0}, \begin{pmatrix} \sigma^2_{Int} & \sigma_{01} & \sigma_{02} \\ \sigma_{01} & \sigma^2_{Lin} & \sigma_{12} \\ \sigma_{02} & \sigma_{12} & \sigma^2_{Quad} \end{pmatrix} \right) \]
+Season year is centered at 2020 to isolate the pandemic's structural
+impact, with cubic polynomial terms capturing the hypothesized
+``Boom-and-Bust'' cycle. Age is grand-mean centered (\(\bar{A} = 26.5\)
+years) with a quadratic term to model the biological career arc. Minutes
+played is standardized within each club-year to measure squad status
+independent of team rotation policies, while goals and assists are
+position-centered to capture performance relative to role-specific
+expectations. The vectors \(\mathbf{D}^{pos}_i\) and
+\(\mathbf{D}^{reg}_i\) contain dummy variables for player position
+(reference: Attacker) and region of origin (reference: Europe \& Central
+Asia), respectively. Citizenship status (\(\text{Citizen}_{ij}\))
+indicates whether player \(i\) holds citizenship in club \(j\)'s
+country.
 
 \subsection{Variables and Centering
 Strategies}\label{variables-and-centering-strategies}
@@ -387,7 +361,7 @@ expectations.\footnote{Performance expectations vary by role: A goal
   expectation'' metrics, ensuring the model captures relative
   contributions rather than treating goals and assists equally.}
 
-\includegraphics{Project_Paper_files/figure-pdf/unnamed-chunk-2-1.pdf}
+\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-2-1.pdf}
 
 \subsection{Model Building and Statistical
 Software}\label{model-building-and-statistical-software}
@@ -543,7 +517,7 @@ convex trajectories (e.g., Arsenal, Liverpool) show stronger momentum,
 indicating a more resilient recovery and active value generation
 throughout the decade.
 
-\includegraphics{Project_Paper_files/figure-pdf/unnamed-chunk-5-1.pdf}
+\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-5-1.pdf}
 
 \subsubsection{Biological Age}\label{biological-age}
 
@@ -559,7 +533,7 @@ player's value drops by approximately 1.5 log points (from a peak of
 17.0 to 15.5) as they age from 27 to 35, reflecting the market's heavy
 discount on older assets with limited resale potential.
 
-\includegraphics{Project_Paper_files/figure-pdf/unnamed-chunk-7-1.pdf}
+\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-7-1.pdf}
 
 \subsubsection{\texorpdfstring{\textbf{Contextual Premiums and
 Discounts}}{Contextual Premiums and Discounts}}\label{contextual-premiums-and-discounts}
@@ -593,7 +567,7 @@ European baseline), Latin America stands out as the only region with a
 positive premium (\(\gamma_{region}=0.19\)), suggesting South American
 players function as a ``premium export brand'' in the global market.
 
-\includegraphics{Project_Paper_files/figure-pdf/unnamed-chunk-8-1.pdf}
+\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-8-1.pdf}
 
 \section{Discussion}\label{discussion}
 
@@ -641,6 +615,10 @@ potential inefficiencies that astute market participants can exploit.
 Deloitte. (2021). \emph{Riding the challenge: Annual Review of Football
 Finance 2021}. Deloitte Sports Business Group.
 \url{https://www2.deloitte.com/uk/en/pages/sports-business-group/articles/annual-review-of-football-finance-europe.html}
+
+Deloitte. (2024). Annual review of football finance 2024: European
+football market revenue.
+\url{https://www.deloitte.com/uk/en/about/press-room/deloitte-annual-review-of-football-finance-european-football-market-revenue.html}
 
 Drewes, M., Daumann, F., \& Follert, F. (2021). Exploring the sports
 economic impact of COVID-19 on professional soccer. \emph{Soccer \&
@@ -843,11 +821,11 @@ ICC)}\label{table-1.-model-fit-comparison-aic-bic-and-icc}
 BIC, and ICC)}
 
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1781}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.4110}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1370}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1370}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1370}}@{}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1757}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2973}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1757}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1757}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1757}}@{}}
 \toprule\noalign{}
 \endhead
 \bottomrule\noalign{}
@@ -875,33 +853,20 @@ robust fit & & & \\
 Plots}\label{figure-6.-model-diagnostic-plots}
 \addcontentsline{toc}{subsection}{Figure 6. Model Diagnostic Plots}
 
-\begin{figure}[H]
+\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-12-1.pdf}
 
-{\centering \includegraphics{Project_Paper_files/figure-pdf/unnamed-chunk-12-1.pdf}
-
-}
-
-\caption{Diagnostic plots: (A) Q-Q plot for player random intercepts,
-(B) Q-Q plot for club random intercepts, (C) residuals versus fitted
-values.}
-
-\end{figure}%
+Diagnostic plots: (A) Q-Q plot for player random intercepts, (B) Q-Q
+plot for club random intercepts, (C) residuals versus fitted values.
 
 \subsection*{Figure 7. Club Random Effects Correlation
 Structure}\label{figure-7.-club-random-effects-correlation-structure}
 \addcontentsline{toc}{subsection}{Figure 7. Club Random Effects
 Correlation Structure}
 
-\begin{figure}[H]
+\includegraphics{Project_Paper_12.9_files/figure-pdf/unnamed-chunk-13-1.pdf}
 
-{\centering \includegraphics{Project_Paper_files/figure-pdf/unnamed-chunk-13-1.pdf}
-
-}
-
-\caption{Correlations among club-level random effects (intercept, linear
-slope, quadratic slope).}
-
-\end{figure}%
+Correlations among club-level random effects (intercept, linear slope,
+quadratic slope).
 
 \newpage
 
