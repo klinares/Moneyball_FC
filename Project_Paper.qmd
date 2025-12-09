@@ -29,7 +29,7 @@ author:
   - name: Namit Shrivastava
     affiliations:
       - name: University of Maryland
-  - name: Sagnik Chakravarti
+  - name: Sagnik Chakravarty
     affiliations:
       - name: University of Maryland
 execute:
