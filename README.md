@@ -29,5 +29,5 @@ This repository houses the code and data analysis for **Moneyball_FC**, a resear
 
 ---
 
-The following code desccribes our [data structuring workflow](https://klinares.github.io/Moneyball_FC/code/transfermarkt_data.html) that informs this project's [manuscript](https://klinares.github.io/Moneyball_FC/Project_paper_final_files/manuscript.html).
+# The following code desccribes our [data structuring workflow](https://klinares.github.io/Moneyball_FC/code/transfermarkt_data.html) that informs this project's [manuscript](https://klinares.github.io/Moneyball_FC/Project_paper_final_files/manuscript.html).
 
