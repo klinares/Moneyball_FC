@@ -1,5 +1,5 @@
 # Moneyball_FC ⚽📊💰
-<img src="https://github.com/klinares/Moneyball_FC/blob/main/images/moneyball.png" width="400" height = "400">
+<img src="https://github.com/klinares/Moneyball_FC/blob/main/images/moneyball.png" width="600" height = "600">
 
 ## Unpacking Player Market Value: A Multilevel Approach
 
@@ -29,5 +29,5 @@ This repository houses the code and data analysis for **Moneyball_FC**, a resear
 
 ---
 
-This repository is a work in progress, and the following code attempts to prepare a [dataset for modeling](https://klinares.github.io/Moneyball_FC/code/transfermarkt_data.html).
+The following code desccribes our [data structuring workflow](https://klinares.github.io/Moneyball_FC/code/transfermarkt_data.html) that informs this project's [manuscript](https://klinares.github.io/Moneyball_FC/Project_paper_final_files/manuscript.html).
 
