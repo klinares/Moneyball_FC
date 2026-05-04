@@ -57,17 +57,13 @@ options(scipen = 999)
 theme_set(theme_minimal(base_size = 12))
 
 # Setting repository path for macOS
-#repo_path <- "/Users/namomac/Desktop/Moneyball_FC/inputs/"
-repo_path <- "/Users/sagnikchakravarty/Moneyball_FC/inputs/"
-#repo_path <- "/Users/jianing/Desktop/UMD/学习/SURV 687  Applications of Statistical Modeling/Final Project/Moneyball_FC-main/inputs/"
+repo_path <- "D:/repos/Moneyball_FC/inputs/"
 # Reading data
 dat <- read_parquet(paste0(repo_path, "player_df.parquet"))
 
 # Source file for models and data processing
-#source("/Users/namomac/Desktop/Moneyball_FC/Project_Paper_files/source_code.R")
-#source("source_code.R")
-source(str_c(str_replace(repo_path, "inputs", "Project_Paper_files"), 
-             "source_code.R"))
+source("source_code.R")
+
 ```
 
 ```{r data-prep}
@@ -96,7 +92,7 @@ vc <- as.data.frame(VarCorr(final_model))
 
 ```
 
-\vspace{-2cm}
+\vspace{-1.5cm}
 
 # Introduction
 
@@ -107,7 +103,9 @@ The European football transfer market has evolved from a scouting exercise to a 
 3.  To what degree does squad status predict market value independent of performance?
 4.  How does squad internationalization affect individual player market valuations?
 
-## Sample and Data
+# Method
+
+### Sample and Data
 
 We obtained data from Transfermarkt and UEFA official rankings using purposive sampling to select the top 21 European clubs based on 10-year averaged UEFA coefficient rankings[^1]. Players from these clubs who had at least a full season during our time frame were selected resulting in a sample of `r format(n_obs, big.mark = ",")` player-season observations from `r format(n_players, big.mark = ",")` unique players across. After listwise deletion of cases with missing citizenship data (\~2% loss), players averaged `r mean_age` years of age (*SD* = `r sd_age`).
 
@@ -115,7 +113,7 @@ We obtained data from Transfermarkt and UEFA official rankings using purposive s
 
 Our outcome variable is the natural logarithm of the player's inflation-adjusted yearly average market value (MV) in 2024 USD. Predictors are categorized into three distinct domains: (1) Player Characteristics, including age, height, position (Attacker, Midfielder, etc.), and citizenship status relative to the club (homegrown vs. foreign); (2) performance and status, captured by goals, assists, red/yellow cards, and playing time; and (3) club context, specifically the proportion of foreign players on the roster and the club's UEFA coefficient, which serves as a proxy for recent competitive success and prestige. For further descriptive statistics on each variable see Appendix A, Table 1.
 
-## Model Specification
+### Model Specification
 
 Our data exhibit a cross-classified structure where players ($i$) are observed repeatedly over time ($t$), but club membership ($j$) changes when players transfer between teams. This structure requires modeling players and clubs as crossed random effects rather than nested effects. Figure 1 visualizes our cross-classified design.
 
@@ -209,7 +207,7 @@ combined_plot <- p_1 + p_2 +
 combined_plot
 ```
 
-## Model Testing and Statistical Software
+### Model Testing and Statistical Software
 
 We employed sequential model building: (1) null model for ICC estimation; (2) linear time polynomial; (3) cubic time polynomial; (4) random slope for quadratic time at club level[^3]; (5) player/club-season Level 1 predictors with quadratic age, and all code is found in Appendix B. Model selection and comparison was guided by Likelihood Ratio Tests (LRT) to evaluate the statistical significance of nested model improvements, and the Akaike Information Criterion (AIC) and Bayesian Information Criterion (BIC). Models yielding significant LRT results (p\<.05) and lower values on both information criteria were retained for subsequent analysis. We describe each model in Appendix C, Table 1 alongside ICC, AIC, and BIC values.
 
@@ -389,7 +387,7 @@ kable(fx_display,
 
 ```
 
-## Market Evolution
+### Market Evolution
 
 Using raw polynomials centered at 2020 ($t=0$), our model mathematically pinpoints the moment the market froze. The linear coefficient at the 2020 baseline is effectively zero ($\gamma_1 = 0.00, p = 0.93$), indicating that at the exact onset of the pandemic, the relentless inflation of the previous decade came to a complete halt. The significant negative quadratic ($\gamma_2 = -0.27$) and cubic ($\gamma_3 = -0.12$) terms confirm the transition from a pre-2019 "Boom" into a structural correction. Figure 3 displays club specific trajectories, with panels ordered by baseline prestige. Elite clubs maintain higher valuations throughout, while trajectory curvature varies substantially. Clubs like Barcelona and Juventus show concave patterns indicating stagnation, whereas Arsenal and Liverpool display more resilient recovery and active value generation throughout the decade.
 
@@ -478,7 +476,7 @@ ggplot(final_plot_data, aes(x = x + 2020, y = predicted)) +
   )
 ```
 
-## Biological Age
+### Biological Age
 
 Our model predicts the peak age to be 26.9[^4] for optimal transfer market value. We visualize in Figure 4 the biological constraints on valuation. The model predicts peak valuation at age 27, with values dropping approximately 1.5 log points by age 35, reflecting the market's discount on older assets with limited resale potential.
 
@@ -554,13 +552,13 @@ ggplot(plot_data_age, aes(x = age_real, y = predicted)) +
   theme(plot.title = element_text(face = "bold"))
 ```
 
-## **Contextual Premiums and Discounts**
+### **Contextual Premiums and Discounts**
 
-Squad status remains the dominant behavioral driver, with a one standard deviation increase in relative playing time yielding a 42% valuation premium $\gamma_6=.35$. Homegrown players face a 17% discount relative to foreign imports $\beta_2=-.19$, potentially reflecting the recruitment premium required to attract international talent. Neither squad internationalization $\gamma_{11}=.10, p=.32$ nor UEFA coefficient ($p=.70$) reached significance, suggesting these metrics add little beyond club random effects. Figure 5 summarizes Level 2 fixed effects. Attackers command the highest valuations, with Goalkeepers facing the steepest positional penalty $\beta_{pos,2}=-1.06$. Among regions, only Latin America shows a significant premium $\beta_{reg, 2}=.19$ suggesting South American players function as a "premium export brand" in the global market.
+Squad status remains the dominant behavioral driver, with a one standard deviation increase in relative playing time yielding a 42% valuation premium $\gamma_6=.35$. Homegrown players face a 17% discount relative to foreign imports $\beta_2=-.19$, potentially reflecting the recruitment premium required to attract international talent. Neither squad internationalization $\gamma_{11}=.10, p=.32$ nor UEFA coefficient ($p=.70$) reached significance, suggesting these metrics add little beyond club random effects. Figure 5 summarizes Level 2 fixed effects. Attackers command the highest valuations, with Goalkeepers facing the steepest positional penalty $\beta_{pos,2}=-1.06$. Latin America shows a significant premium $\beta_{reg, 2}=.19$ suggesting South American players function as a "premium export brand" in the global market.
 
 ```{r}
 #| fig-width: 7
-#| fig-height: 5.25
+#| fig-height: 5.5
 #| 
 plot_summs(final_model, 
            coefs = c("Homegrown (Citizen)" = "citizen_of_club_countryYes",
@@ -593,11 +591,11 @@ Our cross-classified multilevel model successfully addressed the methodological 
 
 The model effectively answered our four research questions. The cubic time polynomial captured the hypothesized boom-and-bust cycle, with the 2020 centering strategy isolating the pandemic's structural impact. The quadratic age term confirmed the inverted-U career trajectory, identifying the peak valuation age. Squad status, operationalized through within-club standardized minutes, emerged as a stronger predictor than raw performance metrics, and the inclusion of region-of-origin effects revealed geographic valuation disparities.
 
-## Limitations
+### Limitations
 
 Several limitations warrant consideration. First, our sample comprises only elite clubs from top European leagues, limiting generalizability to lower divisions or non-European markets. Second, Transfermarkt valuations, while validated as proxies for transfer fees, reflect crowd-sourced estimates rather than actual transaction prices. Third, our model cannot capture unobserved factors such as injury history, contract length, or agent influence that likely affect valuations. Finally, the small number of clubs constrains the complexity of random effects we could estimate, preventing inclusion of a random cubic slope.
 
-## Implications
+### Implications
 
 These findings carry practical implications for European football economics. Clubs may exploit the domestic discount by investing in homegrown talent development rather than paying recruitment premiums for foreign players of comparable quality. The strong signaling value of playing time suggests that loan strategies to increase minutes for young players could yield valuation returns beyond skill development alone. The Latin American premium reflects the continued marketability of South American talent in European football, potentially driven by historical success and brand recognition. As the market continues to recover from pandemic-era corrections, understanding these valuation dynamics becomes increasingly important for sustainable club financial planning.
 
@@ -846,7 +844,7 @@ calculate_lrt_mixture(model_time_cubic, model_slope_quadratic)
 ## Table 1. Model Fit Comparison (AIC, BIC, and ICC) {.unnumbered}
 
 |  |  |  |  |  |
-|-------------|--------------------|-------------|-------------|-------------|
+|-------------|---------------------|-------------|-------------|-------------|
 | **Models** | **Purpose & Research Justification** | ICCplayer/ club | AIC | BIC |
 | **Null** | Calculate ICC and partition variance between players and clubs before adding predictors | .75/.03 | 20105.19 | 20132.62 |
 | **Time Linear** | Test for a general linear trend in market value growth | .76/.03 | 20050.17 | 20084.46 |
